@@ -2596,13 +2596,14 @@ function wantsLongAnswer(query) {
   return /detall|extens|amplia|profund|completo|en\s+detalle|más\s+informaci[oó]n|mas\s+informacion|explica(me)?\s+bien|resumen\s+largo/i.test(query || '');
 }
 
-/* Small talk / identidad: estas preguntas no deben ir al RAG de documentos —
-   se responden siempre desde la persona del MetaHuman, nunca con un fragmento
-   de documento al azar. */
+/* Small talk / identidad / capacidades: estas preguntas no deben ir al RAG de
+   documentos — se responden siempre desde la persona del MetaHuman, nunca con
+   un fragmento de documento al azar. */
 function isConversationalQuery(query) {
   const q = normalizeText(query).trim();
   return /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|hi|hello|hola!*|que tal|como estas|como andas|saludos)\b/.test(q)
     || /quien eres|quién eres|que eres tu|qué eres tú|como te llamas|cómo te llamas|cual es tu nombre|cuál es tu nombre|preséntate|presentate|cuentame de ti|cuéntame de ti|con quien hablo|con quién hablo/.test(q)
+    || /como.{0,4}(me|te|nos).{0,4}ayud|en que.{0,4}ayud|que puedes hacer|para que sirves|que puedes hacer por mi|necesito ayuda|^ayudame|que puedes ofrecer|que sabes hacer|cual es tu funcion|que puedes contarme|en que me puedes apoyar|que funciones tienes|que puedo preguntarte|que puedo hacer aqui/.test(q)
     || /^(gracias|muchas gracias|ok gracias|perfecto gracias)\b/.test(q)
     || /^(adios|adiós|chau|hasta luego|nos vemos|bye)\b/.test(q);
 }
@@ -2610,19 +2611,36 @@ function isConversationalQuery(query) {
 function conversationalKind(query) {
   const q = normalizeText(query).trim();
   if (/quien eres|quién eres|que eres tu|qué eres tú|como te llamas|cómo te llamas|cual es tu nombre|cuál es tu nombre|preséntate|presentate|cuentame de ti|cuéntame de ti|con quien hablo|con quién hablo/.test(q)) return 'identity';
+  if (/como.{0,4}(me|te|nos).{0,4}ayud|en que.{0,4}ayud|que puedes hacer|para que sirves|que puedes hacer por mi|necesito ayuda|^ayudame|que puedes ofrecer|que sabes hacer|cual es tu funcion|que puedes contarme|en que me puedes apoyar|que funciones tienes|que puedo preguntarte|que puedo hacer aqui/.test(q)) return 'capabilities';
   if (/^(gracias|muchas gracias|ok gracias|perfecto gracias)\b/.test(q)) return 'thanks';
   if (/^(adios|adiós|chau|hasta luego|nos vemos|bye)\b/.test(q)) return 'farewell';
   return 'greeting';
+}
+
+/* Pista de temas disponibles (etiquetas o, en su defecto, títulos de documentos)
+   para que las respuestas de "¿en qué me puedes ayudar?" sean concretas y no genéricas. */
+function getTopicHint() {
+  const tags = state.tags.map(t => t.name);
+  const docs = getRealSources().map(s => s.name);
+  const list = tags.length ? tags : docs;
+  if (!list.length) return null;
+  return list.slice(0, 3).join(', ');
 }
 
 function buildLocalConversationalAnswer(query, long) {
   const name = mhPersona.name || 'tu MetaHuman';
   const role = mhPersona.role ? mhPersona.role.toLowerCase() : 'asistente';
   const kind = conversationalKind(query);
+  const hint = getTopicHint();
   let short, extended;
   if (kind === 'identity') {
     short = `Soy ${name}, tu ${role}. ¿En qué te ayudo?`;
     extended = `Soy ${name}, tu ${role} entrenado con el conocimiento que hayas indexado en este motor. Puedo responder preguntas sobre los documentos y fuentes que conectes — ¿en qué te ayudo?`;
+  } else if (kind === 'capabilities') {
+    short = hint ? `Puedo ayudarte con: ${hint}. ¿Qué necesitas?` : `Puedo responder sobre lo que indexes en Documentos. ¿Qué necesitas?`;
+    extended = hint
+      ? `Puedo responder preguntas sobre ${hint} — que es lo que tengo indexado ahora —, resumir documentos o explicarte su contenido. Dime qué necesitas.`
+      : `Todavía no tengo documentos indexados. En cuanto agregues contenido en el módulo Documentos, podré responder preguntas sobre él, resumirlo o explicarte su contenido. ¿Qué necesitas?`;
   } else if (kind === 'thanks') {
     short = '¡De nada! Aquí estoy.';
     extended = '¡De nada! Aquí estoy si necesitas algo más sobre el conocimiento indexado.';
@@ -2638,10 +2656,14 @@ function buildLocalConversationalAnswer(query, long) {
 
 function buildPersonaSystemPrompt(tono, long) {
   const persona = mhPersona.name ? `Te llamas "${mhPersona.name}" y actúas como ${mhPersona.role}.` : 'Eres el asistente MetaHuman entrenado de esta marca.';
+  const hint = getTopicHint();
+  const capabilities = hint
+    ? `Lo que tienes indexado ahora: ${hint}. Si te preguntan en qué puedes ayudar, menciónalo de forma concreta.`
+    : 'Todavía no hay documentos indexados; si te preguntan en qué puedes ayudar, dilo y sugiere agregar contenido en el módulo Documentos.';
   const lengthRule = long
     ? 'El usuario pidió una respuesta extensa o detallada: responde con el detalle necesario.'
-    : 'Responde de forma breve y natural — 1 frase, como en un chat real, sin cortar ideas a la mitad. Puedes cerrar invitando a seguir la conversación.';
-  return `${persona} Responde siempre en primera persona, de forma natural y conversacional — este es un saludo o una pregunta sobre quién eres, no necesitas citar documentos. Tono de comunicación: ${tono}. ${lengthRule}`;
+    : 'Responde de forma breve y natural — 1 o 2 frases, como en un chat real, sin cortar ideas a la mitad. Puedes cerrar invitando a seguir la conversación.';
+  return `${persona} Responde siempre en primera persona, de forma natural y conversacional — esto es un saludo, una pregunta sobre quién eres o sobre en qué puedes ayudar, no necesitas citar documentos textualmente. ${capabilities} Tono de comunicación: ${tono}. ${lengthRule}`;
 }
 
 /* Preguntas sobre el corpus en general ("¿de qué trata el documento?", "resúmelo",
@@ -2939,7 +2961,10 @@ async function queryCore() {
         : `En "${retrieval[0].title}": ${trimNatural(retrieval[0].text, 16, 24)}`;
       engineUsed = { provider: 'local', model: 'extracción-local' };
     } else {
-      answerText = 'No encontré eso en tus documentos con el modo local. Conecta una API real (Claude, OpenAI o créditos Crabify) para que un modelo razone sobre todo tu contenido.';
+      const hint = getTopicHint();
+      answerText = hint
+        ? `No encontré eso exactamente, pero puedo ayudarte con: ${hint}. ¿Sobre cuál quieres saber más?`
+        : 'No tengo eso indexado todavía. Agrega documentos en el módulo Documentos y con gusto te ayudo.';
       engineUsed = { provider: 'local', model: 'sin-coincidencia' };
       grounded = false;
     }
