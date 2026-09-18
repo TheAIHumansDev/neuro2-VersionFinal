@@ -2596,6 +2596,54 @@ function wantsLongAnswer(query) {
   return /detall|extens|amplia|profund|completo|en\s+detalle|más\s+informaci[oó]n|mas\s+informacion|explica(me)?\s+bien|resumen\s+largo/i.test(query || '');
 }
 
+/* Small talk / identidad: estas preguntas no deben ir al RAG de documentos —
+   se responden siempre desde la persona del MetaHuman, nunca con un fragmento
+   de documento al azar. */
+function isConversationalQuery(query) {
+  const q = normalizeText(query).trim();
+  return /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|hi|hello|hola!*|que tal|como estas|como andas|saludos)\b/.test(q)
+    || /quien eres|quién eres|que eres tu|qué eres tú|como te llamas|cómo te llamas|cual es tu nombre|cuál es tu nombre|preséntate|presentate|cuentame de ti|cuéntame de ti|con quien hablo|con quién hablo/.test(q)
+    || /^(gracias|muchas gracias|ok gracias|perfecto gracias)\b/.test(q)
+    || /^(adios|adiós|chau|hasta luego|nos vemos|bye)\b/.test(q);
+}
+
+function conversationalKind(query) {
+  const q = normalizeText(query).trim();
+  if (/quien eres|quién eres|que eres tu|qué eres tú|como te llamas|cómo te llamas|cual es tu nombre|cuál es tu nombre|preséntate|presentate|cuentame de ti|cuéntame de ti|con quien hablo|con quién hablo/.test(q)) return 'identity';
+  if (/^(gracias|muchas gracias|ok gracias|perfecto gracias)\b/.test(q)) return 'thanks';
+  if (/^(adios|adiós|chau|hasta luego|nos vemos|bye)\b/.test(q)) return 'farewell';
+  return 'greeting';
+}
+
+function buildLocalConversationalAnswer(query, long) {
+  const name = mhPersona.name || 'tu MetaHuman';
+  const role = mhPersona.role ? mhPersona.role.toLowerCase() : 'asistente';
+  const kind = conversationalKind(query);
+  let short, extended;
+  if (kind === 'identity') {
+    short = `Soy ${name}, tu ${role}.`;
+    extended = `Soy ${name}, tu ${role} entrenado con el conocimiento que hayas indexado en este motor. Puedo responder preguntas sobre los documentos y fuentes que conectes.`;
+  } else if (kind === 'thanks') {
+    short = '¡De nada! Aquí estoy.';
+    extended = '¡De nada! Aquí estoy si necesitas algo más sobre el conocimiento indexado.';
+  } else if (kind === 'farewell') {
+    short = '¡Hasta luego!';
+    extended = '¡Hasta luego! Vuelve cuando quieras seguir consultando el núcleo de conocimiento.';
+  } else {
+    short = `¡Hola! Soy ${name}. ¿En qué te ayudo?`;
+    extended = `¡Hola! Soy ${name}, tu ${role}. Puedo responder preguntas sobre los documentos y fuentes que hayas indexado — ¿en qué te ayudo hoy?`;
+  }
+  return long ? extended : short;
+}
+
+function buildPersonaSystemPrompt(tono, long) {
+  const persona = mhPersona.name ? `Te llamas "${mhPersona.name}" y actúas como ${mhPersona.role}.` : 'Eres el asistente MetaHuman entrenado de esta marca.';
+  const lengthRule = long
+    ? 'El usuario pidió una respuesta extensa o detallada: responde con el detalle necesario.'
+    : 'Responde en un máximo de 10 a 15 palabras, de forma natural y conversacional.';
+  return `${persona} Responde siempre en primera persona, de forma natural y conversacional — este es un saludo o una pregunta sobre quién eres, no necesitas citar documentos. Tono de comunicación: ${tono}. ${lengthRule}`;
+}
+
 function getFallbackAnswer(long) {
   const hasRealContent = state.files.some(f => f.content && f.status === 'ready');
   if (!hasRealContent) {
@@ -2726,7 +2774,7 @@ function retrieveTopChunks(query, k) {
     let score = 0;
     qWords.forEach(w => { if (t.includes(w)) score++; });
     return { title: c.title, text: c.text, chunk_id: c.chunk_id, score: score / qWords.length };
-  }).filter(c => c.score > 0).sort((a,b) => b.score - a.score);
+  }).filter(c => c.score >= 0.34).sort((a,b) => b.score - a.score); // exige al menos ~1/3 de las palabras de la pregunta
   return scored.slice(0, k);
 }
 
@@ -2770,18 +2818,38 @@ async function queryCore() {
     const allChunks = getDocumentChunks();
     const hasContent = allChunks.length > 0;
     const long = wantsLongAnswer(q) || !mhState.shortAnswers;
+    const conversational = isConversationalQuery(q);
 
-    let retrieval = hasContent ? retrieveTopChunks(q, 5) : [];
+    let retrieval = [];
     let answerText;
     let engineUsed;
-    let grounded = hasContent;
+    let grounded = false;
     const canUseRealApi = mhState.realMode && mhState.apiConfig.connected;
 
-    if (!hasContent) {
+    if (conversational) {
+      // Saludos, "quién eres", agradecimientos, etc. — nunca se responden con
+      // un fragmento de documento al azar; siempre desde la persona del MetaHuman.
+      if (canUseRealApi) {
+        try {
+          const systemPrompt = buildPersonaSystemPrompt(tono, long);
+          const real = await callProviderAPI(mhState.apiConfig.provider, mhState.apiConfig.model, mhState.apiConfig.key, [{ role: 'user', content: q }], systemPrompt);
+          answerText = long ? (real || buildLocalConversationalAnswer(q, long)) : trimToWords(real || buildLocalConversationalAnswer(q, long), 15);
+          engineUsed = { provider: mhState.apiConfig.provider, model: mhState.apiConfig.model };
+        } catch (err) {
+          answerText = buildLocalConversationalAnswer(q, long);
+          engineUsed = { provider: 'local', model: 'persona-local (fallback por error de API)' };
+        }
+      } else {
+        answerText = buildLocalConversationalAnswer(q, long);
+        engineUsed = { provider: 'local', model: 'persona-local' };
+      }
+      grounded = false;
+    } else if (!hasContent) {
+      retrieval = [];
       answerText = getFallbackAnswer(long);
       engineUsed = { provider: 'local', model: 'sin-datos-indexados' };
       grounded = false;
-    } else if (canUseRealApi) {
+    } else if ((retrieval = retrieveTopChunks(q, 5)) && canUseRealApi) {
       const contextChunks = (retrieval.length ? retrieval : allChunks.map(c => ({ ...c, score: 0 }))).slice(0, 8);
       try {
         const systemPrompt = buildRagSystemPrompt(contextChunks, tono, long);
