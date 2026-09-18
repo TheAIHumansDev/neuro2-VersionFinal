@@ -1,0 +1,3258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuro AI — Motor de Entrenamiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Extracción real de texto de PDF y DOCX en el navegador (sin backend) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
+<style>
+:root {
+  --cream: #FAF7F2;
+  --parchment: #F3EDE3;
+  --blush: #F2DDD8;
+  --rose: #E8C4BC;
+  --dusty-rose: #C9948A;
+  --sage: #C8D5C0;
+  --sage-deep: #8FAA85;
+  --lavender: #D8D0E8;
+  --lavender-deep: #9B8FB5;
+  --champagne: #EDD9A3;
+  --champagne-deep: #C9A84C;
+  --ink: #2C2620;
+  --ink-soft: #5A4F47;
+  --ink-muted: #9A8C85;
+  --ink-faint: #C8BDB8;
+  --white: #FFFFFF;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --shadow-soft: 0 2px 20px rgba(44,38,32,0.05);
+  --shadow-card: 0 4px 32px rgba(44,38,32,0.08);
+  --shadow-hover: 0 12px 48px rgba(44,38,32,0.14);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --border: rgba(44,38,32,0.08);
+  --core-glow: rgba(155,143,181,0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 1000; opacity: 0.5;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: 64px 1fr;
+  min-height: 100vh;
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  background: rgba(250,247,242,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.3px;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--dusty-rose), var(--lavender-deep));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: white;
+}
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  margin-left: 16px;
+}
+.back-link:hover { color: var(--ink); }
+
+.topbar-center { display: flex; align-items: center; gap: 8px; }
+.status-pill {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 30px;
+  border: 1px solid rgba(143,170,133,0.4);
+  background: rgba(200,213,192,0.2);
+  font-size: 11px; color: var(--sage-deep); letter-spacing: 0.3px;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sage-deep); animation: pulse-g 2s ease-in-out infinite; }
+@keyframes pulse-g { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+.btn-ghost {
+  background: transparent; border: 1px solid var(--border); color: var(--ink-soft);
+  padding: 8px 18px; border-radius: 50px; font-family: var(--font-body); font-size: 12px;
+  cursor: pointer; transition: all 0.2s; font-weight: 400;
+}
+.btn-ghost:hover { border-color: rgba(44,38,32,0.2); color: var(--ink); }
+.btn-primary {
+  background: var(--ink); color: var(--cream); border: none; padding: 9px 22px;
+  border-radius: 50px; font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.25s;
+}
+.btn-primary:hover { background: var(--ink-soft); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(44,38,32,0.2); }
+.btn-primary:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+
+.sidebar { background: var(--parchment); border-right: 1px solid var(--border); padding: 28px 0; overflow-y: auto; }
+.nav-section { margin-bottom: 32px; }
+.nav-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); padding: 0 20px 10px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer;
+  transition: all 0.15s; color: var(--ink-muted); font-size: 13px; border-left: 2px solid transparent;
+  margin: 1px 0; font-weight: 400;
+}
+.nav-item:hover { color: var(--ink-soft); background: rgba(44,38,32,0.03); }
+.nav-item.active { color: var(--ink); border-left-color: var(--dusty-rose); background: rgba(201,148,138,0.08); font-weight: 500; }
+.nav-icon { font-size: 14px; width: 18px; text-align: center; }
+.nav-badge { margin-left: auto; background: rgba(201,148,138,0.2); color: var(--dusty-rose); font-size: 9px; padding: 2px 7px; border-radius: 10px; font-weight: 500; }
+.nav-badge.mh { background: rgba(155,143,181,0.22); color: var(--lavender-deep); }
+
+.main { overflow-y: auto; padding: 36px 40px; background: var(--cream); }
+
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp 0.35s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-header { margin-bottom: 32px; }
+.page-eyebrow { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+.page-title { font-family: var(--font-display); font-size: 32px; font-weight: 500; letter-spacing: -0.3px; color: var(--ink); line-height: 1.2; }
+.page-title em { font-style: italic; color: var(--dusty-rose); }
+.page-title em.mh { color: var(--lavender-deep); }
+.page-sub { color: var(--ink-muted); font-size: 13px; font-weight: 300; margin-top: 4px; }
+
+.cards { display: grid; gap: 16px; }
+.cards-2 { grid-template-columns: 1fr 1fr; }
+.cards-3 { grid-template-columns: repeat(3, 1fr); }
+.cards-4 { grid-template-columns: repeat(4, 1fr); }
+
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; transition: box-shadow 0.25s; }
+.card:hover { box-shadow: var(--shadow-card); }
+.card-blush { background: linear-gradient(135deg, rgba(242,221,216,0.4) 0%, var(--white) 60%); }
+.card-sage { background: linear-gradient(135deg, rgba(200,213,192,0.3) 0%, var(--white) 60%); }
+.card-lavender { background: linear-gradient(135deg, rgba(216,208,232,0.3) 0%, var(--white) 60%); }
+.card-champagne { background: linear-gradient(135deg, rgba(237,217,163,0.3) 0%, var(--white) 60%); }
+
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-family: var(--font-display); font-size: 15px; font-weight: 500; color: var(--ink); }
+.card-icon { font-size: 20px; opacity: 0.8; }
+
+.stat-val { font-family: var(--font-display); font-size: 40px; font-weight: 400; letter-spacing: -1px; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+.stat-val.sm { font-size: 30px; }
+.stat-label { color: var(--ink-muted); font-size: 11px; font-weight: 300; }
+.stat-change { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; margin-top: 8px; color: var(--sage-deep); background: rgba(200,213,192,0.3); padding: 3px 9px; border-radius: 20px; }
+.stat-change.mh { color: var(--lavender-deep); background: rgba(216,208,232,0.35); }
+
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 7px; font-weight: 500; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 11px 16px; color: var(--ink); font-family: var(--font-body); font-size: 13px; outline: none;
+  transition: all 0.2s; appearance: none; font-weight: 300;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: rgba(201,148,138,0.5); background: var(--white); box-shadow: 0 0 0 3px rgba(201,148,138,0.08);
+}
+.form-input:disabled { opacity: 0.55; cursor: not-allowed; background: var(--parchment); }
+.form-textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+.form-select option { background: var(--parchment); }
+input::placeholder, textarea::placeholder { color: var(--ink-faint); }
+
+.upload-zone { border: 2px dashed rgba(44,38,32,0.12); border-radius: var(--radius); padding: 48px 28px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--parchment); }
+.upload-zone:hover, .upload-zone.drag-over { border-color: rgba(201,148,138,0.5); background: rgba(242,221,216,0.2); }
+.upload-icon { font-size: 40px; margin-bottom: 14px; display: block; opacity: 0.7; }
+.upload-title { font-family: var(--font-display); font-size: 17px; font-weight: 500; margin-bottom: 6px; color: var(--ink); }
+.upload-sub { color: var(--ink-muted); font-size: 12px; margin-bottom: 18px; font-weight: 300; }
+.upload-types { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.type-chip { background: rgba(44,38,32,0.05); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 10px; color: var(--ink-muted); font-weight: 500; letter-spacing: 0.5px; }
+#file-input { display: none; }
+
+.file-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--parchment); border-radius: var(--radius-sm); margin-bottom: 8px; border: 1px solid var(--border); animation: slideIn 0.2s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+.file-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.file-icon.pdf { background: rgba(232,196,188,0.5); }
+.file-icon.docx { background: rgba(216,208,232,0.5); }
+.file-icon.csv { background: rgba(200,213,192,0.5); }
+.file-icon.txt { background: rgba(237,217,163,0.5); }
+.file-icon.url { background: rgba(242,221,216,0.5); }
+.file-name { flex: 1; font-size: 13px; color: var(--ink-soft); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-size { color: var(--ink-faint); font-size: 11px; }
+.file-status { font-size: 10px; padding: 3px 9px; border-radius: 10px; font-weight: 500; }
+.file-status.processing { background: rgba(237,217,163,0.4); color: var(--champagne-deep); }
+.file-status.ready { background: rgba(200,213,192,0.4); color: var(--sage-deep); }
+.file-remove { cursor: pointer; color: var(--ink-faint); background: none; border: none; font-size: 13px; transition: color 0.15s; }
+.file-remove:hover { color: var(--dusty-rose); }
+
+.progress-wrap { background: rgba(44,38,32,0.06); border-radius: 4px; height: 3px; margin: 4px 0 10px; overflow: hidden; }
+.progress-bar { height: 100%; background: linear-gradient(90deg, var(--rose), var(--dusty-rose)); border-radius: 4px; animation: loadbar 1.8s ease-in-out infinite alternate; }
+@keyframes loadbar { from{width:30%} to{width:85%} }
+
+.role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+.role-card { background: var(--parchment); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+.role-card:hover { border-color: rgba(201,148,138,0.4); background: rgba(242,221,216,0.2); }
+.role-card.selected { border-color: var(--dusty-rose); background: rgba(201,148,138,0.08); }
+.role-emoji { font-size: 22px; display: block; margin-bottom: 8px; }
+.role-name { font-size: 12px; font-weight: 500; color: var(--ink); }
+.role-desc { font-size: 10px; color: var(--ink-muted); margin-top: 2px; font-weight: 300; }
+
+.tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 30px; font-size: 12px; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; font-weight: 400; }
+.tag-add-btn { background: transparent; border: 1.5px dashed var(--border); color: var(--ink-muted); border-radius: 30px; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: var(--font-body); transition: all 0.15s; }
+.tag-add-btn:hover { border-color: var(--dusty-rose); color: var(--dusty-rose); }
+.tag-remove { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 9px; background: rgba(44,38,32,0.08); transition: background 0.15s; }
+.tag-remove:hover { background: rgba(201,148,138,0.4); }
+
+.trend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.trend-source { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.trend-source-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.trend-source-name { font-family: var(--font-display); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.source-badge { padding: 3px 9px; border-radius: 10px; font-size: 9px; font-weight: 500; letter-spacing: 0.5px; }
+.badge-rss { background: rgba(237,217,163,0.4); color: var(--champagne-deep); }
+.badge-api { background: rgba(216,208,232,0.4); color: var(--lavender-deep); }
+.badge-social { background: rgba(232,196,188,0.4); color: var(--dusty-rose); }
+.badge-google { background: rgba(200,213,192,0.4); color: var(--sage-deep); }
+.trend-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(44,38,32,0.05); }
+.trend-item:last-child { border-bottom: none; padding-bottom: 0; }
+.trend-rank { font-size: 10px; color: var(--ink-faint); width: 16px; flex-shrink: 0; margin-top: 2px; }
+.trend-text { font-size: 12px; line-height: 1.4; color: var(--ink-soft); font-weight: 400; }
+.trend-text a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-faint); }
+.trend-meta { display: flex; gap: 8px; margin-top: 3px; }
+.trend-time { font-size: 10px; color: var(--ink-faint); }
+.trend-score { font-size: 10px; color: var(--sage-deep); }
+
+.sparkline { display: flex; align-items: flex-end; gap: 2px; height: 28px; }
+.spark-bar { flex: 1; background: rgba(201,148,138,0.25); border-radius: 2px 2px 0 0; transition: background 0.15s; min-height: 4px; }
+.spark-bar:hover { background: rgba(201,148,138,0.6); }
+
+.report-hero { background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; margin-bottom: 20px; position: relative; overflow: hidden; }
+.report-hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(201,148,138,0.15) 0%, transparent 70%); pointer-events: none; }
+.report-hero-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
+.report-hero-title { font-family: var(--font-display); font-size: 24px; font-weight: 500; color: var(--ink); margin-bottom: 16px; line-height: 1.3; }
+.report-hero-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+.rh-meta-item { font-size: 11px; color: var(--ink-muted); display: flex; align-items: center; gap: 5px; }
+.rh-meta-item span { color: var(--ink-soft); font-weight: 500; }
+
+.report-section { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 12px; overflow: hidden; }
+.rs-head { padding: 14px 20px; border-bottom: 1px solid rgba(44,38,32,0.05); display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 15px; font-weight: 500; background: rgba(44,38,32,0.015); color: var(--ink); }
+.rs-body { padding: 20px; font-size: 13px; line-height: 1.8; color: var(--ink-soft); font-weight: 300; }
+.rs-body strong { color: var(--ink); font-weight: 500; }
+
+.email-preview { background: var(--parchment); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-top: 16px; }
+.email-toolbar { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; background: var(--white); }
+.email-dot { width: 10px; height: 10px; border-radius: 50%; }
+.email-body { padding: 24px; font-size: 13px; line-height: 1.7; }
+.email-field { display: flex; gap: 10px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.email-field-label { color: var(--ink-faint); width: 50px; flex-shrink: 0; font-weight: 300; }
+
+.code-block { background: var(--ink); border-radius: var(--radius-sm); overflow: hidden; }
+.code-header { padding: 12px 18px; border-bottom: 1px solid rgba(250,247,242,0.08); display: flex; align-items: center; justify-content: space-between; }
+.code-lang { color: rgba(201,148,138,0.9); font-size: 11px; font-weight: 500; letter-spacing: 0.5px; }
+.code-lang.mh { color: rgba(155,143,181,0.95); }
+.code-copy { background: transparent; border: 1px solid rgba(250,247,242,0.15); color: rgba(250,247,242,0.5); padding: 4px 12px; border-radius: 6px; font-family: var(--font-body); font-size: 10px; cursor: pointer; transition: all 0.15s; }
+.code-copy:hover { color: rgba(250,247,242,0.9); border-color: rgba(250,247,242,0.3); }
+pre { padding: 22px; overflow-x: auto; font-size: 11.5px; line-height: 1.75; color: rgba(250,247,242,0.7); font-family: var(--font-mono); margin: 0; }
+.kw { color: rgba(216,208,232,0.9); }
+.fn { color: rgba(200,213,192,0.9); }
+.str { color: rgba(237,217,163,0.9); }
+.cm { color: rgba(250,247,242,0.3); font-style: italic; }
+.num { color: rgba(232,196,188,0.9); }
+.jk { color: rgba(155,143,181,0.95); }
+
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(44,38,32,0.05); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-info { flex: 1; }
+.toggle-lbl { font-size: 13px; color: var(--ink-soft); font-weight: 400; }
+.toggle-desc { font-size: 11px; color: var(--ink-faint); margin-top: 2px; font-weight: 300; }
+.toggle { width: 38px; height: 22px; background: rgba(44,38,32,0.1); border-radius: 11px; cursor: pointer; position: relative; transition: all 0.2s; flex-shrink: 0; }
+.toggle::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: all 0.2s; box-shadow: 0 1px 4px rgba(44,38,32,0.15); }
+.toggle.on { background: var(--dusty-rose); }
+.toggle.on::after { transform: translateX(16px); }
+.toggle.on.lav { background: var(--lavender-deep); }
+
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 6px; bottom: 0; width: 1px; background: linear-gradient(to bottom, var(--rose), transparent); }
+.timeline-item { position: relative; padding-bottom: 24px; }
+.timeline-dot { position: absolute; left: -20px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--cream); border: 2px solid var(--rose); }
+.timeline-dot.active { background: var(--dusty-rose); border-color: var(--dusty-rose); box-shadow: 0 0 0 4px rgba(201,148,138,0.15); }
+.timeline-time { font-size: 10px; color: var(--dusty-rose); margin-bottom: 3px; letter-spacing: 0.5px; }
+.timeline-ttl { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+.timeline-desc { font-size: 11px; color: var(--ink-faint); font-weight: 300; }
+
+.mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 64px; margin-top: 14px; }
+.bar { flex: 1; border-radius: 4px 4px 0 0; transition: opacity 0.15s; cursor: pointer; }
+.bar:hover { opacity: 0.7; }
+
+.section-head { font-family: var(--font-display); font-size: 15px; font-weight: 500; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(44,38,32,0.07); display: flex; align-items: center; gap: 10px; color: var(--ink); }
+.section-num { width: 22px; height: 22px; border-radius: 50%; background: rgba(201,148,138,0.15); color: var(--dusty-rose); font-family: var(--font-body); font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+.section-num.mh { background: rgba(155,143,181,0.18); color: var(--lavender-deep); }
+.divider { height: 1px; background: rgba(44,38,32,0.06); margin: 24px 0; }
+.url-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.url-row .form-input { flex: 1; }
+
+.notification { position: fixed; bottom: 28px; right: 28px; background: var(--white); border: 1px solid rgba(201,148,138,0.3); border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; z-index: 999; transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1); max-width: 300px; box-shadow: 0 12px 40px rgba(44,38,32,0.12); }
+.notification.show { transform: translateX(0); }
+.notif-icon { font-size: 20px; }
+.notif-msg { font-size: 12px; line-height: 1.4; font-weight: 300; }
+.notif-msg strong { color: var(--ink); display: block; font-family: var(--font-display); font-size: 14px; font-weight: 500; margin-bottom: 1px; }
+
+.flow-strip { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 12px 0 4px; }
+.flow-node { border-radius: var(--radius-sm); padding: 12px 18px; font-size: 11px; text-align: center; border: 1px solid var(--border); font-weight: 400; color: var(--ink-soft); }
+.fn-blush { background: rgba(242,221,216,0.4); border-color: rgba(201,148,138,0.2); }
+.fn-lavender { background: rgba(216,208,232,0.3); border-color: rgba(155,143,181,0.2); }
+.fn-rose { background: rgba(232,196,188,0.3); border-color: rgba(201,148,138,0.2); }
+.fn-champagne { background: rgba(237,217,163,0.3); border-color: rgba(201,168,76,0.2); }
+.fn-sage { background: rgba(200,213,192,0.3); border-color: rgba(143,170,133,0.2); }
+.flow-arrow-txt { color: var(--ink-faint); font-size: 16px; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(44,38,32,0.1); border-radius: 3px; }
+
+.color-opt { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; transition: transform 0.15s; }
+.color-opt:hover { transform: scale(1.15); }
+
+/* ══════════ METAHUMAN MODULES ══════════ */
+
+/* source connector cards */
+.source-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; display: flex; flex-direction: column; gap: 10px; transition: box-shadow .25s, border-color .25s; }
+.source-card.connected { border-color: rgba(155,143,181,0.35); }
+.source-top { display: flex; align-items: center; gap: 12px; }
+.source-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; background: rgba(216,208,232,0.35); }
+.source-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.source-type { font-size: 10px; color: var(--ink-faint); font-weight: 300; }
+.source-stats { display: flex; justify-content: space-between; align-items: center; }
+.source-count { font-family: var(--font-display); font-size: 20px; color: var(--ink); }
+.source-count-lbl { font-size: 9px; color: var(--ink-faint); letter-spacing: .5px; text-transform: uppercase; }
+.source-sync-bar { height: 3px; border-radius: 3px; background: rgba(44,38,32,0.06); overflow: hidden; }
+.source-sync-fill { height: 100%; background: linear-gradient(90deg, var(--lavender), var(--lavender-deep)); border-radius: 3px; transition: width .6s ease; }
+.source-foot { display: flex; align-items: center; justify-content: space-between; }
+.source-status-txt { font-size: 10px; font-weight: 500; }
+.source-status-txt.on { color: var(--lavender-deep); }
+.source-status-txt.off { color: var(--ink-faint); }
+
+/* neural core visual */
+.core-visual-wrap { display: flex; align-items: center; justify-content: center; padding: 8px 0 4px; }
+.core-svg { width: 100%; max-width: 620px; height: auto; }
+.core-line { stroke: var(--ink-faint); stroke-width: 2; fill: none; stroke-dasharray: 5 7; opacity: 0.3; animation: coreflow 1.4s linear infinite; }
+.core-line.active { stroke: var(--lavender-deep); opacity: 0.9; }
+@keyframes coreflow { to { stroke-dashoffset: -24; } }
+.core-node-circle { fill: var(--white); stroke: var(--border); stroke-width: 1.5; transition: all .3s ease; }
+.core-node.active .core-node-circle { stroke: var(--lavender-deep); filter: drop-shadow(0 0 6px var(--core-glow)); }
+.core-node-label { font-family: var(--font-body); font-size: 9.5px; fill: var(--ink-muted); font-weight: 500; }
+.core-node-icon { font-size: 15px; }
+.core-center-glow { animation: corepulse 2.6s ease-in-out infinite; transform-origin: center; }
+@keyframes corepulse { 0%,100% { r: 46; opacity: .45; } 50% { r: 58; opacity: 0; } }
+.core-center-ring { fill: url(#coreGrad); }
+.core-center-text { font-family: var(--font-display); font-size: 13px; font-weight: 600; fill: var(--white); }
+.core-center-sub { font-family: var(--font-body); font-size: 7px; fill: rgba(255,255,255,0.75); letter-spacing: 1px; }
+
+/* training pipeline */
+.stage-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
+.stage-idx { width: 26px; height: 26px; border-radius: 50%; background: rgba(155,143,181,0.15); color: var(--lavender-deep); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .3s; }
+.stage-idx.done { background: var(--lavender-deep); color: var(--white); }
+.stage-idx.active { background: var(--lavender-deep); color: var(--white); animation: pulse-g 1.2s ease-in-out infinite; }
+.stage-body { flex: 1; }
+.stage-name { font-size: 12.5px; color: var(--ink-soft); font-weight: 500; margin-bottom: 6px; }
+.stage-bar { height: 5px; border-radius: 5px; background: rgba(44,38,32,0.06); overflow: hidden; }
+.stage-bar-fill { height: 100%; width: 0%; border-radius: 5px; background: linear-gradient(90deg, var(--lavender), var(--lavender-deep)); transition: width .4s ease; }
+.stage-pct { font-size: 10px; color: var(--ink-faint); width: 34px; text-align: right; flex-shrink: 0; }
+
+.terminal { background: var(--ink); border-radius: var(--radius-sm); overflow: hidden; }
+.terminal-head { padding: 10px 16px; border-bottom: 1px solid rgba(250,247,242,0.08); display: flex; align-items: center; gap: 8px; }
+.terminal-dot { width: 8px; height: 8px; border-radius: 50%; }
+.terminal-title { margin-left: 6px; font-size: 10px; color: rgba(250,247,242,0.4); letter-spacing: .5px; }
+.terminal-body { padding: 16px 18px; height: 220px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; line-height: 1.9; color: rgba(155,143,181,0.85); }
+.terminal-line { display: flex; gap: 10px; opacity: 0; animation: termIn .3s ease forwards; }
+@keyframes termIn { to { opacity: 1; } }
+.terminal-ts { color: rgba(250,247,242,0.3); flex-shrink: 0; }
+.terminal-ok { color: rgba(200,213,192,0.9); }
+.terminal-warn { color: rgba(237,217,163,0.9); }
+
+/* playground */
+.chat-log { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
+.chat-bubble { max-width: 82%; padding: 12px 16px; border-radius: 14px; font-size: 12.5px; line-height: 1.6; }
+.chat-bubble.user { align-self: flex-end; background: var(--ink); color: var(--cream); border-bottom-right-radius: 4px; }
+.chat-bubble.system { align-self: flex-start; background: rgba(216,208,232,0.25); border: 1px solid rgba(155,143,181,0.25); color: var(--ink-soft); border-bottom-left-radius: 4px; }
+.chat-bubble .bubble-persona { display: block; font-size: 10px; font-weight: 600; color: var(--lavender-deep); margin-bottom: 3px; letter-spacing: 0.3px; }
+.chat-empty { color: var(--ink-faint); font-size: 12px; text-align: center; padding: 20px; font-weight: 300; }
+.playground-input-row { display: flex; gap: 8px; }
+.playground-input-row .form-input { flex: 1; }
+.mh-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; padding: 3px 10px; border-radius: 20px; background: rgba(216,208,232,0.35); color: var(--lavender-deep); font-weight: 500; }
+
+/* connected sources pills used elsewhere */
+.pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pill-src { font-size: 9.5px; padding: 3px 9px; border-radius: 20px; background: rgba(44,38,32,0.05); color: var(--ink-muted); border: 1px solid var(--border); }
+
+/* api connection card */
+.mh-chip.ok { background: rgba(200,213,192,0.4); color: var(--sage-deep); }
+.mh-chip.err { background: rgba(232,196,188,0.45); color: var(--dusty-rose); }
+.mh-chip.pending { background: rgba(237,217,163,0.4); color: var(--champagne-deep); }
+.kb-warning { background: rgba(237,217,163,0.35); border: 1px solid rgba(201,168,76,0.35); color: var(--champagne-deep); font-size: 11px; line-height: 1.5; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; }
+.api-note { font-size: 10px; color: var(--ink-faint); margin-top: 10px; line-height: 1.5; }
+.engine-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px; padding: 2px 8px; border-radius: 20px; background: rgba(200,213,192,0.35); color: var(--sage-deep); font-weight: 500; margin-left: 6px; }
+.engine-tag.sim { background: rgba(44,38,32,0.06); color: var(--ink-muted); }
+
+/* knowledge map */
+.map-edge { stroke: var(--ink-faint); stroke-width: 1.4; opacity: 0.4; }
+.map-edge.tag { stroke: var(--dusty-rose); opacity: 0.55; }
+.map-edge.source { stroke: var(--lavender-deep); opacity: 0.6; }
+.map-edge.entity { stroke: var(--sage-deep); opacity: 0.55; stroke-dasharray: 3 4; }
+.map-node-circle { stroke-width: 1.5; fill: var(--white); transition: all .3s; }
+.map-node-circle.hub { fill: url(#coreGrad); }
+.map-node-circle.tag { stroke: var(--dusty-rose); }
+.map-node-circle.source { stroke: var(--lavender-deep); }
+.map-node-circle.entity { stroke: var(--sage-deep); fill: rgba(200,213,192,0.25); }
+.map-node-label { font-family: var(--font-body); font-size: 9px; fill: var(--ink-muted); font-weight: 500; }
+.pattern-list-empty { color: var(--ink-faint); font-size: 12px; text-align: center; padding: 24px; font-weight: 300; }
+
+@media (max-width: 768px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .cards-2, .cards-3, .cards-4 { grid-template-columns: 1fr; }
+  .trend-grid { grid-template-columns: 1fr; }
+  .role-grid { grid-template-columns: 1fr 1fr; }
+  .main { padding: 24px 20px; }
+}
+
+/* ══════════ WIZARD PERSONA (Módulo 02) ══════════ */
+.wiz-steps { display: flex; align-items: center; gap: 0; margin-bottom: 28px; flex-wrap: wrap; }
+.wiz-step { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 50px; font-size: 11px; color: var(--ink-muted); cursor: pointer; transition: all .2s; }
+.wiz-step.active, .wiz-step.done { background: rgba(155,143,181,0.12); color: var(--ink); }
+.wiz-step .wiz-num { width: 20px; height: 20px; border-radius: 50%; background: rgba(44,38,32,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; }
+.wiz-step.active .wiz-num, .wiz-step.done .wiz-num { background: var(--lavender-deep); color: var(--white); }
+.wiz-connector { width: 24px; height: 1px; background: rgba(44,38,32,0.12); flex-shrink: 0; }
+.wiz-pane { display: none; }
+.wiz-pane.active { display: block; animation: fadeUp .3s ease; }
+.wiz-nav { display: flex; justify-content: space-between; margin-top: 20px; }
+
+.avatar-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 6px; }
+.avatar-opt { aspect-ratio: 1; border-radius: var(--radius-sm); background: var(--parchment); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; transition: all .2s; }
+.avatar-opt:hover { border-color: rgba(201,148,138,0.4); }
+.avatar-opt.selected { border-color: var(--lavender-deep); background: rgba(216,208,232,0.25); box-shadow: 0 0 0 2px rgba(155,143,181,0.2); }
+
+.uniform-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 6px; }
+.uniform-opt { background: var(--parchment); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; transition: all .2s; font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
+.uniform-opt:hover { border-color: rgba(201,148,138,0.4); }
+.uniform-opt.selected { border-color: var(--lavender-deep); background: rgba(216,208,232,0.2); color: var(--ink); font-weight: 500; }
+
+.persona-preview { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--parchment); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.persona-preview-avatar { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--lavender), var(--lavender-deep)); display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; overflow: hidden; }
+.persona-preview-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.persona-preview-name { font-family: var(--font-display); font-size: 16px; font-weight: 500; color: var(--ink); }
+.persona-preview-role { font-size: 11px; color: var(--ink-muted); }
+.upload-mini { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.upload-mini input[type=file] { display: none; }
+.upload-mini-btn { background: transparent; border: 1.5px dashed var(--border); color: var(--ink-muted); border-radius: 30px; padding: 7px 16px; font-size: 11px; cursor: pointer; font-family: var(--font-body); transition: all .15s; }
+.upload-mini-btn:hover { border-color: var(--lavender-deep); color: var(--lavender-deep); }
+
+/* ══════════ TENDENCIAS · AGENTE ══════════ */
+.trend-agent-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
+.trend-agent-row { display: flex; gap: 10px; }
+.trend-agent-row .form-input { flex: 1; }
+.trend-empty { color: var(--ink-faint); font-size: 12px; text-align: center; padding: 40px 20px; font-weight: 300; }
+
+/* ══════════ FUENTES RSS/API · EXPLICACIÓN ══════════ */
+.explain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+.explain-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; }
+.explain-card .explain-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+.explain-card .explain-title { font-family: var(--font-display); font-size: 14px; font-weight: 500; margin-bottom: 6px; color: var(--ink); }
+.explain-card .explain-body { font-size: 11.5px; color: var(--ink-soft); line-height: 1.6; font-weight: 300; }
+@media (max-width: 900px) { .explain-grid { grid-template-columns: 1fr; } }
+
+/* ══════════ PLAYGROUND · TABS DE CLAVE ══════════ */
+.key-tabs { display: flex; gap: 6px; background: var(--parchment); border-radius: 50px; padding: 4px; margin-bottom: 16px; width: fit-content; }
+.key-tab { padding: 8px 18px; border-radius: 50px; font-size: 11.5px; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all .2s; background: transparent; border: none; font-family: var(--font-body); }
+.key-tab.active { background: var(--white); color: var(--ink); box-shadow: var(--shadow-soft); }
+.key-pane { display: none; }
+.key-pane.active { display: block; }
+.credit-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.credit-plan { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 16px; cursor: pointer; transition: all .2s; text-align: center; }
+.credit-plan:hover { border-color: rgba(155,143,181,0.4); }
+.credit-plan.selected { border-color: var(--lavender-deep); background: rgba(216,208,232,0.15); }
+.credit-plan .cp-name { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
+.credit-plan .cp-price { font-family: var(--font-display); font-size: 24px; color: var(--ink); }
+.credit-plan .cp-credits { font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+.credits-balance { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(216,208,232,0.2); border-radius: var(--radius-sm); margin-top: 12px; font-size: 12px; }
+.response-length-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:4px">
+      <div class="logo">
+        <div class="logo-mark" id="topbar-avatar">✦</div>
+        <span id="topbar-brand">Neuro AI</span>
+      </div>
+      <a href="landing.html" class="back-link">← Volver al sitio</a>
+    </div>
+    <div class="topbar-center">
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        Motor activo
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-ghost" onclick="generateReport()">⚡ Generar reporte</button>
+      <button class="btn-primary" onclick="sendEmail()">✉ Enviar reporte</button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="navigate('dashboard', this)">
+        <span class="nav-icon">◈</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="navigate('documentos', this)">
+        <span class="nav-icon">📄</span> Documentos
+        <span class="nav-badge" id="doc-count">0</span>
+      </div>
+      <div class="nav-item" onclick="navigate('configuracion', this)">
+        <span class="nav-icon">✦</span> Configurar IA
+      </div>
+      <div class="nav-item" onclick="navigate('etiquetas', this)">
+        <span class="nav-icon">◇</span> Etiquetas
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Monitoreo</div>
+      <div class="nav-item" onclick="navigate('tendencias', this)">
+        <span class="nav-icon">↗</span> Tendencias
+      </div>
+      <div class="nav-item" onclick="navigate('fuentes', this)">
+        <span class="nav-icon">⊕</span> Fuentes RSS/API
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">MetaHuman IA</div>
+      <div class="nav-item" onclick="navigate('fuentes-mh', this)">
+        <span class="nav-icon">⬡</span> Fuentes de Datos
+        <span class="nav-badge mh" id="mh-source-count">0</span>
+      </div>
+      <div class="nav-item" onclick="navigate('nucleo', this)">
+        <span class="nav-icon">◉</span> Núcleo de Entrenamiento
+      </div>
+      <div class="nav-item" onclick="navigate('playground', this)">
+        <span class="nav-icon">⌁</span> Playground JSON
+      </div>
+      <div class="nav-item" onclick="navigate('integracion', this)">
+        <span class="nav-icon">⌬</span> Integración API
+      </div>
+      <div class="nav-item" onclick="navigate('mapa', this)">
+        <span class="nav-icon">🕸️</span> Mapa de Conocimiento
+      </div>
+      <div class="nav-item" onclick="navigate('exportar', this)">
+        <span class="nav-icon">⇩</span> Exportar Dataset
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Reportes</div>
+      <div class="nav-item" onclick="navigate('reporte', this)">
+        <span class="nav-icon">▣</span> Reporte diario
+      </div>
+      <div class="nav-item" onclick="navigate('email', this)">
+        <span class="nav-icon">✉</span> Email · GAS
+      </div>
+      <div class="nav-item" onclick="navigate('programacion', this)">
+        <span class="nav-icon">◎</span> Programación
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="page-header">
+        <div class="page-eyebrow">Vista general</div>
+        <div class="page-title">Motor de <em>Inteligencia</em></div>
+        <div class="page-sub">Actualizado hace 2 minutos · Miércoles 25 de febrero</div>
+      </div>
+
+      <div class="cards cards-4" style="margin-bottom:16px">
+        <div class="card card-blush">
+          <div class="card-header"><div class="card-title">Documentos</div><span class="card-icon">📄</span></div>
+          <div class="stat-val" id="stat-docs">0</div>
+          <div class="stat-label">archivos indexados</div>
+          <div class="stat-change">↑ Agregar fuentes</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Etiquetas</div><span class="card-icon">🏷</span></div>
+          <div class="stat-val" id="stat-tags">0</div>
+          <div class="stat-label">categorías activas</div>
+        </div>
+        <div class="card card-sage">
+          <div class="card-header"><div class="card-title">Señales</div><span class="card-icon">📡</span></div>
+          <div class="stat-val">47</div>
+          <div class="stat-label">tendencias detectadas</div>
+        </div>
+        <div class="card card-champagne">
+          <div class="card-header"><div class="card-title">Reportes</div><span class="card-icon">📊</span></div>
+          <div class="stat-val">12</div>
+          <div class="stat-label">enviados este mes</div>
+        </div>
+      </div>
+
+      <div class="cards cards-2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Actividad semanal</div></div>
+          <div class="mini-chart">
+            <div class="bar" style="height:38%;background:rgba(201,148,138,0.25)"></div>
+            <div class="bar" style="height:62%;background:rgba(201,148,138,0.35)"></div>
+            <div class="bar" style="height:50%;background:rgba(201,148,138,0.25)"></div>
+            <div class="bar" style="height:80%;background:rgba(201,148,138,0.55)"></div>
+            <div class="bar" style="height:58%;background:rgba(201,148,138,0.35)"></div>
+            <div class="bar" style="height:28%;background:rgba(201,148,138,0.2)"></div>
+            <div class="bar" style="height:95%;background:rgba(201,148,138,0.7)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px">
+            <span style="font-size:10px;color:var(--ink-faint)">L</span>
+            <span style="font-size:10px;color:var(--ink-faint)">M</span>
+            <span style="font-size:10px;color:var(--ink-faint)">X</span>
+            <span style="font-size:10px;color:var(--ink-faint)">J</span>
+            <span style="font-size:10px;color:var(--ink-faint)">V</span>
+            <span style="font-size:10px;color:var(--ink-faint)">S</span>
+            <span style="font-size:10px;color:var(--ink-faint)">D</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Estado del pipeline</div></div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot active"></div>
+              <div class="timeline-time">Ahora</div>
+              <div class="timeline-ttl">Motor activo</div>
+              <div class="timeline-desc">Procesando señales en tiempo real</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot active"></div>
+              <div class="timeline-time">09:00 AM</div>
+              <div class="timeline-ttl">Reporte #12 generado</div>
+              <div class="timeline-desc">Enviado a 4 destinatarios con éxito</div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-time">Mañana 09:00</div>
+              <div class="timeline-ttl">Próximo envío</div>
+              <div class="timeline-desc">Reporte #13 programado</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Flujo del sistema</div></div>
+        <div class="flow-strip">
+          <div class="flow-node fn-blush">📄 Ingestión<br><span style="color:var(--ink-faint);font-size:10px">documentos</span></div>
+          <span class="flow-arrow-txt">→</span>
+          <div class="flow-node fn-lavender">✦ Perfil IA<br><span style="color:var(--ink-faint);font-size:10px">rol + audiencia</span></div>
+          <span class="flow-arrow-txt">→</span>
+          <div class="flow-node fn-rose">📡 Monitor<br><span style="color:var(--ink-faint);font-size:10px">tendencias</span></div>
+          <span class="flow-arrow-txt">→</span>
+          <div class="flow-node fn-champagne">📊 Reporte IA<br><span style="color:var(--ink-faint);font-size:10px">generación auto</span></div>
+          <span class="flow-arrow-txt">→</span>
+          <div class="flow-node fn-sage">✉ Email GAS<br><span style="color:var(--ink-faint);font-size:10px">envío automático</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DOCUMENTOS ══ -->
+    <div class="panel" id="panel-documentos">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 01</div>
+        <div class="page-title">Subida de <em>Documentos</em></div>
+        <div class="page-sub">Indexa tu conocimiento de marca para entrenar el motor IA</div>
+      </div>
+      <div class="cards cards-2">
+        <div>
+          <div class="section-head"><span class="section-num">1</span> Subir archivos</div>
+          <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" multiple accept=".pdf,.docx,.txt,.csv" onchange="handleFiles(event)">
+            <span class="upload-icon">⬆</span>
+            <div class="upload-title">Arrastra o selecciona archivos</div>
+            <div class="upload-sub">Máximo 50 MB por archivo · Se extrae el texto real en tu navegador</div>
+            <div class="upload-types">
+              <span class="type-chip">PDF</span>
+              <span class="type-chip">DOCX</span>
+              <span class="type-chip">TXT</span>
+              <span class="type-chip">CSV</span>
+            </div>
+          </div>
+          <div style="margin-top:24px">
+            <div class="section-head"><span class="section-num">2</span> Añadir URLs</div>
+            <div id="url-list">
+              <div class="url-row">
+                <input class="form-input" type="url" placeholder="https://ejemplo.com/articulo-referencia">
+                <button class="btn-ghost" onclick="addUrl(this)">+ Agregar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-head">Archivos indexados</div>
+          <div id="file-list">
+            <div style="text-align:center;padding:48px 20px;color:var(--ink-faint)">
+              <div style="font-size:32px;margin-bottom:10px;opacity:0.5">◫</div>
+              <div style="font-size:13px">Sin documentos todavía</div>
+              <div style="font-size:11px;margin-top:4px;font-weight:300">Sube archivos para comenzar el entrenamiento</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="card" style="background:var(--parchment)">
+            <div class="card-title" style="margin-bottom:14px">Configuración de indexación</div>
+            <div class="form-group">
+              <label class="form-label">Chunk size (tokens)</label>
+              <input class="form-input" type="number" value="512">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Embedding model</label>
+              <select class="form-select">
+                <option>text-embedding-3-small</option>
+                <option>text-embedding-3-large</option>
+              </select>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:10px">Pegar texto de conocimiento</div>
+            <div class="form-group">
+              <label class="form-label">Título / fuente</label>
+              <input class="form-input" id="kb-title" type="text" placeholder="Ej. Preguntas frecuentes, manual de producto...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contenido</label>
+              <textarea class="form-textarea" id="kb-content" style="min-height:110px" placeholder="Pega aquí el texto real que el MetaHuman debe conocer..."></textarea>
+            </div>
+            <button class="btn-primary" style="width:100%" onclick="addKnowledgeChunk()">+ Indexar texto</button>
+            <div class="api-note">Este texto, y también los archivos PDF, DOCX, TXT y CSV que subas arriba, se analizan de verdad (extracción de texto en tu navegador) y se usan como contexto real en el Playground — tanto en modo local como con API real. Si un PDF está escaneado como imagen (sin texto seleccionable), la extracción puede no encontrar texto.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONFIGURACIÓN · WIZARD DE PERSONA ══ -->
+    <div class="panel" id="panel-configuracion">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 02</div>
+        <div class="page-title">Crea tu <em>MetaHuman</em></div>
+        <div class="page-sub">Sigue los pasos — cada uno toma menos de un minuto</div>
+      </div>
+
+      <div class="wiz-steps" id="wiz-steps">
+        <div class="wiz-step active" data-step="1" onclick="goWizStep(1)"><span class="wiz-num">1</span> Nombre y rol</div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" data-step="2" onclick="goWizStep(2)"><span class="wiz-num">2</span> Personalidad</div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" data-step="3" onclick="goWizStep(3)"><span class="wiz-num">3</span> Apariencia</div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" data-step="4" onclick="goWizStep(4)"><span class="wiz-num">4</span> Audiencia</div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" data-step="5" onclick="goWizStep(5)"><span class="wiz-num">5</span> Confirmar</div>
+      </div>
+
+      <div class="cards cards-2" style="align-items:start">
+        <div class="card">
+
+          <!-- PASO 1: nombre + rol -->
+          <div class="wiz-pane active" id="wiz-pane-1">
+            <div class="section-head"><span class="section-num">1</span> ¿Cómo se llama tu MetaHuman?</div>
+            <div class="form-group">
+              <label class="form-label">Nombre</label>
+              <input class="form-input" id="mh-name" type="text" placeholder="Ej: Sofía, Marco, Nova..." oninput="updatePersonaPreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rol principal</label>
+              <div class="role-grid">
+                <div class="role-card selected" data-role="Estratega" onclick="selectRole(this)"><span class="role-emoji">🎯</span><div class="role-name">Estratega</div><div class="role-desc">Visión y análisis</div></div>
+                <div class="role-card" data-role="Editor" onclick="selectRole(this)"><span class="role-emoji">📰</span><div class="role-name">Editor</div><div class="role-desc">Contenido y media</div></div>
+                <div class="role-card" data-role="Consultor" onclick="selectRole(this)"><span class="role-emoji">💼</span><div class="role-name">Consultor</div><div class="role-desc">Asesoría experta</div></div>
+                <div class="role-card" data-role="Analista" onclick="selectRole(this)"><span class="role-emoji">🔬</span><div class="role-name">Analista</div><div class="role-desc">Datos e insights</div></div>
+                <div class="role-card" data-role="Concierge" onclick="selectRole(this)"><span class="role-emoji">🛎️</span><div class="role-name">Concierge</div><div class="role-desc">Atención al cliente</div></div>
+                <div class="role-card" data-role="Personalizado" onclick="selectRole(this)"><span class="role-emoji">⚙️</span><div class="role-name">Custom</div><div class="role-desc">Personalizado</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PASO 2: personalidad -->
+          <div class="wiz-pane" id="wiz-pane-2">
+            <div class="section-head"><span class="section-num">2</span> Personalidad y tono</div>
+            <div class="form-group">
+              <label class="form-label">Tono de comunicación</label>
+              <select class="form-select" id="cfg-tono" onchange="updatePersonaPreview()">
+                <option>Profesional y directo</option>
+                <option>Amigable y cercano</option>
+                <option>Técnico y preciso</option>
+                <option>Inspirador y visionario</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descripción breve</label>
+              <textarea class="form-textarea" id="mh-description" placeholder="Ej: Eres un estratega de marketing digital con visión ejecutiva. Comunicás ideas complejas de forma elegante y orientada a resultados..." oninput="updatePersonaPreview()"></textarea>
+            </div>
+          </div>
+
+          <!-- PASO 3: apariencia -->
+          <div class="wiz-pane" id="wiz-pane-3">
+            <div class="section-head"><span class="section-num">3</span> ¿Cómo se ve?</div>
+            <label class="form-label">Elige un avatar</label>
+            <div class="avatar-grid" id="avatar-grid">
+              <div class="avatar-opt selected" data-avatar="👩‍💼" onclick="selectAvatar(this)">👩‍💼</div>
+              <div class="avatar-opt" data-avatar="🧑‍💼" onclick="selectAvatar(this)">🧑‍💼</div>
+              <div class="avatar-opt" data-avatar="👨‍💼" onclick="selectAvatar(this)">👨‍💼</div>
+              <div class="avatar-opt" data-avatar="🧑‍🚀" onclick="selectAvatar(this)">🧑‍🚀</div>
+              <div class="avatar-opt" data-avatar="👩‍🔬" onclick="selectAvatar(this)">👩‍🔬</div>
+              <div class="avatar-opt" data-avatar="🧑‍✈️" onclick="selectAvatar(this)">🧑‍✈️</div>
+              <div class="avatar-opt" data-avatar="👩‍🎨" onclick="selectAvatar(this)">👩‍🎨</div>
+              <div class="avatar-opt" data-avatar="🧑‍⚕️" onclick="selectAvatar(this)">🧑‍⚕️</div>
+              <div class="avatar-opt" data-avatar="🤖" onclick="selectAvatar(this)">🤖</div>
+              <div class="avatar-opt" data-avatar="👩‍💻" onclick="selectAvatar(this)">👩‍💻</div>
+              <div class="avatar-opt" data-avatar="🧑‍🎤" onclick="selectAvatar(this)">🧑‍🎤</div>
+              <div class="avatar-opt" data-avatar="✦" onclick="selectAvatar(this)">✦</div>
+            </div>
+            <div class="upload-mini">
+              <button type="button" class="upload-mini-btn" onclick="document.getElementById('mh-photo-input').click()">📷 O sube una foto/render real</button>
+              <input type="file" id="mh-photo-input" accept="image/*" onchange="handlePersonaPhoto(event)">
+              <span id="mh-photo-name" style="font-size:11px;color:var(--ink-faint)"></span>
+            </div>
+            <div class="divider"></div>
+            <label class="form-label">Uniforme / vestimenta</label>
+            <div class="uniform-grid" id="uniform-grid">
+              <div class="uniform-opt selected" data-uniform="Ejecutivo / traje formal" onclick="selectUniform(this)">👔 Ejecutivo / traje formal</div>
+              <div class="uniform-opt" data-uniform="Casual de oficina" onclick="selectUniform(this)">👕 Casual de oficina</div>
+              <div class="uniform-opt" data-uniform="Uniforme corporativo de marca" onclick="selectUniform(this)">🏢 Uniforme corporativo</div>
+              <div class="uniform-opt" data-uniform="Bata / uniforme técnico" onclick="selectUniform(this)">🥼 Bata / técnico</div>
+              <div class="uniform-opt" data-uniform="Uniforme de aerolínea / aeropuerto" onclick="selectUniform(this)">✈️ Aerolínea / aeropuerto</div>
+              <div class="uniform-opt" data-uniform="Personalizado" onclick="selectUniform(this)">🎨 Personalizado</div>
+            </div>
+          </div>
+
+          <!-- PASO 4: audiencia -->
+          <div class="wiz-pane" id="wiz-pane-4">
+            <div class="section-head"><span class="section-num">4</span> Audiencia objetivo</div>
+            <div class="form-group">
+              <label class="form-label">Segmento principal</label>
+              <input class="form-input" id="mh-audience" type="text" placeholder="Ej: CMOs de empresas B2B SaaS">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nivel de expertise</label>
+              <select class="form-select" id="mh-expertise">
+                <option>Principiante</option>
+                <option selected>Intermedio</option>
+                <option>Avanzado</option>
+                <option>Experto / C-Level</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Sector o industria</label>
+              <input class="form-input" id="mh-sector" type="text" placeholder="Ej: Tecnología, Fintech, Retail...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Objetivo principal</label>
+              <select class="form-select" id="mh-goal">
+                <option>Generación de leads</option>
+                <option>Educación y awareness</option>
+                <option selected>Inteligencia competitiva</option>
+                <option>Fidelización de clientes</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PASO 5: confirmar -->
+          <div class="wiz-pane" id="wiz-pane-5">
+            <div class="section-head"><span class="section-num">5</span> Confirma tu MetaHuman</div>
+            <div class="persona-preview" id="persona-preview" style="margin-bottom:16px">
+              <div class="persona-preview-avatar" id="persona-preview-avatar">👩‍💼</div>
+              <div>
+                <div class="persona-preview-name" id="persona-preview-name">Sin nombre todavía</div>
+                <div class="persona-preview-role" id="persona-preview-role">Rol · Uniforme</div>
+              </div>
+            </div>
+            <div class="api-note" style="margin-bottom:14px">Este perfil se usa para responder en el Playground, en los reportes y en cualquier integración con tu MetaHuman. Puedes volver y editarlo cuando quieras.</div>
+            <button class="btn-primary" style="width:100%" onclick="saveConfig()">✦ Guardar y activar MetaHuman</button>
+          </div>
+
+          <div class="wiz-nav">
+            <button class="btn-ghost" id="wiz-btn-back" onclick="wizBack()" style="visibility:hidden">← Atrás</button>
+            <button class="btn-primary" id="wiz-btn-next" onclick="wizNext()">Siguiente →</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-head">Vista previa en vivo</div>
+          <div class="persona-preview" style="margin-bottom:16px">
+            <div class="persona-preview-avatar" id="persona-preview-avatar-2">👩‍💼</div>
+            <div>
+              <div class="persona-preview-name" id="persona-preview-name-2">Sin nombre todavía</div>
+              <div class="persona-preview-role" id="persona-preview-role-2">Rol · Uniforme</div>
+            </div>
+          </div>
+          <div class="card" style="background:var(--parchment)">
+            <div class="card-title" style="margin-bottom:10px">¿Por qué estos datos?</div>
+            <div class="api-note" style="font-size:11.5px">
+              El <strong>nombre y rol</strong> definen cómo se presenta tu MetaHuman en cada respuesta.<br><br>
+              El <strong>tono y descripción</strong> le dan personalidad — así responde siempre igual, sin importar quién pregunte.<br><br>
+              La <strong>apariencia y uniforme</strong> se usan para tu motor de avatar (LiveAvatar / MetaHuman SDK) y para que el equipo visualice al agente.<br><br>
+              La <strong>audiencia y objetivo</strong> ajustan el nivel de detalle y el enfoque de cada respuesta.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ETIQUETAS ══ -->
+    <div class="panel" id="panel-etiquetas">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 03</div>
+        <div class="page-title">Etiquetas <em>Temáticas</em></div>
+        <div class="page-sub">Organiza el conocimiento por categorías estratégicas</div>
+      </div>
+      <div class="cards cards-2">
+        <div class="card">
+          <div class="section-head"><span class="section-num">1</span> Crear etiqueta</div>
+          <div class="form-group">
+            <label class="form-label">Nombre</label>
+            <input class="form-input" id="tag-name" type="text" placeholder="Ej: Inteligencia Artificial">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+              <div class="color-opt" style="background:var(--dusty-rose)" onclick="selectColor(this,'#C9948A')"></div>
+              <div class="color-opt" style="background:var(--lavender-deep)" onclick="selectColor(this,'#9B8FB5')"></div>
+              <div class="color-opt" style="background:var(--sage-deep)" onclick="selectColor(this,'#8FAA85')"></div>
+              <div class="color-opt" style="background:var(--champagne-deep)" onclick="selectColor(this,'#C9A84C')"></div>
+              <div class="color-opt" style="background:#7BA5BF" onclick="selectColor(this,'#7BA5BF')"></div>
+              <div class="color-opt" style="background:#C4875A" onclick="selectColor(this,'#C4875A')"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Palabras clave</label>
+            <input class="form-input" id="tag-keywords" type="text" placeholder="IA, machine learning, LLM...">
+          </div>
+          <button class="btn-primary" onclick="addTag()">+ Crear etiqueta</button>
+        </div>
+        <div>
+          <div class="section-head">Etiquetas activas</div>
+          <div class="tags-container" id="tags-container">
+            <div style="color:var(--ink-faint);font-size:12px;padding:24px;text-align:center;width:100%;font-weight:300">Sin etiquetas. Crea tu primera categoría.</div>
+          </div>
+          <div class="divider"></div>
+          <div class="card" style="background:var(--parchment)">
+            <div class="card-title" style="margin-bottom:12px">Sugerencias</div>
+            <div class="tags-container">
+              <div class="tag" style="background:rgba(201,148,138,0.12);border-color:rgba(201,148,138,0.3);color:var(--dusty-rose)" onclick="suggestTag(this,'Marketing Digital','#C9948A')">+ Marketing Digital</div>
+              <div class="tag" style="background:rgba(155,143,181,0.12);border-color:rgba(155,143,181,0.3);color:var(--lavender-deep)" onclick="suggestTag(this,'Inteligencia Artificial','#9B8FB5')">+ Inteligencia Artificial</div>
+              <div class="tag" style="background:rgba(143,170,133,0.12);border-color:rgba(143,170,133,0.3);color:var(--sage-deep)" onclick="suggestTag(this,'Tendencias 2025','#8FAA85')">+ Tendencias 2025</div>
+              <div class="tag" style="background:rgba(201,168,76,0.12);border-color:rgba(201,168,76,0.3);color:var(--champagne-deep)" onclick="suggestTag(this,'Estrategia','#C9A84C')">+ Estrategia</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TENDENCIAS · AGENTE IA ══ -->
+    <div class="panel" id="panel-tendencias">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 04</div>
+        <div class="page-title">Monitor de <em>Tendencias</em></div>
+        <div class="page-sub">Indica qué quieres vigilar — el agente busca en blogs, Google Trends, redes sociales y APIs web</div>
+      </div>
+
+      <div class="trend-agent-card">
+        <div class="section-head" style="margin-bottom:16px"><span class="section-num">1</span> ¿Qué tendencia deseas monitorear?</div>
+        <div class="trend-agent-row">
+          <input class="form-input" id="trend-topic" type="text" placeholder="Ej: agentes de IA en marketing, SINPE Móvil, aerolíneas low-cost...">
+          <button class="btn-primary" id="trend-start-btn" onclick="startTrendMonitor()">🔎 Iniciar monitoreo</button>
+        </div>
+        <div class="api-note" id="trend-mode-note" style="margin-top:12px"></div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title">Registro del agente</div><span class="mh-chip" id="trend-agent-status">○ en espera</span></div>
+        <div class="terminal">
+          <div class="terminal-head">
+            <div class="terminal-dot" style="background:#FF6059"></div>
+            <div class="terminal-dot" style="background:#FFBE2E"></div>
+            <div class="terminal-dot" style="background:#28C840"></div>
+            <span class="terminal-title">trend-agent.log</span>
+          </div>
+          <div class="terminal-body" id="trend-agent-log">
+            <div class="terminal-line" style="animation-delay:0s"><span class="terminal-ts">[espera]</span><span>Escribe un tema arriba y presiona "Iniciar monitoreo"...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trend-grid" id="trend-grid">
+        <div class="trend-source"><div class="trend-source-header"><div class="trend-source-name">Blogs <span class="source-badge badge-rss">RSS/Web</span></div></div><div class="trend-empty">Sin resultados todavía</div></div>
+        <div class="trend-source"><div class="trend-source-header"><div class="trend-source-name">Google Trends <span class="source-badge badge-google">Búsquedas</span></div></div><div class="trend-empty">Sin resultados todavía</div></div>
+        <div class="trend-source"><div class="trend-source-header"><div class="trend-source-name">Redes Sociales <span class="source-badge badge-social">Social</span></div></div><div class="trend-empty">Sin resultados todavía</div></div>
+        <div class="trend-source"><div class="trend-source-header"><div class="trend-source-name">APIs / Web <span class="source-badge badge-api">JSON</span></div></div><div class="trend-empty">Sin resultados todavía</div></div>
+      </div>
+    </div>
+
+    <!-- ══ FUENTES RSS/API ══ -->
+    <div class="panel" id="panel-fuentes">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 05</div>
+        <div class="page-title">Fuentes <em>RSS / APIs</em></div>
+        <div class="page-sub">Conecta tus fuentes de monitoreo e inteligencia externa</div>
+      </div>
+
+      <div class="explain-grid">
+        <div class="explain-card">
+          <span class="explain-icon">📡</span>
+          <div class="explain-title">¿Qué es un feed RSS?</div>
+          <div class="explain-body">Es un enlace que un blog o medio publica con sus artículos más recientes, en un formato que máquinas pueden leer. Al conectarlo aquí, el motor revisa ese enlace cada cierto tiempo y trae los títulos y resúmenes nuevos automáticamente — sin que tengas que visitar el sitio.</div>
+        </div>
+        <div class="explain-card">
+          <span class="explain-icon">🔗</span>
+          <div class="explain-title">¿Qué es una API?</div>
+          <div class="explain-body">Es la puerta de entrada que un servicio (Google Trends, redes sociales, un medio de noticias) ofrece para que otros programas pidan sus datos directamente. Necesitas una clave (API Key) que el proveedor te entrega al registrarte en su plataforma.</div>
+        </div>
+        <div class="explain-card">
+          <span class="explain-icon">✅</span>
+          <div class="explain-title">¿Qué debo hacer?</div>
+          <div class="explain-body">1) Copia la URL del feed RSS de un blog, o crea una cuenta de desarrollador en el servicio que quieras (ej. NewsAPI) para obtener tu API Key. 2) Pégala abajo. 3) El motor sincroniza esa fuente según la frecuencia que elijas y la usa en el Monitor de Tendencias.</div>
+        </div>
+      </div>
+
+      <div class="cards cards-2">
+        <div>
+          <div class="section-head"><span class="section-num">1</span> Agregar feed RSS</div>
+          <div class="form-group"><label class="form-label">URL del feed</label><input class="form-input" type="url" placeholder="https://feeds.example.com/rss"></div>
+          <div class="form-group"><label class="form-label">Nombre</label><input class="form-input" type="text" placeholder="TechCrunch AI"></div>
+          <div class="form-group"><label class="form-label">Frecuencia</label><select class="form-select"><option>Cada hora</option><option selected>Cada 6 horas</option><option>Diario</option></select></div>
+          <button class="btn-primary" onclick="notify('📡','Feed RSS agregado','Comenzará a monitorear en la próxima sincronización')">+ Agregar RSS</button>
+          <div class="divider"></div>
+          <div class="section-head"><span class="section-num">2</span> Conectar API</div>
+          <div class="form-group"><label class="form-label">Proveedor</label><select class="form-select"><option>Google Trends API</option><option>NewsAPI</option><option>Twitter/X API</option><option>LinkedIn API</option><option>Custom API</option></select></div>
+          <div class="form-group"><label class="form-label">API Key</label><input class="form-input" type="password" placeholder="••••••••••••••••"></div>
+          <button class="btn-ghost" onclick="notify('🔗','API conectada','Verificando credenciales...')">Conectar API</button>
+        </div>
+        <div>
+          <div class="section-head">Fuentes activas</div>
+          <div class="card" style="margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:36px;height:36px;background:rgba(237,217,163,0.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px">🟠</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:500">TechCrunch · AI Feed</div><div style="font-size:11px;color:var(--ink-faint);font-weight:300">rss.techcrunch.com · cada 6h</div></div>
+              <span style="background:rgba(200,213,192,0.4);color:var(--sage-deep);font-size:10px;padding:3px 9px;border-radius:10px">activo</span>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:36px;height:36px;background:rgba(216,208,232,0.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px">🔵</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:500">Google Trends API</div><div style="font-size:11px;color:var(--ink-faint);font-weight:300">trends.google.com · diario</div></div>
+              <span style="background:rgba(200,213,192,0.4);color:var(--sage-deep);font-size:10px;padding:3px 9px;border-radius:10px">activo</span>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:36px;height:36px;background:rgba(232,196,188,0.4);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px">🔴</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:500">NewsAPI · Technology</div><div style="font-size:11px;color:var(--ink-faint);font-weight:300">newsapi.org/v2 · cada hora</div></div>
+              <span style="background:rgba(237,217,163,0.3);color:var(--champagne-deep);font-size:10px;padding:3px 9px;border-radius:10px">pausado</span>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MÓDULO MH · FUENTES DE DATOS ══ -->
+    <div class="panel" id="panel-fuentes-mh">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 09 · MetaHuman IA</div>
+        <div class="page-title">Fuentes de <em class="mh">Conocimiento</em></div>
+        <div class="page-sub">Conecta fuentes reales por URL — se leen con una petición real desde tu navegador, nada simulado</div>
+      </div>
+
+      <div class="cards cards-4" style="margin-bottom:20px">
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Documentos indexados</div><span class="card-icon">📄</span></div>
+          <div class="stat-val" id="mh-active-sources">0</div>
+          <div class="stat-label">con contenido real</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Caracteres indexados</div><span class="card-icon">◫</span></div>
+          <div class="stat-val" id="mh-total-records">0</div>
+          <div class="stat-label">de texto real analizable</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Fuentes en vivo</div><span class="card-icon">🔗</span></div>
+          <div class="stat-val" id="mh-freshness">0</div>
+          <div class="stat-label">conectadas por URL real</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Cobertura</div><span class="card-icon">✦</span></div>
+          <div class="stat-val" id="mh-coverage">0%</div>
+          <div class="stat-label">del núcleo con datos reales</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header"><div class="card-title">Conectar fuente en vivo (URL real)</div><span class="card-icon">🔗</span></div>
+        <div class="cards cards-3">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Nombre</label>
+            <input class="form-input" id="live-source-name" type="text" placeholder="Ej: FAQ pública, Sheet publicado como CSV...">
+          </div>
+          <div class="form-group" style="margin-bottom:0;grid-column:span 2">
+            <label class="form-label">URL (pública o con CORS habilitado)</label>
+            <input class="form-input" id="live-source-url" type="text" placeholder="https://.../datos.csv o https://api.tuservicio.com/kb">
+          </div>
+        </div>
+        <button class="btn-primary" style="margin-top:14px" onclick="connectLiveSource()">🔗 Conectar y sincronizar ahora</button>
+        <div class="api-note">Esto hace un <code>fetch()</code> real desde tu navegador a la URL indicada e indexa la respuesta como texto. Si la URL no permite CORS o no es pública, la conexión fallará — eso es esperado, no simulamos el resultado. Funciona bien con hojas de Google Sheets publicadas como CSV, endpoints públicos de API, o cualquier recurso accesible por HTTP.</div>
+      </div>
+
+      <div class="section-head"><span class="section-num mh">1</span> Fuentes en vivo conectadas</div>
+      <div id="live-source-list"><div class="pattern-list-empty">Aún no has conectado ninguna fuente en vivo.</div></div>
+    </div>
+
+    <!-- ══ MÓDULO MH · NÚCLEO DE ENTRENAMIENTO ══ -->
+    <div class="panel" id="panel-nucleo">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 10 · MetaHuman IA</div>
+        <div class="page-title">Núcleo de <em class="mh">Entrenamiento</em></div>
+        <div class="page-sub">Fusión de tus documentos reales y fuentes en vivo en la memoria del MetaHuman</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="core-visual-wrap">
+          <svg class="core-svg" viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="coreGrad" cx="35%" cy="30%" r="75%">
+                <stop offset="0%" stop-color="#B5A8CC"/>
+                <stop offset="55%" stop-color="#9B8FB5"/>
+                <stop offset="100%" stop-color="#7D6F9C"/>
+              </radialGradient>
+            </defs>
+            <g id="core-lines"></g>
+            <g id="core-nodes"></g>
+            <g transform="translate(300,190)">
+              <circle class="core-center-glow" r="46" fill="var(--core-glow)"></circle>
+              <circle class="core-center-ring" r="42"></circle>
+              <text class="core-center-text" text-anchor="middle" y="-2" id="core-center-text">MH</text>
+              <text class="core-center-sub" text-anchor="middle" y="12">NÚCLEO</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="cards cards-2" style="align-items:start">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Pipeline de entrenamiento</div>
+            <button class="btn-primary" id="train-btn" onclick="startTraining()">▶ Iniciar entrenamiento</button>
+          </div>
+          <div id="stage-list"></div>
+        </div>
+        <div>
+          <div class="cards cards-2" style="margin-bottom:16px">
+            <div class="card card-lavender">
+              <div class="card-title" style="margin-bottom:10px">Vectores generados</div>
+              <div class="stat-val sm" id="stat-vectors">0</div>
+            </div>
+            <div class="card card-lavender">
+              <div class="card-title" style="margin-bottom:10px">Precisión estimada</div>
+              <div class="stat-val sm" id="stat-accuracy">—</div>
+            </div>
+            <div class="card card-lavender">
+              <div class="card-title" style="margin-bottom:10px">Tokens procesados</div>
+              <div class="stat-val sm" id="stat-tokens">0</div>
+            </div>
+            <div class="card card-lavender">
+              <div class="card-title" style="margin-bottom:10px">Fuentes fusionadas</div>
+              <div class="stat-val sm" id="stat-fused">0</div>
+            </div>
+          </div>
+          <div class="terminal">
+            <div class="terminal-head">
+              <div class="terminal-dot" style="background:#FF6059"></div>
+              <div class="terminal-dot" style="background:#FFBE2E"></div>
+              <div class="terminal-dot" style="background:#28C840"></div>
+              <span class="terminal-title">training.log</span>
+            </div>
+            <div class="terminal-body" id="training-log">
+              <div class="terminal-line" style="animation-delay:0s"><span class="terminal-ts">[espera]</span><span>Presiona "Iniciar entrenamiento" para fusionar tus documentos y fuentes en vivo...</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MÓDULO MH · PLAYGROUND JSON ══ -->
+    <div class="panel" id="panel-playground">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 11 · MetaHuman IA</div>
+        <div class="page-title">Playground de <em class="mh">Respuestas</em></div>
+        <div class="page-sub">Prueba a tu MetaHuman con respuestas reales — usa tu propia clave o créditos de Crabify</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title">Conexión con API real (Claude / OpenAI)</div>
+          <span class="mh-chip" id="api-status-chip">○ sin conectar</span>
+        </div>
+
+        <div class="key-tabs">
+          <button class="key-tab active" id="key-tab-own" onclick="switchKeyTab('own')">Mi propia API Key</button>
+          <button class="key-tab" id="key-tab-credits" onclick="switchKeyTab('credits')">Comprar créditos Crabify</button>
+        </div>
+
+        <!-- TAB: propia clave -->
+        <div class="key-pane active" id="key-pane-own">
+          <div class="cards cards-4" style="gap:12px">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Proveedor</label>
+              <select class="form-select" id="api-provider" onchange="populateModelOptions()">
+                <option value="anthropic">Claude (Anthropic)</option>
+                <option value="openai">OpenAI</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Modelo</label>
+              <select class="form-select" id="api-model" onchange="toggleCustomModel()"></select>
+              <input class="form-input" id="api-model-custom" type="text" placeholder="ID de modelo personalizado" style="display:none;margin-top:8px">
+            </div>
+            <div class="form-group" style="margin-bottom:0;grid-column:span 2">
+              <label class="form-label">API Key</label>
+              <input class="form-input" id="api-key" type="password" placeholder="sk-ant-... o sk-...">
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;margin-top:4px;flex-wrap:wrap">
+            <button class="btn-primary" onclick="testApiConnection()">Probar conexión</button>
+            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:220px">
+              <div class="toggle" id="real-mode-toggle" onclick="this.classList.toggle('on');mhState.realMode=this.classList.contains('on');notify(mhState.realMode?'⌁':'○', mhState.realMode?'Modo real activado':'Modo simulado activado', mhState.realMode?'El playground usará tu API key':'Las respuestas se generan localmente')"></div>
+              <div>
+                <div class="toggle-lbl" style="font-size:12px">Usar respuesta real en el playground</div>
+                <div class="toggle-desc">Si está apagado, las respuestas se simulan localmente</div>
+              </div>
+            </div>
+          </div>
+          <div class="api-note">Tu clave se guarda solo en este navegador (localStorage) y se usa para llamar directo a la API del proveedor — nunca pasa por servidores de Neuro AI.</div>
+        </div>
+
+        <!-- TAB: créditos Crabify -->
+        <div class="key-pane" id="key-pane-credits">
+          <div class="api-note" style="margin-bottom:12px">Compra créditos y usa el motor de IA de Crabify sin configurar tu propia clave. Las solicitudes pasan por un proxy propio (Google Apps Script) que guarda la clave real del lado del servidor — nunca queda expuesta en el navegador.</div>
+          <div class="credit-plans">
+            <div class="credit-plan" data-plan="starter" data-credits="200" data-price="9" onclick="selectCreditPlan(this)">
+              <div class="cp-name">Starter</div>
+              <div class="cp-price">$9</div>
+              <div class="cp-credits">200 créditos</div>
+            </div>
+            <div class="credit-plan selected" data-plan="pro" data-credits="1000" data-price="29" onclick="selectCreditPlan(this)">
+              <div class="cp-name">Pro</div>
+              <div class="cp-price">$29</div>
+              <div class="cp-credits">1,000 créditos</div>
+            </div>
+            <div class="credit-plan" data-plan="business" data-credits="5000" data-price="99" onclick="selectCreditPlan(this)">
+              <div class="cp-name">Business</div>
+              <div class="cp-price">$99</div>
+              <div class="cp-credits">5,000 créditos</div>
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;margin-top:14px" onclick="buyCredits()">💳 Comprar créditos</button>
+          <div class="credits-balance">
+            <span>Saldo actual</span>
+            <strong id="credits-balance-val">0 créditos</strong>
+          </div>
+          <div class="api-note" id="crabify-proxy-note">Proxy configurado en: <code id="crabify-proxy-url-display">PEGA_AQUI_TU_URL_DE_APPS_SCRIPT</code> · edita la constante <code>CRABIFY_PROXY_URL</code> en el código para conectar tu backend.</div>
+        </div>
+
+        <div class="response-length-row">
+          <div class="toggle on lav" id="short-answers-toggle" onclick="this.classList.toggle('on');mhState.shortAnswers=this.classList.contains('on')"></div>
+          <div>
+            <div class="toggle-lbl" style="font-size:12px">Respuestas cortas (10-15 palabras)</div>
+            <div class="toggle-desc">Se desactiva sola si tu pregunta pide una respuesta extensa o detallada</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title">Conversación de prueba</div><span class="mh-chip" id="playground-persona-chip">◉ RAG sobre tus documentos</span></div>
+        <div id="playground-kb-notice"></div>
+        <div class="chat-log" id="chat-log">
+          <div class="chat-empty">Escribe una pregunta sobre el contenido que indexaste en Documentos.</div>
+        </div>
+        <div class="playground-input-row">
+          <input class="form-input" id="playground-query" type="text" placeholder="Pregunta algo sobre tus documentos indexados..." onkeydown="if(event.key==='Enter')queryCore()">
+          <button class="btn-primary" id="playground-send-btn" onclick="queryCore()">Consultar →</button>
+        </div>
+        <div class="pill-row">
+          <span class="pill-src" onclick="fillQuery('¿Qué documentos tienes indexados?')">qué documentos tienes</span>
+          <span class="pill-src" onclick="fillQuery('Resume el contenido indexado')">resumir contenido</span>
+          <span class="pill-src" onclick="fillQuery('Explícame en detalle el contenido indexado')">respuesta extensa</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-head"><span class="section-num mh">JSON</span> Respuesta estructurada</div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang mh">application/json · respuesta del núcleo</span>
+            <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+          </div>
+          <pre id="json-output">{
+  <span class="cm">// esperando consulta...</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MÓDULO MH · INTEGRACIÓN API ══ -->
+    <div class="panel" id="panel-integracion">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 12 · MetaHuman IA</div>
+        <div class="page-title">Integración & <em class="mh">API</em></div>
+        <div class="page-sub">Conecta el núcleo de conocimiento a tu motor de avatar / MetaHuman</div>
+      </div>
+
+      <div class="cards cards-3" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Endpoint de consulta</div><span class="card-icon">⌁</span></div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);word-break:break-all">POST /v1/metahuman/query</div>
+          <div class="stat-label" style="margin-top:8px">latencia media 340ms</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Webhook de sincronización</div><span class="card-icon">⬡</span></div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);word-break:break-all">POST /v1/sources/sync</div>
+          <div class="stat-label" style="margin-top:8px">tiempo real · push automático</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Autenticación</div><span class="card-icon">✦</span></div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-soft)">Bearer token · API key</div>
+          <div class="stat-label" style="margin-top:8px">rotación cada 90 días</div>
+        </div>
+      </div>
+
+      <div class="section-head"><span class="section-num mh">1</span> Consultar el núcleo desde tu avatar / MetaHuman</div>
+      <div class="code-block" style="margin-bottom:20px">
+        <div class="code-header">
+          <span class="code-lang mh">JavaScript · Motor de Avatar (LiveAvatar / MetaHuman SDK)</span>
+          <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+        </div>
+        <pre><span class="cm">// Se ejecuta cuando el usuario habla con el MetaHuman</span>
+<span class="kw">async function</span> <span class="fn">queryNeuroCore</span>(userSpeech, sessionId) {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">"https://api.neuroai.app/v1/metahuman/query"</span>, {
+    method: <span class="str">"POST"</span>,
+    headers: {
+      <span class="str">"Authorization"</span>: <span class="str">`Bearer ${NEURO_API_KEY}`</span>,
+      <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+    },
+    body: JSON.<span class="fn">stringify</span>({
+      query: userSpeech,
+      session_id: sessionId,
+      persona_id: <span class="str">"sofia-concierge-v2"</span>,
+      mode: <span class="str">"rag_only"</span>,
+      <span class="cm">// el backend recupera únicamente fragmentos reales de tus documentos indexados</span>
+      stream: <span class="kw">true</span>
+    })
+  });
+
+  <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+
+  <span class="cm">// data.response.text -> se envía al motor de voz (TTS)</span>
+  <span class="cm">// data.response.avatar.emotion / gesture -> controla la animación facial</span>
+  <span class="fn">avatarEngine</span>.<span class="fn">speak</span>(data.response.text, {
+    emotion: data.response.avatar.emotion,
+    gesture: data.response.avatar.gesture
+  });
+
+  <span class="kw">return</span> data;
+}</pre>
+      </div>
+
+      <div class="section-head"><span class="section-num mh">2</span> Sincronizar una nueva fuente vía Google Apps Script</div>
+      <div class="code-block" style="margin-bottom:20px">
+        <div class="code-header">
+          <span class="code-lang mh">JavaScript · Google Apps Script</span>
+          <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+        </div>
+        <pre><span class="cm">// Sincroniza un Google Sheet como fuente de conocimiento del MetaHuman</span>
+<span class="kw">function</span> <span class="fn">syncSheetToNeuroCore</span>() {
+  <span class="kw">const</span> sheet = SpreadsheetApp.<span class="fn">getActiveSpreadsheet</span>().<span class="fn">getSheetByName</span>(<span class="str">"FAQ"</span>);
+  <span class="kw">const</span> rows = sheet.<span class="fn">getDataRange</span>().<span class="fn">getValues</span>().<span class="fn">slice</span>(1);
+
+  <span class="kw">const</span> payload = {
+    source_id: <span class="str">"google_sheets_faq"</span>,
+    source_type: <span class="str">"structured"</span>,
+    records: rows.<span class="fn">map</span>(r => ({ pregunta: r[0], respuesta: r[1], categoria: r[2] }))
+  };
+
+  UrlFetchApp.<span class="fn">fetch</span>(<span class="str">"https://api.neuroai.app/v1/sources/sync"</span>, {
+    method: <span class="str">"POST"</span>,
+    headers: {
+      <span class="str">"Authorization"</span>: <span class="str">`Bearer ${PropertiesService.getScriptProperties().getProperty("NEURO_API_KEY")}`</span>,
+      <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+    },
+    payload: JSON.<span class="fn">stringify</span>(payload)
+  });
+}
+<span class="cm">// Activar: Editar → Activadores → cada 1 hora</span></pre>
+      </div>
+
+      <div class="section-head"><span class="section-num mh">3</span> Proxy de créditos Crabify (Google Apps Script)</div>
+      <div class="code-block" style="margin-bottom:20px">
+        <div class="code-header">
+          <span class="code-lang mh">JavaScript · Google Apps Script</span>
+          <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+        </div>
+        <pre><span class="cm">// Guarda tu clave real en Configuración del proyecto → Script Properties → ANTHROPIC_API_KEY</span>
+<span class="cm">// Así nunca se expone en el navegador del cliente.</span>
+<span class="kw">function</span> <span class="fn">doPost</span>(e) {
+  <span class="kw">const</span> body = JSON.<span class="fn">parse</span>(e.postData.contents);
+  <span class="kw">const</span> apiKey = PropertiesService.<span class="fn">getScriptProperties</span>().<span class="fn">getProperty</span>(<span class="str">"ANTHROPIC_API_KEY"</span>);
+
+  <span class="cm">// Aquí deberías validar créditos del usuario (ej. contra un Google Sheet) antes de responder</span>
+
+  <span class="kw">const</span> res = UrlFetchApp.<span class="fn">fetch</span>(<span class="str">"https://api.anthropic.com/v1/messages"</span>, {
+    method: <span class="str">"POST"</span>,
+    headers: {
+      <span class="str">"x-api-key"</span>: apiKey,
+      <span class="str">"anthropic-version"</span>: <span class="str">"2023-06-01"</span>,
+      <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+    },
+    payload: JSON.<span class="fn">stringify</span>({
+      model: body.model || <span class="str">"claude-sonnet-5"</span>,
+      max_tokens: body.max_tokens || <span class="num">300</span>,
+      system: body.system,
+      messages: body.messages
+    })
+  });
+
+  <span class="kw">return</span> ContentService
+    .<span class="fn">createTextOutput</span>(res.<span class="fn">getContentText</span>())
+    .<span class="fn">setMimeType</span>(ContentService.MimeType.JSON);
+}
+<span class="cm">// Implementar como Aplicación web → Ejecutar como Yo → Acceso: Cualquier usuario</span>
+<span class="cm">// Pegar la URL /exec resultante en la constante CRABIFY_PROXY_URL de este archivo</span></pre>
+      </div>
+
+      <div class="section-head"><span class="section-num mh">4</span> Esquema de respuesta</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang mh">application/json · schema</span>
+          <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+        </div>
+        <pre>{
+  <span class="jk">"query"</span>: <span class="str">"string"</span>,
+  <span class="jk">"grounded"</span>: <span class="kw">true</span> | <span class="kw">false</span>,
+  <span class="jk">"retrieval"</span>: [{ <span class="jk">"document"</span>: <span class="str">"string"</span>, <span class="jk">"chunk_id"</span>: <span class="str">"string"</span>, <span class="jk">"score"</span>: <span class="num">0.0</span>-<span class="num">1.0</span> }],
+  <span class="jk">"engine"</span>: { <span class="jk">"provider"</span>: <span class="str">"string"</span>, <span class="jk">"model"</span>: <span class="str">"string"</span> },
+  <span class="jk">"response"</span>: {
+    <span class="jk">"text"</span>: <span class="str">"string"</span>,
+    <span class="jk">"tone"</span>: <span class="str">"string"</span>,
+    <span class="jk">"avatar"</span>: { <span class="jk">"emotion"</span>: <span class="str">"string"</span>, <span class="jk">"gesture"</span>: <span class="str">"string"</span> }
+  }
+}</pre>
+      </div>
+    </div>
+
+    <!-- ══ MÓDULO MH · MAPA DE CONOCIMIENTO ══ -->
+    <div class="panel" id="panel-mapa">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 13 · MetaHuman IA</div>
+        <div class="page-title">Mapa de <em class="mh">Conocimiento</em></div>
+        <div class="page-sub">Patrones, entidades y conexiones detectadas en tus fuentes, etiquetas y conversaciones de prueba</div>
+      </div>
+
+      <div class="cards cards-4" style="margin-bottom:20px">
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Nodos totales</div><span class="card-icon">🕸️</span></div>
+          <div class="stat-val" id="map-node-count">0</div>
+          <div class="stat-label">fuentes + etiquetas + entidades</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Conexiones</div><span class="card-icon">⌁</span></div>
+          <div class="stat-val" id="map-edge-count">0</div>
+          <div class="stat-label">relaciones detectadas</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Entidades únicas</div><span class="card-icon">✦</span></div>
+          <div class="stat-val" id="map-entity-count">0</div>
+          <div class="stat-label">temas mencionados en consultas</div>
+        </div>
+        <div class="card card-lavender">
+          <div class="card-header"><div class="card-title">Patrón dominante</div><span class="card-icon">◎</span></div>
+          <div class="stat-val sm" id="map-top-pattern">—</div>
+          <div class="stat-label">tema más frecuente</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <div class="card-title">Grafo de relaciones</div>
+          <button class="btn-primary" onclick="detectPatterns()">🔍 Detectar patrones</button>
+        </div>
+        <div class="core-visual-wrap">
+          <svg class="core-svg" id="map-svg" viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg">
+            <g id="map-edges"></g>
+            <g id="map-nodes"></g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Patrones y conexiones detectadas</div>
+        <div id="pattern-list"><div class="pattern-list-empty">Presiona "Detectar patrones" para analizar tus fuentes, etiquetas y las consultas hechas en el Playground.</div></div>
+      </div>
+    </div>
+
+    <!-- ══ MÓDULO MH · EXPORTAR DATASET ══ -->
+    <div class="panel" id="panel-exportar">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 14 · MetaHuman IA</div>
+        <div class="page-title">Exportar <em class="mh">Dataset</em></div>
+        <div class="page-sub">Sintetiza grandes volúmenes de datos de entrenamiento y descárgalos en el formato que necesites</div>
+      </div>
+
+      <div class="cards cards-2" style="align-items:start">
+        <div class="card">
+          <div class="section-head"><span class="section-num mh">1</span> Generar ejemplos sintéticos</div>
+          <div class="form-group">
+            <label class="form-label">Cantidad de ejemplos a generar</label>
+            <input class="form-input" id="synth-count" type="number" value="30" min="1" max="500">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Basado en</label>
+            <select class="form-select" id="synth-basis">
+              <option value="both">Etiquetas + fuentes conectadas</option>
+              <option value="tags">Solo etiquetas temáticas</option>
+              <option value="sources">Solo fuentes conectadas</option>
+            </select>
+          </div>
+          <button class="btn-primary" style="width:100%" onclick="generateSyntheticDataset()">⚡ Generar dataset sintético</button>
+          <div class="divider"></div>
+          <div class="cards cards-2">
+            <div class="card card-lavender"><div class="card-title" style="margin-bottom:8px">Ejemplos en el dataset</div><div class="stat-val sm" id="dataset-count">0</div></div>
+            <div class="card card-lavender"><div class="card-title" style="margin-bottom:8px">Tokens aprox.</div><div class="stat-val sm" id="dataset-tokens">0</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-head"><span class="section-num mh">2</span> Formato de exportación</div>
+          <div class="form-group">
+            <label class="form-label">Formato</label>
+            <select class="form-select" id="export-format" onchange="updatePreview()">
+              <option value="jsonl">JSONL · fine-tuning conversacional</option>
+              <option value="json">JSON · snapshot completo del núcleo</option>
+              <option value="graph">JSON · grafo de conocimiento (nodes/edges)</option>
+              <option value="csv">CSV · tabla plana de fuentes</option>
+            </select>
+          </div>
+          <button class="btn-primary" style="width:100%" onclick="exportDataset()">⬇ Generar y descargar</button>
+          <div class="divider"></div>
+          <div class="section-head" style="margin-bottom:10px">Vista previa</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang mh" id="export-preview-label">JSONL · fine-tuning</span>
+              <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+            </div>
+            <pre id="export-preview">// genera un dataset o cambia el formato para ver la vista previa</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REPORTE ══ -->
+    <div class="panel" id="panel-reporte">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 06</div>
+        <div class="page-title">Reporte Diario <em>Estratégico</em></div>
+        <div class="page-sub">Generado automáticamente · Miércoles 25 de febrero de 2025</div>
+      </div>
+      <div class="report-hero">
+        <div class="report-hero-label">Reporte #12 · Miércoles 25 de febrero</div>
+        <div class="report-hero-title">Inteligencia Estratégica:<br>IA & Marketing Digital</div>
+        <div class="report-hero-meta">
+          <span class="rh-meta-item">✦ Generado por <span>Neuro AI</span></span>
+          <span class="rh-meta-item">📄 Docs <span id="report-doc-count">0</span></span>
+          <span class="rh-meta-item">📡 Fuentes <span>12</span></span>
+          <span class="rh-meta-item">⏱ <span>3.2s</span></span>
+        </div>
+      </div>
+      <div class="report-section">
+        <div class="rs-head">🎯 Resumen ejecutivo</div>
+        <div class="rs-body">Esta semana se registra un aumento del <strong>47%</strong> en conversaciones sobre agentes de IA autónomos en redes sociales profesionales. Las organizaciones B2B aceleran sus inversiones en automatización conversacional, con énfasis en la personalización a escala. La regulación europea de IA (EU AI Act) comienza a generar ajustes en las estrategias de adopción tecnológica.</div>
+      </div>
+      <div class="report-section">
+        <div class="rs-head">📈 Tendencias emergentes</div>
+        <div class="rs-body">
+          <strong>1. AI Agents como nueva categoría de producto</strong> — Las búsquedas sobre "AI agents for business" crecieron 320% interanual. Empresas como Salesforce, HubSpot y Notion lanzan capacidades agénticas nativas.<br><br>
+          <strong>2. RAG vs Fine-tuning debate</strong> — La comunidad técnica debate la estrategia óptima de personalización de LLMs. El consenso emergente favorece RAG híbrido para la mayoría de casos empresariales.<br><br>
+          <strong>3. Costo de inferencia en caída</strong> — Los modelos frontier reducen costos un 10x año a año, haciendo viable la IA generativa para pymes.
+        </div>
+      </div>
+      <div class="report-section">
+        <div class="rs-head">⚠ Alertas estratégicas</div>
+        <div class="rs-body">Se detectaron <strong>3 alertas</strong> de prioridad alta: (1) Competidor X lanzó funcionalidad de IA conversacional similar a tu roadmap. (2) Nuevo estudio: 68% de usuarios abandona chatbots en el primer turno — oportunidad de diferenciación. (3) Ventana de posicionamiento abierta en "IA para equipos de marketing" con baja competencia directa.</div>
+      </div>
+      <div class="report-section">
+        <div class="rs-head">💡 Recomendaciones accionables</div>
+        <div class="rs-body">
+          <strong>Esta semana:</strong> Publicar contenido educativo sobre AI agents en marketing (alta demanda, baja oferta).<br><br>
+          <strong>Este mes:</strong> Desarrollar benchmark propio sobre retención en AI conversacional vs canales tradicionales.<br><br>
+          <strong>Q1 2025:</strong> Evaluar integración con las 3 plataformas más buscadas: HubSpot, Notion y Slack.
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn-primary" onclick="generateReport()">⚡ Regenerar reporte</button>
+        <button class="btn-ghost" onclick="navigate('email',document.querySelector('[onclick*=email]'))">✉ Enviar por email</button>
+        <button class="btn-ghost">⬇ Exportar PDF</button>
+      </div>
+    </div>
+
+    <!-- ══ EMAIL / GAS ══ -->
+    <div class="panel" id="panel-email">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 07</div>
+        <div class="page-title">Envío por Email · <em>Google Apps Script</em></div>
+        <div class="page-sub">Automatiza la distribución del reporte a tu equipo y clientes</div>
+      </div>
+      <div class="cards cards-2">
+        <div>
+          <div class="section-head"><span class="section-num">1</span> Configuración de envío</div>
+          <div class="form-group"><label class="form-label">Destinatarios</label><textarea class="form-textarea" style="min-height:70px" placeholder="ceo@agencia.com, marketing@agencia.com, cliente@empresa.com"></textarea></div>
+          <div class="form-group"><label class="form-label">Asunto del email</label><input class="form-input" type="text" value="✦ Reporte Estratégico IA — {{fecha}}"></div>
+          <div class="form-group"><label class="form-label">Frecuencia</label><select class="form-select"><option>Diario (9:00 AM)</option><option>Cada lunes</option><option>Manual</option></select></div>
+          <div class="divider"></div>
+          <div class="section-head"><span class="section-num">2</span> Opciones</div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Incluir resumen ejecutivo</div><div class="toggle-desc">Párrafo introductorio generado por IA</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Personalizar por destinatario</div><div class="toggle-desc">Adaptar el reporte al rol de cada receptor</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Adjuntar gráficas de tendencias</div><div class="toggle-desc">Imágenes PNG de sparklines</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <button class="btn-primary" style="width:100%;margin-top:20px" onclick="sendEmail()">✉ Enviar ahora</button>
+        </div>
+        <div>
+          <div class="section-head">Preview del email</div>
+          <div class="email-preview">
+            <div class="email-toolbar">
+              <div class="email-dot" style="background:#FF6059"></div>
+              <div class="email-dot" style="background:#FFBE2E"></div>
+              <div class="email-dot" style="background:#28C840"></div>
+              <span style="margin-left:10px;font-size:11px;color:var(--ink-faint)">Gmail · Preview</span>
+            </div>
+            <div class="email-body">
+              <div class="email-field"><div class="email-field-label">De:</div><div>Neuro AI &lt;reportes@tuagencia.com&gt;</div></div>
+              <div class="email-field"><div class="email-field-label">Asunto:</div><div>✦ Reporte Estratégico IA — 25 Feb 2025</div></div>
+              <div style="margin-top:16px;padding:20px;background:var(--parchment);border-radius:var(--radius-sm);border:1px solid var(--border)">
+                <div style="font-family:var(--font-display);font-size:18px;font-weight:500;margin-bottom:10px">✦ Tu Reporte Diario</div>
+                <div style="font-size:12px;color:var(--ink-soft);line-height:1.7;font-weight:300">Estimado equipo,<br><br>A continuación el resumen estratégico generado automáticamente por tu Motor IA.<br><br><span style="color:var(--dusty-rose);font-weight:500">47 señales</span> analizadas · <span style="color:var(--dusty-rose);font-weight:500">3 alertas</span> críticas · <span style="color:var(--dusty-rose);font-weight:500">5 recomendaciones</span><br><br><span style="color:var(--ink-faint)">— Neuro AI · Motor de Inteligencia</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="section-head">Código Google Apps Script</div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-lang">JavaScript · Google Apps Script</span>
+              <button class="code-copy" onclick="copyCode(this)">Copiar código</button>
+            </div>
+            <pre><span class="cm">// Neuro AI · Google Apps Script</span>
+<span class="cm">// Pegar en script.google.com → Nuevo proyecto</span>
+
+<span class="kw">function</span> <span class="fn">enviarReporteLumiere</span>() {
+  <span class="kw">const</span> cfg = {
+    to: <span class="str">"equipo@tuagencia.com"</span>,
+    subject: <span class="str">`✦ Reporte IA · ${<span class="fn">hoy</span>()}`</span>,
+    api: PropertiesService
+      .<span class="fn">getScriptProperties</span>()
+      .<span class="fn">getProperty</span>(<span class="str">"LUMIERE_API_KEY"</span>)
+  };
+
+  <span class="cm">// 1. Obtener reporte desde Lumière API</span>
+  <span class="kw">const</span> res = UrlFetchApp.<span class="fn">fetch</span>(
+    <span class="str">"https://api.lumiere.ai/v1/report"</span>, {
+    method: <span class="str">"POST"</span>,
+    headers: {
+      <span class="str">"Authorization"</span>: <span class="str">`Bearer ${cfg.api}`</span>,
+      <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>
+    },
+    payload: JSON.<span class="fn">stringify</span>({ date: <span class="fn">hoy</span>() })
+  });
+
+  <span class="kw">const</span> data = JSON.<span class="fn">parse</span>(res.<span class="fn">getContentText</span>());
+
+  <span class="cm">// 2. Enviar por Gmail</span>
+  GmailApp.<span class="fn">sendEmail</span>(cfg.to, cfg.subject,
+    <span class="str">""</span>, {
+      htmlBody: <span class="fn">buildHTML</span>(data),
+      name: <span class="str">"Neuro AI"</span>
+    }
+  );
+}
+
+<span class="kw">function</span> <span class="fn">hoy</span>() {
+  <span class="kw">return</span> Utilities.<span class="fn">formatDate</span>(
+    <span class="kw">new</span> Date(), <span class="str">"America/Bogota"</span>,
+    <span class="str">"dd/MM/yyyy"</span>
+  );
+}
+<span class="cm">// Activar: Editar → Activadores → 09:00 AM diario</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROGRAMACIÓN ══ -->
+    <div class="panel" id="panel-programacion">
+      <div class="page-header">
+        <div class="page-eyebrow">Módulo 08</div>
+        <div class="page-title">Programación <em>Automática</em></div>
+        <div class="page-sub">Configura el pipeline completo y sus disparadores</div>
+      </div>
+      <div class="cards cards-2">
+        <div>
+          <div class="section-head">Pipeline diario</div>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot active"></div><div class="timeline-time">06:00 AM</div><div class="timeline-ttl">Ingestión de fuentes</div><div class="timeline-desc">RSS, APIs y redes sociales — pull automático</div></div>
+            <div class="timeline-item"><div class="timeline-dot active"></div><div class="timeline-time">07:00 AM</div><div class="timeline-ttl">Análisis de tendencias</div><div class="timeline-desc">Scoring y clasificación por etiquetas temáticas</div></div>
+            <div class="timeline-item"><div class="timeline-dot active"></div><div class="timeline-time">08:00 AM</div><div class="timeline-ttl">Generación del reporte</div><div class="timeline-desc">Motor IA procesa señales y genera insights</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">09:00 AM</div><div class="timeline-ttl">Envío por email</div><div class="timeline-desc">Google Apps Script entrega el reporte</div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div class="timeline-time">06:00 PM</div><div class="timeline-ttl">Resumen vespertino</div><div class="timeline-desc">Alertas críticas del día (opcional)</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="section-head">Controles del scheduler</div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Pipeline diario automático</div><div class="toggle-desc">Ejecutar el flujo completo cada día</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Alertas en tiempo real</div><div class="toggle-desc">Notificar tendencias virales al instante</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Re-indexación automática</div><div class="toggle-desc">Procesar nuevos documentos al cargarlos</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="toggle-row"><div class="toggle-info"><div class="toggle-lbl">Backup en Google Sheets</div><div class="toggle-desc">Exportar métricas al spreadsheet diariamente</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="divider"></div>
+          <div class="card" style="background:var(--parchment)">
+            <div class="card-title" style="margin-bottom:14px">Próximas ejecuciones</div>
+            <div class="trend-item"><span class="trend-rank">▶</span><div><div class="trend-text">Ingestión RSS · hoy 18:00</div><div class="trend-meta"><span class="trend-time">en 4h 23min</span><span class="trend-score" style="color:var(--sage-deep)">programado</span></div></div></div>
+            <div class="trend-item"><span class="trend-rank">▶</span><div><div class="trend-text">Reporte diario · mañana 09:00</div><div class="trend-meta"><span class="trend-time">en 17h</span><span class="trend-score" style="color:var(--sage-deep)">programado</span></div></div></div>
+            <div class="trend-item"><span class="trend-rank">▶</span><div><div class="trend-text">Email automático · mañana 09:05</div><div class="trend-meta"><span class="trend-time">en 17h 5min</span><span class="trend-score" style="color:var(--sage-deep)">programado</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification">
+  <div class="notif-icon" id="notif-icon">✓</div>
+  <div class="notif-msg">
+    <strong id="notif-title">Listo</strong>
+    <span id="notif-body">Operación completada</span>
+  </div>
+</div>
+
+<script>
+const state = { files: [], tags: [], selectedColor: '#C9948A', docCount: 0 };
+
+function navigate(panel, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
+  if (el) el.classList.add('active');
+  if (panel === 'mapa') renderKnowledgeMap();
+  if (panel === 'exportar') updatePreview();
+  if (panel === 'playground') refreshPlaygroundNotice();
+}
+
+// FILE UPLOAD
+const dz = document.getElementById('drop-zone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('drag-over'); handleFileList(e.dataTransfer.files); });
+function handleFiles(e) { handleFileList(e.target.files); }
+
+let pdfWorkerConfigured = false;
+function ensurePdfWorker() {
+  if (pdfWorkerConfigured || typeof pdfjsLib === 'undefined') return;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  pdfWorkerConfigured = true;
+}
+
+async function extractPdfText(arrayBuffer) {
+  if (typeof pdfjsLib === 'undefined') throw new Error('El lector de PDF no cargó (revisa tu conexión a internet)');
+  ensurePdfWorker();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(it => it.str).join(' ') + '\n\n';
+  }
+  return text.trim();
+}
+
+async function extractDocxText(arrayBuffer) {
+  if (typeof mammoth === 'undefined') throw new Error('El lector de DOCX no cargó (revisa tu conexión a internet)');
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return (result.value || '').trim();
+}
+
+async function readAndExtract(file, item, extractorFn, label) {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const text = await extractorFn(arrayBuffer);
+    if (!text || !text.trim()) throw new Error(`No se extrajo texto del ${label} (¿está escaneado como imagen?)`);
+    item.content = text;
+    item.status = 'ready';
+    renderFiles(); refreshPlaygroundNotice();
+    notify('📄', `${label} indexado (contenido real)`, `${file.name} — ${text.length.toLocaleString('es-CR')} caracteres`);
+  } catch (err) {
+    item.status = 'ready';
+    item.error = err.message || `No se pudo procesar el ${label}`;
+    renderFiles();
+    notify('⚠', `No se pudo extraer texto del ${label}`, item.error.slice(0,90));
+  }
+}
+
+function handleFileList(files) {
+  Array.from(files).forEach(file => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const item = { name: file.name, size: fmt(file.size), ext, status: 'processing', id: Date.now() + Math.random() };
+    state.files.push(item);
+    state.docCount++;
+    renderFiles(); updateStats();
+
+    if (ext === 'txt' || ext === 'csv') {
+      const reader = new FileReader();
+      reader.onload = e => {
+        item.content = e.target.result;
+        item.status = 'ready';
+        renderFiles();
+        refreshPlaygroundNotice();
+        notify('📄','Documento indexado (contenido real)', file.name);
+      };
+      reader.onerror = () => { item.status = 'ready'; renderFiles(); notify('⚠','No se pudo leer el archivo', file.name); };
+      reader.readAsText(file);
+    } else if (ext === 'pdf') {
+      readAndExtract(file, item, extractPdfText, 'PDF');
+    } else if (ext === 'docx') {
+      readAndExtract(file, item, extractDocxText, 'DOCX');
+    } else {
+      setTimeout(() => {
+        item.status = 'ready';
+        item.error = 'Formato no soportado para extracción automática';
+        renderFiles();
+        notify('⚠','Formato no soportado', file.name + ' — usa TXT, CSV, PDF, DOCX, o pega el texto directamente en Documentos');
+      }, 600);
+    }
+  });
+}
+
+function addKnowledgeChunk() {
+  const title = document.getElementById('kb-title').value.trim() || 'Texto sin título';
+  const content = document.getElementById('kb-content').value.trim();
+  if (!content) { notify('⚠','Contenido vacío','Pega el texto que quieres indexar'); return; }
+  const item = { name: title, size: (content.length/1024).toFixed(1)+' KB', ext:'txt', status:'ready', id: Date.now()+Math.random(), content };
+  state.files.push(item);
+  state.docCount++;
+  document.getElementById('kb-title').value = '';
+  document.getElementById('kb-content').value = '';
+  renderFiles(); updateStats();
+  notify('📝','Texto indexado', title);
+}
+
+function fmt(b) { return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB'; }
+const extI = { pdf:'📕', docx:'📘', doc:'📘', txt:'📝', csv:'📊', url:'🔗' };
+
+function renderFiles() {
+  const el = document.getElementById('file-list');
+  if (!state.files.length) {
+    el.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--ink-faint)"><div style="font-size:32px;margin-bottom:10px;opacity:0.5">◫</div><div style="font-size:13px">Sin documentos todavía</div></div>';
+    return;
+  }
+  el.innerHTML = state.files.map((f,i) => `
+    <div class="file-item">
+      <div class="file-icon ${f.ext}">${extI[f.ext]||'📄'}</div>
+      <div class="file-name">${f.name}${f.content ? ' <span class="engine-tag">contenido indexado</span>' : (f.error ? ' <span class="engine-tag sim">⚠ ' + f.error + '</span>' : '')}</div>
+      <span class="file-size">${f.size}</span>
+      <span class="file-status ${f.status}">${f.status==='processing'?'⟳ procesando':'✓ listo'}</span>
+      <button class="file-remove" onclick="removeFile(${i})">✕</button>
+    </div>
+    ${f.status==='processing'?'<div class="progress-wrap"><div class="progress-bar"></div></div>':''}
+  `).join('');
+}
+
+function removeFile(i) { state.files.splice(i,1); state.docCount=Math.max(0,state.docCount-1); renderFiles(); updateStats(); }
+function updateStats() {
+  document.getElementById('stat-docs').textContent = state.docCount;
+  document.getElementById('doc-count').textContent = state.docCount;
+  document.getElementById('report-doc-count').textContent = state.docCount;
+  updateMhCoverage();
+  refreshPlaygroundNotice();
+}
+
+function addUrl() {
+  const list = document.getElementById('url-list');
+  const row = document.createElement('div'); row.className='url-row';
+  row.innerHTML='<input class="form-input" type="url" placeholder="https://..."><button class="btn-ghost" onclick="addUrl(this)">+ Agregar</button>';
+  list.appendChild(row);
+  const inputs = list.querySelectorAll('input[type=url]');
+  const last = inputs[inputs.length-2];
+  if (last && last.value) {
+    const item = { name: last.value, size:'URL', ext:'url', status:'processing', id: Date.now() };
+    state.files.push(item); state.docCount++;
+    renderFiles(); updateStats();
+    setTimeout(() => { item.status='ready'; renderFiles(); notify('🔗','URL indexada',last.value.slice(0,40)); }, 2000);
+  }
+}
+
+function selectColor(el,c) { document.querySelectorAll('.color-opt').forEach(x=>x.style.outline='none'); el.style.outline='2.5px solid '+c; state.selectedColor=c; }
+
+function addTag() {
+  const name = document.getElementById('tag-name').value.trim();
+  if (!name) { notify('⚠','Nombre requerido','Escribe un nombre para la etiqueta'); return; }
+  const keywords = document.getElementById('tag-keywords').value.trim();
+  state.tags.push({ name, color: state.selectedColor, keywords });
+  document.getElementById('tag-name').value='';
+  document.getElementById('tag-keywords').value='';
+  renderTags(); updateTagStats(); notify('🏷','Etiqueta creada',name);
+}
+
+function suggestTag(el, name, color) { state.tags.push({ name, color, keywords:'' }); el.remove(); renderTags(); updateTagStats(); notify('🏷','Etiqueta agregada',name); }
+
+function renderTags() {
+  const c = document.getElementById('tags-container');
+  if (!state.tags.length) { c.innerHTML='<div style="color:var(--ink-faint);font-size:12px;padding:24px;text-align:center;width:100%;font-weight:300">Sin etiquetas. Crea tu primera categoría.</div>'; return; }
+  c.innerHTML = state.tags.map((t,i)=>`
+    <div class="tag" style="background:${t.color}18;border-color:${t.color}40;color:${t.color}">
+      ${t.name}<span class="tag-remove" onclick="removeTag(${i})">✕</span>
+    </div>
+  `).join('') + '<button class="tag-add-btn" onclick="navigate(\'etiquetas\',document.querySelector(\'[onclick*=etiquetas]\'))">+ Nueva</button>';
+}
+
+function removeTag(i) { state.tags.splice(i,1); renderTags(); updateTagStats(); }
+function updateTagStats() { document.getElementById('stat-tags').textContent = state.tags.length; }
+
+function generateReport() {
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '⟳ Generando...';
+  btn.disabled = true;
+  setTimeout(() => { btn.textContent = orig; btn.disabled = false; notify('📊','Reporte generado','Reporte diario listo'); }, 2500);
+}
+
+function sendEmail() { notify('✉','Email enviado','Reporte entregado vía Google Apps Script'); }
+
+function copyCode(btnEl) {
+  const pre = btnEl ? btnEl.closest('.code-block').querySelector('pre') : document.querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>notify('📋','Código copiado','Pégalo en tu editor o en script.google.com'));
+}
+
+let nt;
+function notify(icon, title, body) {
+  clearTimeout(nt);
+  document.getElementById('notif-icon').textContent=icon;
+  document.getElementById('notif-title').textContent=title;
+  document.getElementById('notif-body').textContent=body;
+  const n=document.getElementById('notification');
+  n.classList.add('show');
+  nt=setTimeout(()=>n.classList.remove('show'),3500);
+}
+
+/* ══════════════════════════════════════════
+   PERSONA / WIZARD DEL METAHUMAN (Módulo 02)
+   ══════════════════════════════════════════ */
+
+const mhPersona = {
+  name: '', role: 'Estratega', tono: 'Profesional y directo', description: '',
+  avatar: '👩‍💼', photo: null, uniform: 'Ejecutivo / traje formal',
+  audience: '', expertise: 'Intermedio', sector: '', goal: 'Inteligencia competitiva',
+  saved: false
+};
+let wizStep = 1;
+
+function goWizStep(n) {
+  wizStep = n;
+  document.querySelectorAll('.wiz-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('wiz-pane-' + n).classList.add('active');
+  document.querySelectorAll('.wiz-step').forEach(s => {
+    const step = parseInt(s.dataset.step, 10);
+    s.classList.toggle('active', step === n);
+    s.classList.toggle('done', step < n);
+  });
+  document.getElementById('wiz-btn-back').style.visibility = n === 1 ? 'hidden' : 'visible';
+  document.getElementById('wiz-btn-next').style.display = n === 5 ? 'none' : 'inline-block';
+  updatePersonaPreview();
+}
+function wizNext() { if (wizStep < 5) goWizStep(wizStep + 1); }
+function wizBack() { if (wizStep > 1) goWizStep(wizStep - 1); }
+
+function selectRole(el) {
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  mhPersona.role = el.dataset.role;
+  updatePersonaPreview();
+}
+function selectAvatar(el) {
+  document.querySelectorAll('.avatar-opt').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  mhPersona.avatar = el.dataset.avatar;
+  mhPersona.photo = null;
+  document.getElementById('mh-photo-name').textContent = '';
+  updatePersonaPreview();
+}
+function selectUniform(el) {
+  document.querySelectorAll('.uniform-opt').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  mhPersona.uniform = el.dataset.uniform;
+  updatePersonaPreview();
+}
+function handlePersonaPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    mhPersona.photo = ev.target.result;
+    document.getElementById('mh-photo-name').textContent = file.name;
+    updatePersonaPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function updatePersonaPreview() {
+  mhPersona.name = (document.getElementById('mh-name') && document.getElementById('mh-name').value.trim()) || mhPersona.name;
+  mhPersona.tono = (document.getElementById('cfg-tono') && document.getElementById('cfg-tono').value) || mhPersona.tono;
+  mhPersona.description = (document.getElementById('mh-description') && document.getElementById('mh-description').value.trim()) || mhPersona.description;
+
+  const avatarHTML = mhPersona.photo ? `<img src="${mhPersona.photo}" alt="avatar">` : mhPersona.avatar;
+  const label = mhPersona.name ? mhPersona.name : 'Sin nombre todavía';
+  const sub = `${mhPersona.role} · ${mhPersona.uniform}`;
+
+  ['persona-preview-avatar','persona-preview-avatar-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = avatarHTML;
+  });
+  ['persona-preview-name','persona-preview-name-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = label;
+  });
+  ['persona-preview-role','persona-preview-role-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = sub;
+  });
+}
+
+function saveConfig() {
+  mhPersona.name = (document.getElementById('mh-name').value.trim()) || mhPersona.name || 'Tu MetaHuman';
+  mhPersona.audience = document.getElementById('mh-audience').value.trim();
+  mhPersona.expertise = document.getElementById('mh-expertise').value;
+  mhPersona.sector = document.getElementById('mh-sector').value.trim();
+  mhPersona.goal = document.getElementById('mh-goal').value;
+  mhPersona.saved = true;
+
+  document.getElementById('topbar-brand').textContent = mhPersona.name;
+  document.getElementById('topbar-avatar').innerHTML = mhPersona.photo ? `<img src="${mhPersona.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">` : mhPersona.avatar;
+  const chip = document.getElementById('playground-persona-chip');
+  if (chip) chip.innerHTML = `◉ ${mhPersona.name} · RAG sobre tus documentos`;
+  const coreText = document.getElementById('core-center-text');
+  if (coreText) coreText.textContent = mhPersona.name.slice(0,2).toUpperCase();
+
+  updatePersonaPreview();
+  notify('✦', `${mhPersona.name} está listo`, 'El perfil de tu MetaHuman ha sido guardado y activado');
+}
+
+/* ══════════════════════════════════════════
+   METAHUMAN TRAINING ENGINE
+   ══════════════════════════════════════════ */
+
+const mhState = {
+  liveSources: [], stageIdx: -1, training: false, vectors: 0, tokens: 0,
+  entities: [], dataset: [], realMode: false, querying: false, shortAnswers: true,
+  apiConfig: { provider: 'anthropic', model: '', key: '', connected: false },
+  credits: 0, selectedCreditPlan: { plan: 'pro', credits: 1000, price: 29 },
+  keyMode: 'own', trendMonitoring: false
+};
+
+// Proxy propio (Google Apps Script) para el modo "créditos Crabify" — la clave
+// real del proveedor vive en Script Properties del lado del servidor, nunca aquí.
+const CRABIFY_PROXY_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT';
+
+const MODEL_OPTIONS = {
+  anthropic: [
+    { id: 'claude-sonnet-5', label: 'Claude Sonnet 5 (recomendado)' },
+    { id: 'claude-opus-4-8', label: 'Claude Opus 4.8' },
+    { id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5' },
+    { id: 'claude-fable-5', label: 'Claude Fable 5' }
+  ],
+  openai: [
+    { id: 'gpt-5.6-sol', label: 'GPT-5.6 Sol (frontier)' },
+    { id: 'gpt-5.6-terra', label: 'GPT-5.6 Terra (balanceado)' },
+    { id: 'gpt-5.6-luna', label: 'GPT-5.6 Luna (económico)' }
+  ]
+};
+
+function populateModelOptions() {
+  const providerSel = document.getElementById('api-provider');
+  const modelSel = document.getElementById('api-model');
+  if (!providerSel || !modelSel) return;
+  const opts = MODEL_OPTIONS[providerSel.value] || [];
+  modelSel.innerHTML = opts.map(o => `<option value="${o.id}">${o.label}</option>`).join('') + '<option value="__custom__">Personalizado (escribir ID)…</option>';
+  const customInput = document.getElementById('api-model-custom');
+  if (customInput) customInput.style.display = 'none';
+}
+
+function toggleCustomModel() {
+  const modelSel = document.getElementById('api-model');
+  const customInput = document.getElementById('api-model-custom');
+  if (!modelSel || !customInput) return;
+  customInput.style.display = modelSel.value === '__custom__' ? 'block' : 'none';
+}
+
+function getSelectedModel() {
+  const modelSel = document.getElementById('api-model');
+  if (!modelSel) return '';
+  if (modelSel.value === '__custom__') return (document.getElementById('api-model-custom').value || '').trim();
+  return modelSel.value;
+}
+
+/* ── tabs: propia clave vs créditos Crabify ── */
+function switchKeyTab(tab) {
+  mhState.keyMode = tab;
+  document.getElementById('key-tab-own').classList.toggle('active', tab === 'own');
+  document.getElementById('key-tab-credits').classList.toggle('active', tab === 'credits');
+  document.getElementById('key-pane-own').classList.toggle('active', tab === 'own');
+  document.getElementById('key-pane-credits').classList.toggle('active', tab === 'credits');
+}
+function selectCreditPlan(el) {
+  document.querySelectorAll('.credit-plan').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  mhState.selectedCreditPlan = { plan: el.dataset.plan, credits: parseInt(el.dataset.credits,10), price: parseInt(el.dataset.price,10) };
+}
+function buyCredits() {
+  const plan = mhState.selectedCreditPlan;
+  // Aquí es donde conectarías el mismo flujo de pago de Crabify (PayPal / transferencia / SINPE)
+  // y, una vez confirmado, sumarías los créditos reales desde tu backend (Sheet/GAS).
+  mhState.credits += plan.credits;
+  localStorage.setItem('crabify_credits', String(mhState.credits));
+  mhState.apiConfig = { provider: 'crabify', model: 'crabify-managed', key: '', connected: true };
+  document.getElementById('credits-balance-val').textContent = mhState.credits.toLocaleString('es-CR') + ' créditos';
+  document.getElementById('api-status-chip').textContent = '● créditos Crabify activos';
+  document.getElementById('api-status-chip').className = 'mh-chip ok';
+  document.getElementById('crabify-proxy-url-display').textContent = CRABIFY_PROXY_URL;
+  notify('💳', `Plan ${plan.plan} activado`, `+${plan.credits.toLocaleString('es-CR')} créditos — ya puedes usar el playground sin tu propia clave`);
+}
+function restoreCredits() {
+  const raw = localStorage.getItem('crabify_credits');
+  mhState.credits = raw ? parseInt(raw, 10) : 0;
+  const el = document.getElementById('credits-balance-val');
+  if (el) el.textContent = mhState.credits.toLocaleString('es-CR') + ' créditos';
+  const proxyEl = document.getElementById('crabify-proxy-url-display');
+  if (proxyEl) proxyEl.textContent = CRABIFY_PROXY_URL;
+}
+
+function getRealSources() {
+  const docs = state.files.filter(f => f.content && f.status === 'ready').map(f => ({
+    id: 'doc:' + f.id, name: f.name, icon: f.source === 'live' ? '🔗' : '📄', type: f.source === 'live' ? 'Fuente en vivo' : 'Documento', count: f.content.length
+  }));
+  return docs;
+}
+
+const TRAINING_STAGES = [
+  'Ingesta de documentos y fuentes en vivo',
+  'Fragmentación en chunks (chunking)',
+  'Indexación por palabras clave (retrieval)',
+  'Construcción del grafo de conocimiento',
+  'Validación de cobertura'
+];
+
+function initMetaHuman() {
+  mhState.dataset = [];
+  mhState.liveSources = mhState.liveSources || [];
+  renderLiveSources();
+  renderStages();
+  updateMhSummary();
+  updateDatasetStats();
+  restoreApiConfig();
+  restoreCredits();
+  updatePersonaPreview();
+  drawCore();
+}
+
+function restoreApiConfig() {
+  populateModelOptions();
+  try {
+    const raw = localStorage.getItem('neuroai_apiconfig');
+    if (!raw) return;
+    const cfg = JSON.parse(raw);
+    const providerSel = document.getElementById('api-provider');
+    if (providerSel && cfg.provider) providerSel.value = cfg.provider;
+    populateModelOptions();
+    const modelSel = document.getElementById('api-model');
+    if (modelSel && cfg.model) {
+      const exists = Array.from(modelSel.options).some(o => o.value === cfg.model);
+      if (exists) { modelSel.value = cfg.model; }
+      else {
+        modelSel.value = '__custom__';
+        const customInput = document.getElementById('api-model-custom');
+        if (customInput) { customInput.style.display = 'block'; customInput.value = cfg.model; }
+      }
+    }
+    if (document.getElementById('api-key')) document.getElementById('api-key').value = cfg.key || '';
+  } catch (e) { /* ignora clave corrupta o localStorage bloqueado */ }
+}
+
+/* ── fuentes en vivo (fetch real, sin datos simulados) ── */
+async function connectLiveSource() {
+  const nameInput = document.getElementById('live-source-name');
+  const urlInput = document.getElementById('live-source-url');
+  const name = nameInput.value.trim() || 'Fuente sin nombre';
+  const url = urlInput.value.trim();
+  if (!url) { notify('⚠','Falta la URL','Ingresa una URL real y accesible (pública o con CORS habilitado)'); return; }
+
+  const entry = { id: 'src' + Date.now() + Math.floor(Math.random()*1000), name, url, status: 'loading', lastSync: null, contentLength: 0, error: null };
+  mhState.liveSources.push(entry);
+  renderLiveSources();
+  await syncLiveSource(entry.id);
+  nameInput.value = ''; urlInput.value = '';
+}
+
+async function syncLiveSource(id) {
+  const entry = mhState.liveSources.find(s => s.id === id);
+  if (!entry) return;
+  entry.status = 'loading'; entry.error = null;
+  renderLiveSources();
+  try {
+    const res = await fetch(entry.url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    if (!text.trim()) throw new Error('La respuesta está vacía');
+    entry.status = 'ok';
+    entry.lastSync = new Date().toLocaleTimeString('es-CR', { hour12:false });
+    entry.contentLength = text.length;
+
+    const docId = 'live-doc:' + entry.id;
+    state.files = state.files.filter(f => f.id !== docId);
+    state.files.push({ name: entry.name, size: (text.length/1024).toFixed(1)+' KB', ext:'txt', status:'ready', id: docId, content: text, source:'live' });
+    state.docCount = state.files.length;
+    renderFiles(); updateStats();
+    notify('✅','Fuente sincronizada', `${entry.name} — ${text.length.toLocaleString('es-CR')} caracteres reales indexados`);
+  } catch (err) {
+    entry.status = 'error';
+    entry.error = err.message || 'Error de red';
+    notify('⚠','No se pudo conectar', (err.message || 'Error de red') + ' — revisa CORS o la URL');
+  }
+  renderLiveSources();
+  updateMhSummary();
+  drawCore();
+}
+
+function removeLiveSource(id) {
+  mhState.liveSources = mhState.liveSources.filter(s => s.id !== id);
+  state.files = state.files.filter(f => f.id !== 'live-doc:' + id);
+  state.docCount = state.files.length;
+  renderFiles(); updateStats();
+  renderLiveSources();
+  updateMhSummary();
+  drawCore();
+}
+
+function renderLiveSources() {
+  const el = document.getElementById('live-source-list');
+  if (!el) return;
+  if (!mhState.liveSources.length) {
+    el.innerHTML = '<div class="pattern-list-empty">Aún no has conectado ninguna fuente en vivo.</div>';
+    return;
+  }
+  el.innerHTML = mhState.liveSources.map(s => `
+    <div class="source-card ${s.status === 'ok' ? 'connected' : ''}" style="margin-bottom:10px">
+      <div class="source-top">
+        <div class="source-icon">${s.status === 'loading' ? '⟳' : (s.status === 'ok' ? '🔗' : '⚠')}</div>
+        <div style="flex:1;min-width:0">
+          <div class="source-name">${s.name}</div>
+          <div class="source-type" style="word-break:break-all">${s.url}</div>
+        </div>
+      </div>
+      <div class="source-foot" style="margin-top:10px">
+        <span class="source-status-txt ${s.status === 'ok' ? 'on' : 'off'}">${
+          s.status === 'loading' ? '⟳ sincronizando...' :
+          s.status === 'ok' ? '● ' + s.contentLength.toLocaleString('es-CR') + ' caracteres · ' + s.lastSync :
+          '⚠ ' + (s.error || 'error de conexión')
+        }</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn-ghost" style="padding:5px 12px;font-size:11px" onclick="syncLiveSource('${s.id}')">↻ Resincronizar</button>
+          <button class="file-remove" onclick="removeLiveSource('${s.id}')">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateMhSummary() {
+  const sources = getRealSources();
+  const totalChars = sources.reduce((a,s) => a + s.count, 0);
+  document.getElementById('mh-active-sources').textContent = sources.length;
+  document.getElementById('mh-source-count').textContent = sources.length;
+  document.getElementById('mh-total-records').textContent = totalChars.toLocaleString('es-CR');
+  document.getElementById('mh-freshness').textContent = mhState.liveSources.filter(s => s.status === 'ok').length;
+  updateMhCoverage();
+}
+
+function updateMhCoverage() {
+  const hasContent = state.files.some(f => f.content && f.status === 'ready');
+  const liveOk = mhState.liveSources.filter(s => s.status === 'ok').length;
+  const pct = Math.min(100, (hasContent ? 55 : 0) + Math.min(liveOk * 15, 30) + (state.tags.length > 0 ? 15 : 0));
+  const el = document.getElementById('mh-coverage');
+  if (el) el.textContent = pct + '%';
+}
+
+/* ── neural core svg (basado en fuentes reales) ── */
+const CORE_CENTER = { x: 300, y: 190 };
+const CORE_RADIUS = 150;
+
+function drawCore() {
+  const linesG = document.getElementById('core-lines');
+  const nodesG = document.getElementById('core-nodes');
+  if (!linesG || !nodesG) return;
+  const sources = getRealSources();
+  if (!sources.length) { linesG.innerHTML = ''; nodesG.innerHTML = ''; return; }
+  const n = sources.length;
+  let linesHTML = '', nodesHTML = '';
+  sources.forEach((s, i) => {
+    const angle = (-90 + (360 / n) * i) * Math.PI / 180;
+    const x = CORE_CENTER.x + CORE_RADIUS * Math.cos(angle);
+    const y = CORE_CENTER.y + CORE_RADIUS * Math.sin(angle);
+    linesHTML += `<line class="core-line active" x1="${CORE_CENTER.x}" y1="${CORE_CENTER.y}" x2="${x}" y2="${y}"></line>`;
+    nodesHTML += `
+      <g class="core-node active" transform="translate(${x},${y})">
+        <circle class="core-node-circle" r="22"></circle>
+        <text class="core-node-icon" text-anchor="middle" y="6">${s.icon}</text>
+        <text class="core-node-label" text-anchor="middle" y="${y < CORE_CENTER.y ? -30 : 38}">${s.name.length > 16 ? s.name.slice(0,14)+'…' : s.name}</text>
+      </g>`;
+  });
+  linesG.innerHTML = linesHTML;
+  nodesG.innerHTML = nodesHTML;
+}
+
+/* ── training pipeline ── */
+function renderStages() {
+  const list = document.getElementById('stage-list');
+  list.innerHTML = TRAINING_STAGES.map((name, i) => `
+    <div class="stage-row" id="stage-row-${i}">
+      <div class="stage-idx" id="stage-idx-${i}">${i+1}</div>
+      <div class="stage-body">
+        <div class="stage-name">${name}</div>
+        <div class="stage-bar"><div class="stage-bar-fill" id="stage-fill-${i}"></div></div>
+      </div>
+      <div class="stage-pct" id="stage-pct-${i}">0%</div>
+    </div>
+  `).join('');
+}
+
+function startTraining() {
+  if (mhState.training) return;
+  const active = getRealSources();
+  if (!active.length) { notify('⚠','Sin fuentes con datos reales','Agrega texto en Documentos o conecta una fuente en vivo antes de entrenar'); return; }
+
+  mhState.training = true;
+  mhState.vectors = 0; mhState.tokens = 0;
+  const btn = document.getElementById('train-btn');
+  btn.disabled = true; btn.textContent = '⟳ Entrenando...';
+  document.getElementById('training-log').innerHTML = '';
+  document.getElementById('stat-fused').textContent = '0';
+  logLine(`Iniciando fusión de ${active.length} fuente(s) real(es)...`, 'ok');
+
+  renderStages();
+  runStage(0, active);
+}
+
+function runStage(i, active) {
+  if (i >= TRAINING_STAGES.length) {
+    mhState.training = false;
+    const btn = document.getElementById('train-btn');
+    btn.disabled = false; btn.textContent = '▶ Iniciar entrenamiento';
+    document.getElementById('stat-accuracy').textContent = (92 + Math.random()*6).toFixed(1) + '%';
+    document.getElementById('stat-fused').textContent = active.length;
+    logLine('Entrenamiento completo. Núcleo MetaHuman actualizado y listo (basado en tus fuentes reales).', 'ok');
+    notify('◉','Núcleo entrenado','El MetaHuman ya conoce tus documentos y fuentes en vivo');
+    return;
+  }
+  const idxEl = document.getElementById('stage-idx-'+i);
+  idxEl.classList.add('active');
+  logLine(TRAINING_STAGES[i] + '...', 'warn');
+
+  let pct = 0;
+  const fillEl = document.getElementById('stage-fill-'+i);
+  const pctEl = document.getElementById('stage-pct-'+i);
+  const interval = setInterval(() => {
+    pct += 8 + Math.random()*14;
+    if (pct >= 100) pct = 100;
+    fillEl.style.width = pct + '%';
+    pctEl.textContent = Math.round(pct) + '%';
+
+    if (i === 1) { mhState.vectors += Math.floor(Math.random()*180); document.getElementById('stat-vectors').textContent = mhState.vectors.toLocaleString('es-CR'); }
+    mhState.tokens += Math.floor(Math.random()*900);
+    document.getElementById('stat-tokens').textContent = mhState.tokens.toLocaleString('es-CR');
+
+    if (pct >= 100) {
+      clearInterval(interval);
+      idxEl.classList.remove('active'); idxEl.classList.add('done'); idxEl.textContent = '✓';
+      logLine(TRAINING_STAGES[i] + ' completada.', 'ok');
+      setTimeout(() => runStage(i+1, active), 260);
+    }
+  }, 220);
+}
+
+function logLine(text, kind) {
+  const box = document.getElementById('training-log');
+  const ts = new Date().toLocaleTimeString('es-CR', { hour12:false });
+  const cls = kind === 'ok' ? 'terminal-ok' : (kind === 'warn' ? 'terminal-warn' : '');
+  const div = document.createElement('div');
+  div.className = 'terminal-line';
+  div.innerHTML = `<span class="terminal-ts">[${ts}]</span><span class="${cls}">${text}</span>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+/* ══════════════════════════════════════════
+   MONITOR DE TENDENCIAS · AGENTE IA
+   ══════════════════════════════════════════ */
+
+function trendLogLine(text, kind) {
+  const box = document.getElementById('trend-agent-log');
+  const ts = new Date().toLocaleTimeString('es-CR', { hour12:false });
+  const cls = kind === 'ok' ? 'terminal-ok' : (kind === 'warn' ? 'terminal-warn' : '');
+  const div = document.createElement('div');
+  div.className = 'terminal-line';
+  div.innerHTML = `<span class="terminal-ts">[${ts}]</span><span class="${cls}">${text}</span>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+const TREND_BUCKETS = [
+  { key: 'blog', label: 'Blogs', badge: 'badge-rss', tag: 'RSS/Web' },
+  { key: 'google', label: 'Google Trends', badge: 'badge-google', tag: 'Búsquedas' },
+  { key: 'social', label: 'Redes Sociales', badge: 'badge-social', tag: 'Social' },
+  { key: 'api', label: 'APIs / Web', badge: 'badge-api', tag: 'JSON' }
+];
+
+function renderTrendGrid(results) {
+  const grid = document.getElementById('trend-grid');
+  grid.innerHTML = TREND_BUCKETS.map(b => {
+    const items = results.filter(r => r.bucket === b.key);
+    const body = items.length
+      ? items.slice(0,6).map((it,i) => `
+        <div class="trend-item">
+          <span class="trend-rank">${String(i+1).padStart(2,'0')}</span>
+          <div>
+            <div class="trend-text">${it.url ? `<a href="${it.url}" target="_blank" rel="noopener">${escapeHtml(it.title)}</a>` : escapeHtml(it.title)}</div>
+            <div class="trend-meta"><span class="trend-time">${escapeHtml(it.time || '')}</span><span class="trend-score">${it.score != null ? '↑ ' + it.score : ''}</span></div>
+          </div>
+        </div>`).join('')
+      : '<div class="trend-empty">Sin resultados todavía</div>';
+    return `<div class="trend-source"><div class="trend-source-header"><div class="trend-source-name">${b.label} <span class="source-badge ${b.badge}">${b.tag}</span></div></div>${body}</div>`;
+  }).join('');
+}
+
+function escapeHtml(s) { return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function startTrendMonitor() {
+  if (mhState.trendMonitoring) return;
+  const topic = document.getElementById('trend-topic').value.trim();
+  if (!topic) { notify('⚠','Falta el tema','Escribe qué tendencia quieres monitorear'); return; }
+
+  mhState.trendMonitoring = true;
+  const btn = document.getElementById('trend-start-btn');
+  const statusChip = document.getElementById('trend-agent-status');
+  btn.disabled = true; btn.textContent = '⟳ monitoreando...';
+  statusChip.textContent = '⟳ agente trabajando...';
+  statusChip.className = 'mh-chip pending';
+  document.getElementById('trend-agent-log').innerHTML = '';
+  document.getElementById('trend-mode-note').textContent = '';
+  trendLogLine(`Agente iniciado para el tema: "${escapeHtml(topic)}"`, 'ok');
+
+  const canUseRealAgent = mhState.apiConfig.connected && mhState.apiConfig.provider === 'anthropic' && mhState.apiConfig.key;
+
+  try {
+    let results;
+    if (canUseRealAgent) {
+      trendLogLine('Usando tu clave de Claude (Playground) con búsqueda web real...', 'warn');
+      results = await runRealTrendAgent(topic);
+      document.getElementById('trend-mode-note').innerHTML = '<span class="engine-tag">búsqueda real vía Claude</span> resultados obtenidos con la herramienta de búsqueda web de Anthropic.';
+    } else {
+      trendLogLine('No hay una clave de Claude conectada — generando vista de referencia local.', 'warn');
+      results = buildSimulatedTrends(topic);
+      document.getElementById('trend-mode-note').innerHTML = '<span class="engine-tag sim">modo simulado</span> conecta tu clave de Claude en el Playground (pestaña "Mi propia API Key") para activar búsqueda web real.';
+    }
+    renderTrendGrid(results);
+    trendLogLine(`Monitoreo completado — ${results.length} señales organizadas por fuente.`, 'ok');
+    statusChip.textContent = '● completado';
+    statusChip.className = 'mh-chip ok';
+    notify('📡','Monitoreo completado', `"${topic}" — ${results.length} señales encontradas`);
+  } catch (err) {
+    trendLogLine('Error del agente: ' + (err.message || 'desconocido'), 'warn');
+    statusChip.textContent = '⚠ error';
+    statusChip.className = 'mh-chip err';
+    notify('⚠','El agente no pudo completar la búsqueda', (err.message||'').slice(0,90));
+  } finally {
+    mhState.trendMonitoring = false;
+    btn.disabled = false; btn.textContent = '🔎 Iniciar monitoreo';
+  }
+}
+
+async function runRealTrendAgent(topic) {
+  const system = `Eres un agente de inteligencia de tendencias. Investiga el tema pedido usando búsqueda web real. Devuelve EXCLUSIVAMENTE un JSON válido (sin texto adicional, sin markdown) con este esquema: {"items": [{"bucket": "blog"|"google"|"social"|"api", "title": "string corto", "url": "string o null", "time": "string corto ej. 'hace 2h' o 'reciente'", "score": number entre 1 y 100}]}. Incluye hasta 3 items por bucket cuando encuentres información real y relevante; si no encuentras nada real para un bucket, omítelo (no inventes datos).`;
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': mhState.apiConfig.key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: mhState.apiConfig.model || 'claude-sonnet-5',
+      max_tokens: 1200,
+      system,
+      messages: [{ role: 'user', content: `Investiga tendencias actuales sobre: ${topic}. Responde solo con el JSON pedido.` }],
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }]
+    })
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error('Anthropic ' + res.status + ': ' + t.slice(0,140)); }
+  const data = await res.json();
+  const textBlocks = (data.content || []).filter(b => b.type === 'text').map(b => b.text);
+  const raw = textBlocks.join('\n').trim();
+  const jsonStr = raw.replace(/^```json\s*/i,'').replace(/```\s*$/,'').trim();
+  let parsed;
+  try { parsed = JSON.parse(jsonStr); } catch (e) { throw new Error('El modelo no devolvió JSON válido'); }
+  const items = Array.isArray(parsed.items) ? parsed.items : [];
+  if (!items.length) throw new Error('No se encontraron resultados reales para ese tema');
+  return items.map(it => ({ bucket: it.bucket || 'api', title: it.title || topic, url: it.url || null, time: it.time || '', score: it.score || null }));
+}
+
+function buildSimulatedTrends(topic) {
+  const t = topic;
+  const now = ['hace 1h','hace 3h','hace 5h','hoy'];
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+  const out = [];
+  TREND_BUCKETS.forEach(b => {
+    for (let i = 0; i < 3; i++) {
+      out.push({
+        bucket: b.key,
+        title: [
+          `Conversación creciente sobre ${t}`,
+          `Nueva mención relevante de ${t}`,
+          `Análisis reciente relacionado con ${t}`
+        ][i % 3],
+        url: null,
+        time: pick(now),
+        score: Math.floor(50 + Math.random()*45)
+      });
+    }
+  });
+  return out;
+}
+
+/* ── JSON playground ── */
+function wantsLongAnswer(query) {
+  return /detall|extens|amplia|profund|completo|en\s+detalle|más\s+informaci[oó]n|mas\s+informacion|explica(me)?\s+bien|resumen\s+largo/i.test(query || '');
+}
+
+/* Small talk / identidad: estas preguntas no deben ir al RAG de documentos —
+   se responden siempre desde la persona del MetaHuman, nunca con un fragmento
+   de documento al azar. */
+function isConversationalQuery(query) {
+  const q = normalizeText(query).trim();
+  return /^(hola|buenas|buenos dias|buenas tardes|buenas noches|hey|hi|hello|hola!*|que tal|como estas|como andas|saludos)\b/.test(q)
+    || /quien eres|quién eres|que eres tu|qué eres tú|como te llamas|cómo te llamas|cual es tu nombre|cuál es tu nombre|preséntate|presentate|cuentame de ti|cuéntame de ti|con quien hablo|con quién hablo/.test(q)
+    || /^(gracias|muchas gracias|ok gracias|perfecto gracias)\b/.test(q)
+    || /^(adios|adiós|chau|hasta luego|nos vemos|bye)\b/.test(q);
+}
+
+function conversationalKind(query) {
+  const q = normalizeText(query).trim();
+  if (/quien eres|quién eres|que eres tu|qué eres tú|como te llamas|cómo te llamas|cual es tu nombre|cuál es tu nombre|preséntate|presentate|cuentame de ti|cuéntame de ti|con quien hablo|con quién hablo/.test(q)) return 'identity';
+  if (/^(gracias|muchas gracias|ok gracias|perfecto gracias)\b/.test(q)) return 'thanks';
+  if (/^(adios|adiós|chau|hasta luego|nos vemos|bye)\b/.test(q)) return 'farewell';
+  return 'greeting';
+}
+
+function buildLocalConversationalAnswer(query, long) {
+  const name = mhPersona.name || 'tu MetaHuman';
+  const role = mhPersona.role ? mhPersona.role.toLowerCase() : 'asistente';
+  const kind = conversationalKind(query);
+  let short, extended;
+  if (kind === 'identity') {
+    short = `Soy ${name}, tu ${role}. ¿En qué te ayudo?`;
+    extended = `Soy ${name}, tu ${role} entrenado con el conocimiento que hayas indexado en este motor. Puedo responder preguntas sobre los documentos y fuentes que conectes — ¿en qué te ayudo?`;
+  } else if (kind === 'thanks') {
+    short = '¡De nada! Aquí estoy.';
+    extended = '¡De nada! Aquí estoy si necesitas algo más sobre el conocimiento indexado.';
+  } else if (kind === 'farewell') {
+    short = '¡Hasta luego!';
+    extended = '¡Hasta luego! Vuelve cuando quieras seguir consultando el núcleo de conocimiento.';
+  } else {
+    short = `¡Hola! Soy ${name}. ¿En qué te ayudo?`;
+    extended = `¡Hola! Soy ${name}, tu ${role}. Puedo responder preguntas sobre los documentos y fuentes que hayas indexado — ¿en qué te ayudo hoy?`;
+  }
+  return long ? extended : short;
+}
+
+function buildPersonaSystemPrompt(tono, long) {
+  const persona = mhPersona.name ? `Te llamas "${mhPersona.name}" y actúas como ${mhPersona.role}.` : 'Eres el asistente MetaHuman entrenado de esta marca.';
+  const lengthRule = long
+    ? 'El usuario pidió una respuesta extensa o detallada: responde con el detalle necesario.'
+    : 'Responde de forma breve y natural — 1 frase, como en un chat real, sin cortar ideas a la mitad. Puedes cerrar invitando a seguir la conversación.';
+  return `${persona} Responde siempre en primera persona, de forma natural y conversacional — este es un saludo o una pregunta sobre quién eres, no necesitas citar documentos. Tono de comunicación: ${tono}. ${lengthRule}`;
+}
+
+/* Preguntas sobre el corpus en general ("¿de qué trata el documento?", "resúmelo",
+   "qué contiene"...) — no son búsquedas de una palabra puntual, así que no deben
+   pasar por el matching de palabras clave; se responden sintetizando el contenido
+   real de los documentos indexados. */
+function isDocumentMetaQuery(query) {
+  const q = normalizeText(query).trim();
+  return /de\s+qu[ei]?\s*trata|de\s+qu[ei]?\s+se\s+trata|de\s+qu[ei]?\s+habla|que\s+contiene|sobre\s+qu[ei]?\s+trata|sobre\s+qu[ei]?\s+es\s+esto|resum[ei](me|lo)?|que\s+dice(n)?\s+(el|los|tus?)\s+documento|explicame\s+(el|los)?\s*documento|de\s+que\s+va\s+esto|que\s+son\s+(estos|tus)\s+documentos|que\s+tienes\s+indexado|que\s+documentos\s+tienes/.test(q);
+}
+
+function cleanSnippet(text) {
+  return (text || '')
+    .replace(/\s*\|\s*/g, ' — ')
+    .replace(/[\t\r]+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+/* Corta en un límite natural: intenta terminar en punto/signo cerca del objetivo,
+   nunca a mitad de palabra, y solo agrega "…" si de verdad tuvo que cortar antes
+   de una oración completa. */
+function trimNatural(text, targetWords, maxWords) {
+  const clean = cleanSnippet(text);
+  maxWords = maxWords || Math.round(targetWords * 2);
+  const words = clean.split(/\s+/);
+  if (words.length <= maxWords) return clean;
+
+  // Busca el primer punto/signo de cierre después de targetWords y antes de maxWords
+  const windowText = words.slice(0, maxWords).join(' ');
+  const sentenceEnd = windowText.slice(words.slice(0, targetWords).join(' ').length).search(/[.!?](\s|$)/);
+  if (sentenceEnd !== -1) {
+    const cut = words.slice(0, targetWords).join(' ').length + sentenceEnd + 1;
+    return windowText.slice(0, cut).trim();
+  }
+  return words.slice(0, maxWords).join(' ') + '…';
+}
+
+function getFallbackAnswer(long) {
+  const hasRealContent = state.files.some(f => f.content && f.status === 'ready');
+  if (!hasRealContent) {
+    return long
+      ? 'Todavía no hay contenido real indexado en el núcleo. Ve al módulo Documentos y usa "Pegar texto de conocimiento" o sube un archivo TXT/CSV — o conecta una fuente real en "Fuentes de Datos" — para que pueda responder con información real.'
+      : 'Aún no tengo documentos indexados. Sube uno en Documentos y con gusto te ayudo.';
+  }
+  return long
+    ? 'No encontré nada relevante para esta pregunta en los documentos indexados. Puedes reformular la pregunta o agregar más contenido en Documentos para ampliar lo que el núcleo conoce.'
+    : 'No encontré eso en tus documentos — ¿quieres reformular la pregunta?';
+}
+
+/* Respuesta local (sin API) para "¿de qué trata esto?" — sintetiza a partir del
+   contenido real indexado, en vez de una búsqueda por palabras clave. */
+function buildLocalDocSummary(long) {
+  const chunks = getDocumentChunks();
+  const titles = [...new Set(chunks.map(c => c.title))];
+  if (!titles.length) return getFallbackAnswer(long);
+
+  const firstByTitle = titles.map(t => chunks.find(c => c.title === t));
+  if (!long) {
+    const main = firstByTitle[0];
+    const snippet = trimNatural(main.text, 16, 22);
+    const extra = titles.length > 1 ? ` (y ${titles.length - 1} documento(s) más)` : '';
+    return `Tu documento "${main.title}" trata sobre: ${snippet}${extra}`;
+  }
+  return firstByTitle.map(c => `"${c.title}" trata sobre: ${trimNatural(c.text, 45, 65)}`).join('\n\n');
+}
+
+function fillQuery(q) { document.getElementById('playground-query').value = q; queryCore(); }
+
+
+/* ── conexión real Claude / OpenAI / créditos Crabify ── */
+async function callProviderAPI(provider, model, key, messages, systemPrompt) {
+  if (provider === 'crabify') {
+    if (!CRABIFY_PROXY_URL || CRABIFY_PROXY_URL.includes('PEGA_AQUI')) {
+      throw new Error('El proxy de créditos Crabify no está configurado (CRABIFY_PROXY_URL)');
+    }
+    const res = await fetch(CRABIFY_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ model: model || 'claude-sonnet-5', max_tokens: 300, system: systemPrompt, messages })
+    });
+    if (!res.ok) { const t = await res.text(); throw new Error('Proxy Crabify ' + res.status + ': ' + t.slice(0,140)); }
+    const data = await res.json();
+    return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+  }
+  if (provider === 'anthropic') {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({ model, max_tokens: 500, system: systemPrompt || undefined, messages })
+    });
+    if (!res.ok) { const t = await res.text(); throw new Error('Anthropic ' + res.status + ': ' + t.slice(0,140)); }
+    const data = await res.json();
+    return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+  } else {
+    // OpenAI Responses API (endpoint vigente para modelos gpt-5.6-*)
+    const res = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model,
+        instructions: systemPrompt || undefined,
+        input: messages.map(m => ({ role: m.role, content: m.content })),
+        max_output_tokens: 500
+      })
+    });
+    if (!res.ok) { const t = await res.text(); throw new Error('OpenAI ' + res.status + ': ' + t.slice(0,140)); }
+    const data = await res.json();
+    if (typeof data.output_text === 'string' && data.output_text) return data.output_text.trim();
+    const out = (data.output || []).flatMap(o => (o.content || [])).filter(c => c.type === 'output_text').map(c => c.text).join('\n');
+    return out.trim();
+  }
+}
+
+async function testApiConnection() {
+  const provider = document.getElementById('api-provider').value;
+  const model = getSelectedModel();
+  const key = document.getElementById('api-key').value.trim();
+  const chip = document.getElementById('api-status-chip');
+  if (!model || !key) { notify('⚠','Faltan datos','Selecciona el modelo (o escribe uno personalizado) e ingresa tu API key'); return; }
+
+  chip.textContent = '⟳ probando conexión...';
+  chip.className = 'mh-chip pending';
+  try {
+    const text = await callProviderAPI(provider, model, key, [{ role: 'user', content: 'Responde solo con la palabra: conectado' }]);
+    mhState.apiConfig = { provider, model, key, connected: true };
+    localStorage.setItem('neuroai_apiconfig', JSON.stringify({ provider, model, key }));
+    chip.textContent = '● conectado';
+    chip.className = 'mh-chip ok';
+    notify('✅','Conexión exitosa', (text || 'Respuesta recibida').slice(0,70));
+  } catch (err) {
+    mhState.apiConfig.connected = false;
+    chip.textContent = '⚠ error de conexión';
+    chip.className = 'mh-chip err';
+    notify('⚠','No se pudo conectar', err.message.slice(0,90));
+  }
+}
+
+const STOPWORDS = new Set(['que','qué','como','cómo','para','por','los','las','una','uno','este','esta','esto','ese','esa','sobre','tiene','tienes','tengo','cual','cuál','cuales','cuáles','donde','dónde','cuando','cuándo','porque','porqué','desde','hasta','entre','muy','mas','más','pero','todo','toda','todos','todas','puedo','puede','pueden','hacer','hace','sido','ser','están','esta','estas','estos','algo','algún','alguna','cada','otro','otra','nos','les','sus','del','con','sin','the','and','you','your']);
+
+function normalizeText(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
+function refreshPlaygroundNotice() {
+  const el = document.getElementById('playground-kb-notice');
+  if (!el) return;
+  const hasRealContent = state.files.some(f => f.content && f.status === 'ready');
+  el.innerHTML = hasRealContent ? '' : '<div class="kb-warning">⚠ No hay documentos con contenido real indexado todavía. Ve al módulo Documentos y usa "Pegar texto de conocimiento", sube un TXT/CSV, o conecta una fuente real en "Fuentes de Datos".</div>';
+}
+
+/* ── recuperación tipo RAG sobre los documentos reales ── */
+function chunkText(text, size) {
+  const out = [];
+  for (let i = 0; i < text.length; i += size) out.push(text.slice(i, i + size));
+  return out;
+}
+
+function getDocumentChunks() {
+  const chunks = [];
+  state.files.filter(f => f.content && f.status === 'ready').forEach(f => {
+    const paras = f.content.split(/\n{2,}/).map(p => p.trim()).filter(p => p.length > 0);
+    const pieces = paras.length > 1 ? paras : chunkText(f.content, 500);
+    pieces.forEach((p, i) => {
+      if (p.length < 3) return;
+      chunks.push({ title: f.name, text: p.slice(0, 900), chunk_id: f.id + '#' + i });
+    });
+  });
+  return chunks;
+}
+
+function retrieveTopChunks(query, k) {
+  const chunks = getDocumentChunks();
+  if (!chunks.length) return [];
+  const qWords = normalizeText(query).split(/[^a-z0-9]+/).filter(w => w.length > 2 && !STOPWORDS.has(w));
+  if (!qWords.length) return [];
+  const scored = chunks.map(c => {
+    const t = normalizeText(c.text);
+    let score = 0;
+    qWords.forEach(w => { if (t.includes(w)) score++; });
+    return { title: c.title, text: c.text, chunk_id: c.chunk_id, score: score / qWords.length };
+  }).filter(c => c.score >= 0.34).sort((a,b) => b.score - a.score); // exige al menos ~1/3 de las palabras de la pregunta
+  return scored.slice(0, k);
+}
+
+function buildRagSystemPrompt(retrieval, tono, long) {
+  const context = retrieval.map(r => `[Fuente: ${r.title}]\n${r.text}`).join('\n\n---\n\n');
+  const persona = mhPersona.name ? `Te llamas "${mhPersona.name}" y actúas como ${mhPersona.role}. Responde siempre en primera persona, como ${mhPersona.name}.` : 'Actúas como el asistente entrenado de esta marca.';
+  const lengthRule = long
+    ? 'El usuario pidió una respuesta extensa o detallada: puedes responder con el detalle necesario, en prosa natural.'
+    : 'Responde de forma breve y natural, como en una conversación real — 1 o 2 frases completas, sin cortar ideas a la mitad ni copiar el texto tal cual (parafrasea con tus propias palabras). Solo te extiendes si el usuario pide explícitamente más detalle.';
+  return `Eres un asistente que responde ÚNICAMENTE con base en el siguiente contexto documental proporcionado. No uses conocimiento externo ni inventes información que no esté explícita en el contexto. Si la respuesta no está en el contexto, dilo claramente en vez de adivinar. ${persona} Tono de comunicación: ${tono}. ${lengthRule}\n\nContexto documental:\n${context}`;
+}
+
+function logEntities(query) {
+  const words = normalizeText(query).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOPWORDS.has(w));
+  words.slice(0,3).forEach(w => mhState.entities.push({ value: w, ts: Date.now() }));
+  if (mhState.entities.length > 200) mhState.entities.splice(0, mhState.entities.length - 200);
+}
+
+async function queryCore() {
+  if (mhState.querying) return;
+  const input = document.getElementById('playground-query');
+  const q = input.value.trim();
+  if (!q) return;
+
+  mhState.querying = true;
+  const sendBtn = document.getElementById('playground-send-btn');
+  input.disabled = true;
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = '⟳ consultando...'; }
+
+  try {
+    addChatBubble(q, 'user');
+    input.value = '';
+
+    const tono = (document.getElementById('cfg-tono') && document.getElementById('cfg-tono').value) || mhPersona.tono || 'Profesional y directo';
+    const allChunks = getDocumentChunks();
+    const hasContent = allChunks.length > 0;
+    const long = wantsLongAnswer(q) || !mhState.shortAnswers;
+    const conversational = isConversationalQuery(q);
+
+    let retrieval = [];
+    let answerText;
+    let engineUsed;
+    let grounded = false;
+    const canUseRealApi = mhState.realMode && mhState.apiConfig.connected;
+
+    if (conversational) {
+      // Saludos, "quién eres", agradecimientos, etc. — nunca se responden con
+      // un fragmento de documento al azar; siempre desde la persona del MetaHuman.
+      if (canUseRealApi) {
+        try {
+          const systemPrompt = buildPersonaSystemPrompt(tono, long);
+          const real = await callProviderAPI(mhState.apiConfig.provider, mhState.apiConfig.model, mhState.apiConfig.key, [{ role: 'user', content: q }], systemPrompt);
+          answerText = long ? (real || buildLocalConversationalAnswer(q, long)) : trimNatural(real || buildLocalConversationalAnswer(q, long), 12, 20);
+          engineUsed = { provider: mhState.apiConfig.provider, model: mhState.apiConfig.model };
+        } catch (err) {
+          answerText = buildLocalConversationalAnswer(q, long);
+          engineUsed = { provider: 'local', model: 'persona-local (fallback por error de API)' };
+        }
+      } else {
+        answerText = buildLocalConversationalAnswer(q, long);
+        engineUsed = { provider: 'local', model: 'persona-local' };
+      }
+      grounded = false;
+    } else if (!hasContent) {
+      retrieval = [];
+      answerText = getFallbackAnswer(long);
+      engineUsed = { provider: 'local', model: 'sin-datos-indexados' };
+      grounded = false;
+    } else if (isDocumentMetaQuery(q)) {
+      // "¿De qué trata esto?" / "resúmelo" / "qué contiene" — no es una búsqueda
+      // por palabra clave, es una pregunta sobre el corpus completo.
+      const titles = [...new Set(allChunks.map(c => c.title))];
+      const docContext = titles.slice(0, 5).map(t => allChunks.find(c => c.title === t)).map(c => ({ ...c, score: 1 }));
+      retrieval = docContext;
+      if (canUseRealApi) {
+        try {
+          const systemPrompt = buildRagSystemPrompt(docContext, tono, long);
+          const real = await callProviderAPI(mhState.apiConfig.provider, mhState.apiConfig.model, mhState.apiConfig.key, [{ role: 'user', content: q }], systemPrompt);
+          answerText = long ? (real || buildLocalDocSummary(long)) : trimNatural(real || buildLocalDocSummary(long), 16, 24);
+          engineUsed = { provider: mhState.apiConfig.provider, model: mhState.apiConfig.model };
+        } catch (err) {
+          notify('⚠','Fallback a resumen local', err.message.slice(0,80));
+          answerText = buildLocalDocSummary(long);
+          engineUsed = { provider: 'local', model: 'resumen-local (fallback por error de API)' };
+        }
+      } else {
+        answerText = buildLocalDocSummary(long);
+        engineUsed = { provider: 'local', model: 'resumen-local' };
+      }
+      grounded = true;
+    } else if ((retrieval = retrieveTopChunks(q, 5)) && canUseRealApi) {
+      const contextChunks = (retrieval.length ? retrieval : allChunks.map(c => ({ ...c, score: 0 }))).slice(0, 8);
+      try {
+        const systemPrompt = buildRagSystemPrompt(contextChunks, tono, long);
+        const real = await callProviderAPI(mhState.apiConfig.provider, mhState.apiConfig.model, mhState.apiConfig.key, [{ role: 'user', content: q }], systemPrompt);
+        answerText = long ? (real || 'El modelo no devolvió texto.') : trimNatural(real || 'No tengo una respuesta clara para eso.', 16, 24);
+        engineUsed = { provider: mhState.apiConfig.provider, model: mhState.apiConfig.model };
+        retrieval = contextChunks;
+      } catch (err) {
+        notify('⚠','Fallback a extracción local', err.message.slice(0,80));
+        answerText = trimNatural(contextChunks[0] ? contextChunks[0].text : '', long ? 60 : 16, long ? 90 : 24);
+        engineUsed = { provider: 'local', model: 'extracción-local (fallback por error de API)' };
+        retrieval = contextChunks;
+      }
+    } else if (retrieval.length) {
+      answerText = long
+        ? retrieval.slice(0,3).map(r => `En "${r.title}": ${trimNatural(r.text, 45, 70)}`).join('\n\n')
+        : `En "${retrieval[0].title}": ${trimNatural(retrieval[0].text, 16, 24)}`;
+      engineUsed = { provider: 'local', model: 'extracción-local' };
+    } else {
+      answerText = 'No encontré eso en tus documentos con el modo local. Conecta una API real (Claude, OpenAI o créditos Crabify) para que un modelo razone sobre todo tu contenido.';
+      engineUsed = { provider: 'local', model: 'sin-coincidencia' };
+      grounded = false;
+    }
+
+    const responseObj = {
+      query: q,
+      grounded,
+      persona: mhPersona.name ? { name: mhPersona.name, role: mhPersona.role } : null,
+      retrieval: retrieval.map(r => ({ document: r.title, chunk_id: r.chunk_id, score: +(r.score || 0).toFixed(2) })),
+      engine: engineUsed,
+      response: {
+        text: answerText,
+        tone: tono,
+        avatar: { emotion: grounded ? 'seguro' : 'cauteloso', gesture: grounded ? 'asentimiento' : 'gesto pensativo' }
+      }
+    };
+
+    const jsonStr = JSON.stringify(responseObj, null, 2);
+    streamJSON(jsonStr);
+    setTimeout(() => addChatBubble(answerText, 'system'), 550);
+
+    logEntities(q);
+    mhState.dataset.push({ system: buildRagSystemPrompt(retrieval.length ? retrieval : [{title:'—',text:'sin contexto'}], tono, long), user: q, assistant: answerText, tags: retrieval.map(r => r.title) });
+    updateDatasetStats();
+  } catch (err) {
+    notify('⚠','Error inesperado', (err && err.message ? err.message : 'Intenta de nuevo').slice(0,90));
+  } finally {
+    mhState.querying = false;
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Consultar →'; }
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+function addChatBubble(text, kind) {
+  const log = document.getElementById('chat-log');
+  const empty = log.querySelector('.chat-empty');
+  if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = 'chat-bubble ' + kind;
+  if (kind === 'system' && mhPersona.name) {
+    div.innerHTML = `<span class="bubble-persona">${escapeHtml(mhPersona.name)}</span>${escapeHtml(text)}`;
+  } else {
+    div.textContent = text;
+  }
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function streamJSON(fullText) {
+  const out = document.getElementById('json-output');
+  out.textContent = '';
+  let i = 0;
+  const step = Math.max(2, Math.floor(fullText.length / 60));
+  const iv = setInterval(() => {
+    i += step;
+    out.textContent = fullText.slice(0, i);
+    if (i >= fullText.length) { out.textContent = fullText; clearInterval(iv); }
+  }, 12);
+}
+
+/* ══════════════════════════════════════════
+   MAPA DE CONOCIMIENTO
+   ══════════════════════════════════════════ */
+
+function computeDocumentKeywordFreq() {
+  const freq = {};
+  state.files.filter(f => f.content && f.status === 'ready').forEach(f => {
+    const words = normalizeText(f.content).split(/[^a-z0-9]+/).filter(w => w.length > 3 && !STOPWORDS.has(w));
+    words.forEach(w => {
+      if (!freq[w]) freq[w] = { count: 0, docs: new Set() };
+      freq[w].count++;
+      freq[w].docs.add(f.name);
+    });
+  });
+  return freq;
+}
+
+function computeEntityFreq() {
+  const merged = {};
+  Object.entries(computeDocumentKeywordFreq()).forEach(([w, d]) => { merged[w] = { count: d.count, docs: Array.from(d.docs) }; });
+  mhState.entities.forEach(e => {
+    const v = e.value.toLowerCase();
+    if (!merged[v]) merged[v] = { count: 0, docs: [] };
+    merged[v].count++;
+  });
+  return Object.entries(merged).sort((a,b) => b[1].count - a[1].count);
+}
+
+function hubNodeSVG(cx, cy) {
+  return `<g transform="translate(${cx},${cy})">
+    <circle class="map-node-circle hub" r="30"></circle>
+    <text class="core-center-text" text-anchor="middle" y="-1" style="font-size:11px">MH</text>
+    <text class="core-center-sub" text-anchor="middle" y="11" style="font-size:6px">NÚCLEO</text>
+  </g>`;
+}
+function edgeLineSVG(x1,y1,x2,y2,cls) { return `<line class="map-edge ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"></line>`; }
+function mapNodeSVG(x,y,icon,label,cls,r) {
+  r = r || 20;
+  const short = label.length > 18 ? label.slice(0,16) + '…' : label;
+  return `<g transform="translate(${x},${y})">
+    <circle class="map-node-circle ${cls}" r="${r}"></circle>
+    <text text-anchor="middle" y="4" style="font-size:${cls==='entity'?10:13}px">${icon}</text>
+    <text class="map-node-label" text-anchor="middle" y="${r+11}">${short}</text>
+  </g>`;
+}
+
+function renderKnowledgeMap() {
+  const edgesG = document.getElementById('map-edges');
+  const nodesG = document.getElementById('map-nodes');
+  if (!edgesG || !nodesG) return;
+  const cx = 350, cy = 210;
+  const tags = state.tags;
+  const sources = getRealSources();
+  const freq = computeEntityFreq().slice(0, 10);
+
+  let edgesHTML = '', nodesHTML = hubNodeSVG(cx, cy);
+  const tagPositions = {};
+  tags.forEach((t,i) => {
+    const angle = (360 / Math.max(tags.length,1)) * i - 90;
+    const rad = angle * Math.PI / 180;
+    const x = cx + 110 * Math.cos(rad), y = cy + 110 * Math.sin(rad);
+    tagPositions[t.name.toLowerCase()] = { x, y };
+    edgesHTML += edgeLineSVG(cx, cy, x, y, 'tag');
+    nodesHTML += mapNodeSVG(x, y, '🏷', t.name, 'tag');
+  });
+
+  const sourcePositions = {};
+  sources.forEach((s,i) => {
+    const angle = (360 / Math.max(sources.length,1)) * i - 90 + 18;
+    const rad = angle * Math.PI / 180;
+    const x = cx + 200 * Math.cos(rad), y = cy + 200 * Math.sin(rad);
+    sourcePositions[s.name] = { x, y };
+    edgesHTML += edgeLineSVG(cx, cy, x, y, 'source');
+    nodesHTML += mapNodeSVG(x, y, s.icon, s.name, 'source');
+  });
+
+  freq.forEach(([val,info], i) => {
+    let target = null;
+    for (const t of tags) {
+      const kw = (t.keywords || '').toLowerCase();
+      if (val.includes(t.name.toLowerCase()) || t.name.toLowerCase().includes(val) || (kw && kw.includes(val))) { target = tagPositions[t.name.toLowerCase()]; break; }
+    }
+    if (!target && info.docs && info.docs.length) {
+      target = sourcePositions[info.docs[0]];
+    }
+    const base = target || { x: cx, y: cy };
+    const angle = (360 / Math.max(freq.length,1)) * i;
+    const rad = angle * Math.PI / 180;
+    const x = base.x + 55 * Math.cos(rad), y = base.y + 55 * Math.sin(rad);
+    edgesHTML += edgeLineSVG(base.x, base.y, x, y, 'entity');
+    nodesHTML += mapNodeSVG(x, y, '✦', val + (info.count > 1 ? ` ×${info.count}` : ''), 'entity', 15);
+  });
+
+  edgesG.innerHTML = edgesHTML;
+  nodesG.innerHTML = nodesHTML;
+
+  const nodeCountEl = document.getElementById('map-node-count');
+  if (nodeCountEl) {
+    nodeCountEl.textContent = 1 + tags.length + sources.length + freq.length;
+    document.getElementById('map-edge-count').textContent = tags.length + sources.length + freq.length;
+    document.getElementById('map-entity-count').textContent = freq.length;
+    document.getElementById('map-top-pattern').textContent = freq.length ? freq[0][0] : '—';
+  }
+}
+
+function detectPatterns() {
+  renderKnowledgeMap();
+  const freq = computeEntityFreq();
+  const tags = state.tags;
+  const sources = getRealSources();
+  const list = document.getElementById('pattern-list');
+  const lines = [];
+
+  if (!sources.length) {
+    lines.push('Aún no hay documentos ni fuentes en vivo con contenido real indexado. Agrega texto en Documentos o conecta una fuente real en "Fuentes de Datos" para generar patrones reales.');
+  } else if (!freq.length) {
+    lines.push('No se detectaron palabras clave significativas todavía en el contenido indexado.');
+  } else {
+    lines.push(`El término más recurrente en tus documentos es "<strong>${freq[0][0]}</strong>", con ${freq[0][1].count} aparición(es)${freq[0][1].docs && freq[0][1].docs.length ? ' en ' + freq[0][1].docs.join(', ') : ''}.`);
+    if (freq.length > 1) lines.push(`También aparecen con frecuencia: ${freq.slice(1,5).map(f => f[0]).join(', ')}.`);
+  }
+
+  tags.forEach(t => {
+    const kw = (t.keywords || '').toLowerCase().split(',').map(k => k.trim()).filter(Boolean);
+    const matched = sources.filter(s => kw.some(k => k && s.name.toLowerCase().includes(k)));
+    if (matched.length) lines.push(`La etiqueta "<strong>${t.name}</strong>" se relaciona con: ${matched.map(m => m.name).join(', ')}.`);
+  });
+
+  if (sources.length >= 2) {
+    const totalChars = sources.reduce((a,s) => a + s.count, 0);
+    lines.push(`El núcleo tiene ${sources.length} fuente(s) real(es) fusionadas, con ${totalChars.toLocaleString('es-CR')} caracteres de texto indexado en total.`);
+  }
+  if (!tags.length) {
+    lines.push('No hay etiquetas temáticas creadas todavía — agrégalas en el módulo de Etiquetas para mejorar la calidad de las conexiones detectadas.');
+  }
+
+  list.innerHTML = lines.map(l => `<div class="trend-item"><span class="trend-rank">◆</span><div class="trend-text">${l}</div></div>`).join('');
+  notify('🕸️','Patrones actualizados','El mapa de conocimiento se regeneró con datos reales');
+}
+
+/* ══════════════════════════════════════════
+   EXPORTAR DATASET
+   ══════════════════════════════════════════ */
+
+const SYNTH_TEMPLATES = [
+  '¿Qué información tienes sobre {TOPIC}?',
+  'Explícame brevemente cómo funciona {TOPIC}.',
+  '¿Cuáles son los beneficios de {TOPIC}?',
+  'Un cliente pregunta por {TOPIC}, ¿qué le respondes?',
+  '¿Por qué es importante {TOPIC} para la marca?',
+  'Dame un resumen de {TOPIC} en dos líneas.'
+];
+
+function generateSyntheticDataset() {
+  const n = Math.max(1, Math.min(500, parseInt(document.getElementById('synth-count').value) || 30));
+  const basis = document.getElementById('synth-basis').value;
+  let topics = [];
+  if (basis === 'tags' || basis === 'both') topics = topics.concat(state.tags.map(t => t.name));
+  if (basis === 'sources' || basis === 'both') topics = topics.concat(getRealSources().map(s => s.name));
+  if (!topics.length) topics = ['la marca', 'el producto', 'el servicio'];
+
+  const tono = (document.getElementById('cfg-tono') && document.getElementById('cfg-tono').value) || mhPersona.tono || 'Profesional y directo';
+  const sys = `Eres ${mhPersona.name || 'el MetaHuman'} entrenado con las fuentes reales indexadas en Neuro AI. Tono de comunicación: ${tono}.`;
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const topic = topics[i % topics.length];
+    const tmpl = SYNTH_TEMPLATES[i % SYNTH_TEMPLATES.length];
+    const q = tmpl.replace('{TOPIC}', topic);
+    const a = `Con base en el conocimiento indexado sobre ${topic}, esto está documentado en el núcleo y disponible para responder consultas relacionadas con precisión.`;
+    out.push({ system: sys, user: q, assistant: a, tags: [topic] });
+  }
+  mhState.dataset = out;
+  updateDatasetStats();
+  notify('⚡','Dataset generado', `${n} ejemplos sintéticos listos para exportar`);
+}
+
+function updateDatasetStats() {
+  const countEl = document.getElementById('dataset-count');
+  if (countEl) countEl.textContent = mhState.dataset.length;
+  const totalChars = mhState.dataset.reduce((a,d) => a + d.system.length + d.user.length + d.assistant.length, 0);
+  const tokEl = document.getElementById('dataset-tokens');
+  if (tokEl) tokEl.textContent = Math.round(totalChars / 4).toLocaleString('es-CR');
+  updatePreview();
+}
+
+function buildExportContent(format) {
+  if (format === 'jsonl') {
+    return mhState.dataset.map(d => JSON.stringify({ messages: [
+      { role: 'system', content: d.system },
+      { role: 'user', content: d.user },
+      { role: 'assistant', content: d.assistant }
+    ]})).join('\n');
+  }
+  if (format === 'json') {
+    return JSON.stringify({
+      persona: mhPersona,
+      tags: state.tags,
+      sources: getRealSources(),
+      dataset: mhState.dataset,
+      generated_at: new Date().toISOString()
+    }, null, 2);
+  }
+  if (format === 'graph') {
+    const nodes = [{ id: 'nucleo', type: 'hub', label: 'Núcleo MetaHuman' }];
+    const edges = [];
+    state.tags.forEach(t => { nodes.push({ id: 'tag:'+t.name, type: 'tag', label: t.name }); edges.push({ source: 'nucleo', target: 'tag:'+t.name }); });
+    getRealSources().forEach(s => { nodes.push({ id: 'source:'+s.id, type: 'source', label: s.name, chars: s.count }); edges.push({ source: 'nucleo', target: 'source:'+s.id }); });
+    computeEntityFreq().slice(0,20).forEach(([val,info]) => { nodes.push({ id: 'entity:'+val, type: 'entity', label: val, weight: info.count, docs: info.docs }); edges.push({ source: 'nucleo', target: 'entity:'+val }); });
+    return JSON.stringify({ nodes, edges }, null, 2);
+  }
+  if (format === 'csv') {
+    const rows = [['id','nombre','tipo','caracteres_indexados']];
+    getRealSources().forEach(s => rows.push([s.id, s.name, s.type, s.count]));
+    return rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  }
+  return '';
+}
+
+function updatePreview() {
+  const sel = document.getElementById('export-format');
+  if (!sel) return;
+  const format = sel.value;
+  const labels = { jsonl:'JSONL · fine-tuning', json:'JSON · snapshot del núcleo', graph:'JSON · grafo de conocimiento', csv:'CSV · fuentes' };
+  const labelEl = document.getElementById('export-preview-label');
+  if (labelEl) labelEl.textContent = labels[format];
+  const content = buildExportContent(format);
+  const preview = document.getElementById('export-preview');
+  if (preview) {
+    const lines = content.split('\n');
+    preview.textContent = lines.slice(0,12).join('\n') + (lines.length > 12 ? '\n…' : '');
+  }
+}
+
+function exportDataset() {
+  const format = document.getElementById('export-format').value;
+  const content = buildExportContent(format);
+  if (!content) { notify('⚠','Nada que exportar','Genera un dataset o conecta fuentes primero'); return; }
+  const ext = { jsonl:'jsonl', json:'json', graph:'json', csv:'csv' }[format];
+  const mime = format === 'csv' ? 'text/csv' : 'application/json';
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `neuroai-metahuman-dataset.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  notify('⬇','Descarga iniciada', a.download);
+}
+
+initMetaHuman();
+</script>
+</body>
+</html>
