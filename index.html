@@ -265,6 +265,51 @@ video ~ .media-ph, img ~ .media-ph { display: none; }
 .ent-stat b { display: block; font-size: 26px; font-weight: 800; color: var(--navy); }
 .ent-stat span { font-size: 12px; color: var(--ink-muted); }
 
+/* Planes: 4 columnas + tabla comparativa */
+.plans-grid { grid-template-columns: repeat(4, 1fr); max-width: 1180px; gap: 20px; }
+.plan { padding: 38px 28px; display: flex; flex-direction: column; }
+.plan .btn { margin-top: auto; }
+.plan.featured { transform: scale(1.02); }
+.plan-price-text { font-size: 38px; letter-spacing: -1px; padding-top: 10px; }
+.plan-features li.soon { color: var(--ink-muted); }
+.plan.featured .plan-features li.soon { color: rgba(255,255,255,.55); }
+.plan-features li.soon::before { content: '◷'; color: var(--ink-muted); }
+.soon-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; background: rgba(63,99,242,.10); color: var(--blue); white-space: nowrap; vertical-align: middle; }
+.plan.featured .soon-tag { background: rgba(255,255,255,.14); color: #fff; }
+.matrix-title { text-align: center; font-size: 22px; font-weight: 800; color: var(--navy); margin: 80px 0 24px; }
+.matrix-scroll { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--white); }
+.matrix { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 14px; }
+.matrix th, .matrix td { padding: 15px 20px; border-bottom: 1px solid var(--line); text-align: center; }
+.matrix tbody tr:last-child th, .matrix tbody tr:last-child td { border-bottom: none; }
+.matrix thead th { font-size: 15px; font-weight: 800; color: var(--navy); padding: 22px 20px; }
+.matrix thead th.hl { background: var(--navy); color: #fff; }
+.matrix tbody th[scope="row"] { text-align: left; font-weight: 500; color: var(--ink); }
+.matrix td { color: var(--ink-soft); }
+.matrix td.hl { background: rgba(22,179,184,.06); }
+.matrix td.yes { color: var(--teal); font-weight: 800; font-size: 16px; }
+.matrix td.no { color: var(--ink-muted); }
+.matrix tr.group th { text-align: left; font-size: 13px; font-weight: 700; color: var(--teal); background: var(--paper); padding: 12px 20px; }
+@media (max-width: 1100px) { .plans-grid { grid-template-columns: repeat(2, 1fr); } .plan.featured { transform: none; } }
+
+/* Add-on MetaHuman */
+.addon { display: flex; align-items: flex-start; gap: 12px; margin: 4px 0 18px; padding: 14px 14px; border-radius: 14px; border: 1.5px dashed var(--line); cursor: pointer; transition: border-color .2s, background .2s; }
+.addon:hover { border-color: var(--teal); }
+.addon input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.addon-box { width: 22px; height: 22px; flex-shrink: 0; border-radius: 7px; border: 2px solid var(--ink-muted); display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all .15s; }
+.addon input:checked ~ .addon-box { background: var(--grad-diag); border-color: transparent; }
+.addon input:checked ~ .addon-box::after { content: '✓'; color: var(--navy); font-weight: 800; font-size: 13px; }
+.addon input:focus-visible ~ .addon-box { outline: 3px solid var(--teal); outline-offset: 2px; }
+.addon:has(input:checked) { border-style: solid; border-color: var(--teal); background: rgba(22,179,184,.06); }
+.addon-text { font-size: 13.5px; font-weight: 600; color: var(--navy); line-height: 1.35; }
+.addon-text small { display: block; font-size: 12px; font-weight: 500; color: var(--ink-muted); margin-top: 2px; }
+.plan.featured .addon { border-color: rgba(255,255,255,.2); }
+.plan.featured .addon:has(input:checked) { border-color: var(--green); background: rgba(61,214,140,.10); }
+.plan.featured .addon-box { border-color: rgba(255,255,255,.5); }
+.plan.featured .addon-text { color: #fff; }
+.plan.featured .addon-text small { color: rgba(255,255,255,.6); }
+.mh-note { font-size: 12px; font-weight: 600; color: var(--teal); margin: -4px 0 10px; }
+.plan.featured .mh-note { color: var(--green); }
+
 /* ── CTA "Toma el control" ── */
 .cta-control { background: var(--navy); color: #fff; text-align: center; position: relative; overflow: hidden; }
 .cta-control::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: var(--grad); }
@@ -597,79 +642,122 @@ footer { padding: 60px; background: var(--white); border-top: 1px solid var(--li
 
     <div class="plans-grid">
       <div class="plan">
-        <div class="plan-tier">Studio</div>
-        <div class="plan-name">Essentials</div>
+        <div class="plan-name">Essential</div>
         <div class="plan-price-wrap"><span class="plan-currency">$</span><span class="plan-price" id="price-studio">297</span></div>
-        <div class="plan-period">USD / mes · por agencia</div>
-        <div class="plan-desc">Perfecto para agencias boutique que quieren comenzar con inteligencia artificial sin complejidad.</div>
+        <div class="plan-period">USD / mes · por empresa</div>
+        <div class="mh-note" data-plan="studio" hidden>Incluye licencia MetaHuman · 350 min/mes</div>
+        <label class="addon">
+          <input type="checkbox" class="mh-check" data-plan="studio">
+          <span class="addon-box" aria-hidden="true"></span>
+          <span class="addon-text">Agregar avatar MetaHuman<small>+ $<span class="mh-price" data-plan="studio">0</span> USD / mes · 350 min/mes ($1.00/min)</small></span>
+        </label>
+        <div class="plan-desc">Para comenzar con un avatar predefinido que ya lleva tu marca.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li>Hasta 3 nodos IA configurados</li>
-          <li>100 documentos indexados</li>
-          <li>5 fuentes RSS/API</li>
-          <li>Reporte diario automatizado</li>
-          <li>Envío por email vía GAS</li>
-          <li>Soporte estándar (48h)</li>
+          <li>Avatar predefinido con tu marca</li>
+          <li>1 idioma (de 80 disponibles)</li>
+          <li>Background predefinido</li>
+          <li>Grabación de videos</li>
+          <li>Versión generativa</li>
+          <li>Analítica de preguntas frecuentes (data descargable)</li>
         </ul>
         <a href="#" class="btn btn-ghost js-signup">Comenzar gratis 14 días</a>
       </div>
 
       <div class="plan featured">
-        <div class="plan-badge">Más popular entre agencias</div>
-        <div class="plan-tier">Agency</div>
+        <div class="plan-badge">Más popular</div>
         <div class="plan-name">Professional</div>
         <div class="plan-price-wrap"><span class="plan-currency">$</span><span class="plan-price" id="price-agency">697</span></div>
-        <div class="plan-period">USD / mes · por agencia</div>
-        <div class="plan-desc">El plan favorito de las agencias que gestionan múltiples clientes premium con exigencias elevadas.</div>
+        <div class="plan-period">USD / mes · por empresa</div>
+        <div class="mh-note" data-plan="agency" hidden>Incluye licencia MetaHuman · 1,000 min/mes</div>
+        <label class="addon">
+          <input type="checkbox" class="mh-check" data-plan="agency">
+          <span class="addon-box" aria-hidden="true"></span>
+          <span class="addon-text">Agregar avatar MetaHuman<small>+ $<span class="mh-price" data-plan="agency">0</span> USD / mes · 1,000 min/mes ($0.75/min)</small></span>
+        </label>
+        <div class="plan-desc">Para equipos que usan su avatar en eventos, capacitaciones y videos.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li>Hasta 15 nodos IA configurados</li>
-          <li>Documentos ilimitados</li>
-          <li>Fuentes ilimitadas RSS/API</li>
-          <li>Reportes personalizados por cliente</li>
-          <li>Monitor en tiempo real 24/7</li>
-          <li>Envío personalizado por destinatario</li>
-          <li>Dashboard white-label</li>
-          <li>Soporte prioritario (4h)</li>
-          <li>Onboarding personalizado</li>
+          <li>Avatar predefinido con tu marca</li>
+          <li>1 vestuario para videos</li>
+          <li>1 idioma (de 80 disponibles)</li>
+          <li>1 background personalizado</li>
+          <li>Dashboard de analítica</li>
+          <li>Templates de dinámicas</li>
         </ul>
         <a href="#" class="btn btn-grad js-signup">Empezar ahora</a>
       </div>
 
       <div class="plan">
-        <div class="plan-tier">Prestige</div>
         <div class="plan-name">Premium</div>
         <div class="plan-price-wrap"><span class="plan-currency">$</span><span class="plan-price" id="price-premium">1,297</span></div>
-        <div class="plan-period">USD / mes · por agencia</div>
-        <div class="plan-desc">Para las agencias que no transigen con el estándar y necesitan las capacidades más avanzadas.</div>
+        <div class="plan-period">USD / mes · por empresa</div>
+        <div class="mh-note" data-plan="premium" hidden>Incluye licencia MetaHuman · 10,000 min/mes</div>
+        <label class="addon">
+          <input type="checkbox" class="mh-check" data-plan="premium">
+          <span class="addon-box" aria-hidden="true"></span>
+          <span class="addon-text">Agregar avatar MetaHuman<small>+ $<span class="mh-price" data-plan="premium">0</span> USD / mes · 10,000 min/mes ($0.28/min)</small></span>
+        </label>
+        <div class="plan-desc">Más idiomas, vestuarios y escenarios para marcas con varias audiencias.</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li>Nodos IA ilimitados</li>
-          <li>Documentos y fuentes ilimitadas</li>
-          <li>Fine-tuning del modelo de marca</li>
-          <li>API privada para integraciones</li>
-          <li>Reportes multicliente automatizados</li>
-          <li>Alertas en tiempo real (Slack, email)</li>
-          <li>Modelo privado dedicado</li>
-          <li>CSM dedicado (Customer Success)</li>
-          <li>SLA 99.9% uptime garantizado</li>
+          <li>Avatar predefinido con tu marca</li>
+          <li>2 vestuarios para videos</li>
+          <li>2 idiomas (de 80 disponibles)</li>
+          <li>2 backgrounds personalizados</li>
+          <li>Dashboard de analítica</li>
+          <li>Templates de dinámicas</li>
+          <li class="soon">WhatsApp y llamadas <span class="soon-tag">Coming soon</span></li>
         </ul>
-        <a href="#contacto" class="btn btn-ghost">Solicitar acceso</a>
+        <a href="#" class="btn btn-ghost js-signup">Empezar ahora</a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-name">Enterprise</div>
+        <div class="plan-price-wrap"><span class="plan-price plan-price-text">A medida</span></div>
+        <div class="plan-period">Cotización según alcance</div>
+        <div class="plan-desc">Un avatar propio, desarrollado a la medida de tu marca.</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li>Avatar de desarrollo propio</li>
+          <li>Desarrollo a la medida</li>
+          <li>5 vestuarios para videos</li>
+          <li>5 idiomas (de 80 disponibles)</li>
+          <li>5 backgrounds personalizados</li>
+          <li>Dashboard de analítica y templates de dinámicas</li>
+        </ul>
+        <a href="#contacto" class="btn btn-primary">Hablar con ventas</a>
       </div>
     </div>
 
-    <div class="enterprise">
-      <div>
-        <div class="ent-kicker">Enterprise</div>
-        <div class="ent-title">¿Necesitas algo a medida?</div>
-        <div class="ent-desc">Licencias corporativas, despliegue on-premise, integraciones personalizadas y equipo dedicado.</div>
-      </div>
-      <div class="ent-stats">
-        <div class="ent-stat"><b>∞</b><span>nodos</span></div>
-        <div class="ent-stat"><b>99.9%</b><span>Uptime SLA</span></div>
-        <div class="ent-stat"><b>1h</b><span>Soporte</span></div>
-      </div>
-      <a href="#contacto" class="btn btn-primary">Hablar con ventas</a>
+    <h3 class="matrix-title">Compara los planes en detalle</h3>
+    <div class="matrix-scroll">
+      <table class="matrix">
+        <thead>
+          <tr><th scope="col"></th><th scope="col">Essential</th><th scope="col" class="hl">Professional</th><th scope="col">Premium</th><th scope="col">Enterprise</th></tr>
+        </thead>
+        <tbody>
+          <tr class="group"><th colspan="5" scope="colgroup">Información de marca</th></tr>
+          <tr><th scope="row">Selección del avatar</th><td>Predefinidos</td><td class="hl">Predefinidos</td><td>Predefinidos</td><td>Desarrollo propio</td></tr>
+          <tr><th scope="row">Desarrollo a la medida</th><td class="no">—</td><td class="hl no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+          <tr><th scope="row">Inclusión de la marca en el avatar</th><td class="yes">✓</td><td class="hl yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><th scope="row">Vestuarios disponibles para videos</th><td>0</td><td class="hl">1</td><td>2</td><td>5</td></tr>
+          <tr><th scope="row">Idiomas (80 disponibles)</th><td>1</td><td class="hl">1</td><td>2</td><td>5</td></tr>
+          <tr><th scope="row">Grabar videos</th><td class="yes">✓</td><td class="hl yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><th scope="row">Cambiar background</th><td>Predefinido</td><td class="hl">1</td><td>2</td><td>5</td></tr>
+          <tr><th scope="row">Multidispositivo (tablet, móvil, computadora)</th><td>Responsive</td><td class="hl">Responsive</td><td>Responsive</td><td>Responsive</td></tr>
+          <tr><th scope="row">Versión generativa</th><td class="yes">✓</td><td class="hl yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr><th scope="row">Analítica de preguntas frecuentes</th><td>Data descargable</td><td class="hl">Dashboard</td><td>Dashboard</td><td>Dashboard</td></tr>
+          <tr><th scope="row">Templates de dinámicas</th><td class="no">—</td><td class="hl yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+          <tr class="group"><th colspan="5" scope="colgroup">Licencia MetaHuman (add-on opcional)</th></tr>
+          <tr><th scope="row">Precio de la licencia</th><td>+ $350 / mes</td><td class="hl">+ $750 / mes</td><td>+ $2,800 / mes</td><td>Según cotización</td></tr>
+          <tr><th scope="row">Minutos incluidos por mes</th><td>350</td><td class="hl">1,000</td><td>10,000</td><td>Según cotización</td></tr>
+          <tr><th scope="row">Costo por minuto</th><td>$1.00</td><td class="hl">$0.75</td><td>$0.28</td><td>Según cotización</td></tr>
+          <tr class="group"><th colspan="5" scope="colgroup">Canales</th></tr>
+          <tr><th scope="row">WhatsApp</th><td class="no">—</td><td class="hl no">—</td><td><span class="soon-tag">Coming soon</span></td><td class="no">—</td></tr>
+          <tr><th scope="row">Llamadas</th><td class="no">—</td><td class="hl no">—</td><td><span class="soon-tag">Coming soon</span></td><td class="no">—</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </section>
@@ -845,19 +933,32 @@ const FORM_ENDPOINT = '';
 
 document.querySelectorAll('.js-signup').forEach(a => a.setAttribute('href', SIGNUP_URL));
 
-// ── TOGGLE DE FACTURACIÓN ──
+// ── TOGGLE DE FACTURACIÓN + LICENCIA METAHUMAN ──
 let isAnnual = false;
 const prices = { studio: [297, 238], agency: [697, 558], premium: [1297, 1038] };
+// Licencia MetaHuman (add-on) por plan, en USD. Monto fijo: no lleva el descuento anual.
+const METAHUMAN_LICENSE = { studio: 350, agency: 750, premium: 2800 }; // Essential 350 min, Professional 1,000 min, Premium 10,000 min
+const priceIds = { studio: 'price-studio', agency: 'price-agency', premium: 'price-premium' };
+const fmt = n => n.toLocaleString('en-US');
+
+function renderPrices() {
+  const i = isAnnual ? 1 : 0;
+  document.querySelectorAll('.mh-price').forEach(el => el.textContent = fmt(METAHUMAN_LICENSE[el.dataset.plan]));
+  Object.keys(prices).forEach(plan => {
+    const withMH = document.querySelector('.mh-check[data-plan="' + plan + '"]').checked;
+    document.getElementById(priceIds[plan]).textContent = fmt(prices[plan][i] + (withMH ? METAHUMAN_LICENSE[plan] : 0));
+    document.querySelector('.mh-note[data-plan="' + plan + '"]').hidden = !withMH;
+  });
+}
 function setToggle(val) {
   isAnnual = val === null ? !isAnnual : val;
   document.getElementById('billing-toggle').classList.toggle('annual', isAnnual);
   document.getElementById('lbl-monthly').classList.toggle('active', !isAnnual);
   document.getElementById('lbl-annual').classList.toggle('active', isAnnual);
-  const i = isAnnual ? 1 : 0;
-  document.getElementById('price-studio').textContent = prices.studio[i].toLocaleString('en-US');
-  document.getElementById('price-agency').textContent = prices.agency[i].toLocaleString('en-US');
-  document.getElementById('price-premium').textContent = prices.premium[i].toLocaleString('en-US');
+  renderPrices();
 }
+document.querySelectorAll('.mh-check').forEach(cb => cb.addEventListener('change', renderPrices));
+renderPrices();
 
 // ── ENVÍO DE FORMULARIOS (GAS) ──
 function wireForm(form, okText) {
