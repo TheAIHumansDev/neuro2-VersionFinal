@@ -1,0 +1,1967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crabify — Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --parchment: #F3EDE3;
+  --blush: #F2DDD8;
+  --rose: #E8C4BC;
+  --dusty-rose: #C9948A;
+  --sage: #C8D5C0;
+  --sage-deep: #8FAA85;
+  --lavender: #D8D0E8;
+  --lavender-deep: #9B8FB5;
+  --champagne: #EDD9A3;
+  --champagne-deep: #C9A84C;
+  --ink: #2C2620;
+  --ink-soft: #5A4F47;
+  --ink-muted: #9A8C85;
+  --ink-faint: #C8BDB8;
+  --white: #FFFFFF;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+  --shadow-card: 0 2px 24px rgba(44,38,32,0.08);
+  --shadow-hover: 0 12px 48px rgba(44,38,32,0.14);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* Orbs */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+}
+.orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(242,221,216,0.5), transparent); top: -10%; left: -15%; }
+.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(216,208,232,0.4), transparent); bottom: 10%; right: -10%; }
+.orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(200,213,192,0.4), transparent); top: 50%; left: 50%; }
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 60px;
+  height: 72px;
+  background: rgba(250,247,242,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(44,38,32,0.06);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--dusty-rose), var(--lavender-deep));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+}
+.nav-back {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+.nav-back:hover { color: var(--ink); }
+
+/* MAIN LAYOUT */
+.auth-wrapper {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 60px;
+}
+
+/* SCREENS */
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 1100px;
+  animation: screenIn 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.screen.active { display: block; }
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PLAN SELECTION SCREEN ── */
+.plan-selection-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.step-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--parchment);
+  border: 1px solid rgba(44,38,32,0.1);
+  border-radius: 50px;
+  padding: 7px 20px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+.step-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--dusty-rose);
+}
+.ps-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.ps-title em { font-style: italic; color: var(--dusty-rose); }
+.ps-sub {
+  font-size: 15px;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+/* Billing toggle */
+.billing-toggle-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+.tog-label {
+  font-size: 13px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.tog-label.active { color: var(--ink); font-weight: 500; }
+.tog-switch {
+  width: 48px; height: 26px;
+  background: var(--ink);
+  border-radius: 13px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.tog-switch::after {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 4px; left: 4px;
+  transition: transform 0.2s;
+}
+.tog-switch.annual::after { transform: translateX(22px); }
+.save-badge {
+  background: rgba(200,213,192,0.5);
+  color: var(--sage-deep);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* Plans grid */
+.plans-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.plan-opt {
+  background: var(--white);
+  border: 2px solid rgba(44,38,32,0.06);
+  border-radius: 24px;
+  padding: 36px 28px;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.plan-opt::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rose), var(--dusty-rose));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.plan-opt:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); border-color: rgba(44,38,32,0.12); }
+.plan-opt:hover::before { opacity: 1; }
+.plan-opt.selected {
+  border-color: var(--dusty-rose);
+  box-shadow: 0 0 0 1px var(--dusty-rose), var(--shadow-hover);
+  transform: translateY(-3px);
+}
+.plan-opt.selected::before { opacity: 1; }
+.plan-opt.featured-opt {
+  background: var(--ink);
+}
+.popular-badge {
+  position: absolute;
+  top: -12px; left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--dusty-rose), var(--lavender-deep));
+  color: white;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+.opt-tier {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+}
+.featured-opt .opt-tier { color: rgba(250,247,242,0.45); }
+.opt-name {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+.featured-opt .opt-name { color: var(--cream); }
+.opt-price-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  margin-bottom: 4px;
+}
+.opt-currency {
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+  font-weight: 300;
+}
+.featured-opt .opt-currency { color: rgba(250,247,242,0.5); }
+.opt-price {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -1.5px;
+}
+.featured-opt .opt-price { color: var(--cream); }
+.opt-period {
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+}
+.featured-opt .opt-period { color: rgba(250,247,242,0.4); }
+.opt-divider {
+  height: 1px;
+  background: rgba(44,38,32,0.07);
+  margin-bottom: 18px;
+}
+.featured-opt .opt-divider { background: rgba(250,247,242,0.1); }
+.opt-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 24px;
+}
+.opt-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.featured-opt .opt-features li { color: rgba(250,247,242,0.65); }
+.feat-chk {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.chk-def { background: rgba(44,38,32,0.07); color: var(--sage-deep); }
+.chk-feat { background: rgba(250,247,242,0.15); color: var(--cream); }
+.btn-select {
+  width: 100%;
+  padding: 14px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+  letter-spacing: 0.3px;
+  border: none;
+}
+.btn-sel-outline {
+  background: transparent;
+  border: 1.5px solid rgba(44,38,32,0.2);
+  color: var(--ink);
+}
+.btn-sel-outline:hover, .plan-opt.selected .btn-sel-outline {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.btn-sel-white {
+  background: var(--cream);
+  color: var(--ink);
+}
+.btn-sel-white:hover { background: white; }
+
+.selected-indicator {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--dusty-rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: white;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: all 0.25s;
+}
+.plan-opt.selected .selected-indicator { opacity: 1; transform: scale(1); }
+
+/* Enterprise option */
+.ent-opt {
+  background: linear-gradient(135deg, var(--parchment), var(--blush));
+  border-radius: 20px;
+  padding: 28px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid rgba(44,38,32,0.08);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.ent-opt:hover { box-shadow: var(--shadow-card); }
+.ent-opt-text .ent-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.ent-opt-text .ent-desc { font-size: 13px; color: var(--ink-soft); font-weight: 300; }
+.btn-ent {
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-ent:hover { background: var(--ink-soft); }
+
+/* ── SIGNUP SCREEN ── */
+.auth-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.auth-info {
+  padding-top: 20px;
+}
+.auth-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--parchment);
+  border: 1px solid rgba(44,38,32,0.1);
+  border-radius: 50px;
+  padding: 6px 14px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 20px;
+}
+.eyebrow-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--dusty-rose);
+}
+.auth-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 3.5vw, 44px);
+  font-weight: 400;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.auth-title em { font-style: italic; color: var(--dusty-rose); }
+.auth-subtitle {
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+.selected-plan-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid rgba(44,38,32,0.1);
+  border-radius: 50px;
+  padding: 8px 16px 8px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 32px;
+}
+.selected-plan-chip:hover { border-color: var(--ink-soft); }
+.chip-icon {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--dusty-rose), var(--lavender-deep));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: white;
+}
+.chip-info { flex: 1; }
+.chip-plan { font-size: 12px; font-weight: 500; color: var(--ink); }
+.chip-price { font-size: 11px; color: var(--ink-muted); }
+.chip-change { font-size: 11px; color: var(--ink-muted); text-decoration: underline; }
+
+.auth-benefits { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.auth-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.benefit-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.bi-rose { background: rgba(242,221,216,0.6); }
+.bi-sage { background: rgba(200,213,192,0.6); }
+.bi-lav { background: rgba(216,208,232,0.6); }
+.bi-cham { background: rgba(237,217,163,0.6); }
+
+/* FORM CARD */
+.form-card {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: var(--shadow-hover);
+  border: 1px solid rgba(44,38,32,0.06);
+}
+.form-tabs {
+  display: flex;
+  background: var(--parchment);
+  border-radius: 50px;
+  padding: 4px;
+  margin-bottom: 28px;
+}
+.form-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: transparent;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.form-tab.active {
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 500;
+  box-shadow: var(--shadow-card);
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 7px;
+  letter-spacing: 0.2px;
+}
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--parchment);
+  border: 1px solid rgba(44,38,32,0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink);
+  transition: all 0.2s;
+  outline: none;
+}
+.form-input:focus {
+  border-color: var(--dusty-rose);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(201,148,138,0.12);
+}
+.form-input::placeholder { color: var(--ink-faint); }
+.form-input.error {
+  border-color: #E88080;
+  background: #FFF8F8;
+}
+.error-msg {
+  font-size: 11px;
+  color: #C05050;
+  margin-top: 5px;
+  display: none;
+}
+.error-msg.visible { display: block; }
+
+.input-with-icon {
+  position: relative;
+}
+.input-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--ink-muted);
+  font-size: 16px;
+  user-select: none;
+  transition: color 0.2s;
+}
+.input-icon:hover { color: var(--ink); }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.password-strength {
+  margin-top: 8px;
+}
+.strength-bars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.strength-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(44,38,32,0.08);
+  transition: background 0.3s;
+}
+.strength-bar.filled-weak { background: #E88080; }
+.strength-bar.filled-medium { background: var(--champagne-deep); }
+.strength-bar.filled-strong { background: var(--sage-deep); }
+.strength-label { font-size: 11px; color: var(--ink-muted); }
+
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+.form-divider::before, .form-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(44,38,32,0.08);
+}
+
+.btn-google {
+  width: 100%;
+  padding: 12px;
+  border-radius: 50px;
+  border: 1.5px solid rgba(44,38,32,0.15);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+.btn-google:hover { border-color: var(--ink); background: var(--parchment); }
+.google-icon {
+  width: 18px; height: 18px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234285F4' d='M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z'/%3E%3Cpath fill='%2334A853' d='M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z'/%3E%3Cpath fill='%23FBBC05' d='M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z'/%3E%3Cpath fill='%23EA4335' d='M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.form-checkbox {
+  width: 16px; height: 16px;
+  border: 1.5px solid rgba(44,38,32,0.25);
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  cursor: pointer;
+  appearance: none;
+  background: var(--parchment);
+  transition: all 0.2s;
+  position: relative;
+}
+.form-checkbox:checked {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.form-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 9px;
+  color: white;
+}
+.check-label {
+  font-size: 12px;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.check-label a { color: var(--dusty-rose); text-decoration: none; }
+.check-label a:hover { text-decoration: underline; }
+
+.btn-submit {
+  width: 100%;
+  padding: 15px;
+  border-radius: 50px;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-submit:hover {
+  background: #1a1410;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 36px rgba(44,38,32,0.22);
+}
+.btn-submit:active { transform: translateY(0); }
+.btn-submit.loading {
+  pointer-events: none;
+  opacity: 0.8;
+}
+.btn-submit .btn-text { transition: opacity 0.2s; }
+.btn-submit .btn-spinner {
+  display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 20px;
+  border: 2px solid rgba(250,247,242,0.3);
+  border-top-color: var(--cream);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.btn-submit.loading .btn-text { opacity: 0; }
+.btn-submit.loading .btn-spinner { display: block; }
+@keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+.form-footer-note {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-top: 14px;
+  line-height: 1.5;
+}
+.form-footer-note a { color: var(--dusty-rose); text-decoration: none; }
+.form-footer-note a:hover { text-decoration: underline; }
+
+/* Forgot password */
+.forgot-link {
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-decoration: none;
+  float: right;
+  margin-top: -4px;
+}
+.forgot-link:hover { color: var(--dusty-rose); }
+
+/* ── SUCCESS SCREEN ── */
+.success-center {
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 40px 0;
+}
+.success-icon-wrap {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(242,221,216,0.6), rgba(216,208,232,0.6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  margin: 0 auto 28px;
+  border: 1px solid rgba(44,38,32,0.08);
+  animation: popIn 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.success-title {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+.success-title em { font-style: italic; color: var(--dusty-rose); }
+.success-sub {
+  font-size: 15px;
+  color: var(--ink-soft);
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+.success-card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 24px 28px;
+  border: 1px solid rgba(44,38,32,0.08);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 32px;
+  text-align: left;
+}
+.success-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(44,38,32,0.06);
+  font-size: 13px;
+}
+.success-row:last-child { border-bottom: none; padding-bottom: 0; }
+.success-row .sr-label { color: var(--ink-muted); }
+.success-row .sr-val { color: var(--ink); font-weight: 500; }
+.success-row .sr-badge {
+  background: rgba(200,213,192,0.5);
+  color: var(--sage-deep);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.btn-dashboard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 16px 40px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+}
+.btn-dashboard:hover {
+  background: #1a1410;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(44,38,32,0.22);
+}
+.success-note { font-size: 12px; color: var(--ink-muted); margin-top: 14px; }
+
+/* Steps progress bar */
+.steps-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 48px;
+}
+.step-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  background: transparent;
+  transition: all 0.3s;
+}
+.step-pill.done, .step-pill.current {
+  background: var(--parchment);
+  color: var(--ink);
+}
+.step-pill .sp-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(44,38,32,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.step-pill.done .sp-num {
+  background: var(--sage-deep);
+  color: white;
+}
+.step-pill.current .sp-num {
+  background: var(--dusty-rose);
+  color: white;
+}
+.step-connector {
+  width: 32px;
+  height: 1px;
+  background: rgba(44,38,32,0.1);
+}
+
+/* FORM PANEL toggle */
+.signup-panel, .login-panel { display: none; }
+.signup-panel.active, .login-panel.active { display: block; }
+
+/* Forgot password screen */
+.forgot-panel { display: none; }
+.forgot-panel.active { display: block; }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--ink); }
+
+/* Trust badges */
+.trust-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+.trust-icon { font-size: 13px; }
+
+/* Save-to-sheet status */
+.sheet-status {
+  font-size: 11px;
+  color: var(--ink-muted);
+  text-align: center;
+  margin-top: 10px;
+  min-height: 14px;
+}
+.sheet-status.err { color: #C05050; }
+
+/* ── PAYMENT SCREEN ── */
+.pm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto 28px;
+}
+.pm-card {
+  background: var(--white);
+  border: 2px solid rgba(44,38,32,0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pm-card.open { border-color: var(--dusty-rose); box-shadow: var(--shadow-card); }
+.pm-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  cursor: pointer;
+}
+.pm-icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.pm-icon-paypal { background: rgba(216,208,232,0.5); }
+.pm-icon-bank { background: rgba(200,213,192,0.5); }
+.pm-icon-sinpe { background: rgba(237,217,163,0.5); }
+.pm-info { flex: 1; }
+.pm-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pm-tag {
+  font-size: 10px;
+  background: var(--parchment);
+  color: var(--ink-soft);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.pm-desc { font-size: 12px; color: var(--ink-soft); margin-top: 2px; font-weight: 300; }
+.pm-chevron { color: var(--ink-muted); font-size: 12px; transition: transform 0.2s; flex-shrink: 0; }
+.pm-card.open .pm-chevron { transform: rotate(180deg); }
+.pm-body { display: none; padding: 0 24px 24px; }
+.pm-card.open .pm-body { display: block; }
+.pm-note { font-size: 12px; color: var(--ink-soft); margin-bottom: 14px; font-weight: 300; line-height: 1.6; }
+.pm-warning { font-size: 12px; color: #C05050; margin-bottom: 10px; line-height: 1.5; }
+.pm-bank-details {
+  background: var(--parchment);
+  border-radius: 14px;
+  padding: 6px 18px;
+  margin-bottom: 16px;
+}
+.pm-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+  border-bottom: 1px solid rgba(44,38,32,0.06);
+}
+.pm-detail-row:last-child { border-bottom: none; }
+.pm-detail-row strong { color: var(--ink); font-weight: 500; font-size: 13px; }
+#paypal-button-container { margin-bottom: 4px; }
+.sr-badge.pending { background: rgba(237,217,163,0.6); color: var(--champagne-deep); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  nav { padding: 0 24px; }
+  .auth-layout { grid-template-columns: 1fr; gap: 32px; }
+  .auth-info { padding-top: 0; }
+  .plans-row { grid-template-columns: 1fr; }
+  .plan-opt.featured-opt { transform: none; }
+  .form-row { grid-template-columns: 1fr; }
+  .steps-progress { gap: 0; }
+  .step-pill span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-mark">🦀</div>
+    Crabify
+  </a>
+  <a href="index.html" class="nav-back">← Volver al inicio</a>
+</nav>
+
+<div class="auth-wrapper">
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- SCREEN 1: PLAN SELECTION           -->
+  <!-- ═══════════════════════════════════ -->
+  <div class="screen active" id="screen-plans">
+    <div class="plan-selection-header">
+      <div class="steps-progress">
+        <div class="step-pill current" id="sp1">
+          <span class="sp-num">1</span>
+          <span>Elige tu plan</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-pill" id="sp2">
+          <span class="sp-num">2</span>
+          <span>Crea tu cuenta</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-pill" id="sp3">
+          <span class="sp-num">3</span>
+          <span>Pago</span>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-pill" id="sp4">
+          <span class="sp-num">4</span>
+          <span>¡Todo listo!</span>
+        </div>
+      </div>
+
+      <div class="step-indicator">
+        <span class="step-dot"></span>
+        Paso 1 de 3
+      </div>
+      <h1 class="ps-title">Elige el plan que<br>lleva tu agencia <em>al siguiente nivel</em></h1>
+      <p class="ps-sub">14 días gratis en todos los planes · Sin tarjeta de crédito · Cancela cuando quieras</p>
+    </div>
+
+    <div class="billing-toggle-wrap">
+      <span class="tog-label active" id="pl-lbl-m" onclick="toggleBilling(false)">Mensual</span>
+      <div class="tog-switch" id="pl-toggle" onclick="toggleBilling(null)"></div>
+      <span class="tog-label" id="pl-lbl-a" onclick="toggleBilling(true)">Anual</span>
+      <span class="save-badge">Ahorra 20%</span>
+    </div>
+
+    <div class="plans-row">
+      <!-- Studio -->
+      <div class="plan-opt" id="opt-studio" onclick="selectPlan('studio')">
+        <div class="selected-indicator">✓</div>
+        <div class="opt-tier">Studio</div>
+        <div class="opt-name">Essentials</div>
+        <div class="opt-price-row">
+          <span class="opt-currency">$</span>
+          <span class="opt-price" id="pl-price-studio">297</span>
+        </div>
+        <div class="opt-period">USD / mes · por agencia</div>
+        <div class="opt-divider"></div>
+        <ul class="opt-features">
+          <li><span class="feat-chk chk-def">✓</span>Hasta 3 agentes IA</li>
+          <li><span class="feat-chk chk-def">✓</span>100 documentos indexados</li>
+          <li><span class="feat-chk chk-def">✓</span>5 fuentes RSS/API</li>
+          <li><span class="feat-chk chk-def">✓</span>Reporte diario automático</li>
+          <li><span class="feat-chk chk-def">✓</span>Soporte estándar (48h)</li>
+        </ul>
+        <button class="btn-select btn-sel-outline">Comenzar gratis</button>
+      </div>
+
+      <!-- Agency (featured) -->
+      <div class="plan-opt featured-opt" id="opt-agency" onclick="selectPlan('agency')">
+        <div class="popular-badge">✦ Más popular</div>
+        <div class="selected-indicator" style="background:rgba(250,247,242,0.3)">✓</div>
+        <div class="opt-tier">Agency</div>
+        <div class="opt-name">Professional</div>
+        <div class="opt-price-row">
+          <span class="opt-currency">$</span>
+          <span class="opt-price" id="pl-price-agency">697</span>
+        </div>
+        <div class="opt-period">USD / mes · por agencia</div>
+        <div class="opt-divider"></div>
+        <ul class="opt-features">
+          <li><span class="feat-chk chk-feat">✓</span>Hasta 15 agentes IA</li>
+          <li><span class="feat-chk chk-feat">✓</span>Documentos ilimitados</li>
+          <li><span class="feat-chk chk-feat">✓</span>Fuentes ilimitadas</li>
+          <li><span class="feat-chk chk-feat">✓</span>Reportes por cliente</li>
+          <li><span class="feat-chk chk-feat">✓</span>Monitor 24/7 · Dashboard white-label</li>
+          <li><span class="feat-chk chk-feat">✓</span>Soporte prioritario (4h)</li>
+          <li><span class="feat-chk chk-feat">✓</span>Onboarding personalizado</li>
+        </ul>
+        <button class="btn-select btn-sel-white">Empezar ahora →</button>
+      </div>
+
+      <!-- Premium -->
+      <div class="plan-opt" id="opt-premium" onclick="selectPlan('premium')">
+        <div class="selected-indicator">✓</div>
+        <div class="opt-tier">Prestige</div>
+        <div class="opt-name">Premium</div>
+        <div class="opt-price-row">
+          <span class="opt-currency">$</span>
+          <span class="opt-price" id="pl-price-premium">1,297</span>
+        </div>
+        <div class="opt-period">USD / mes · por agencia</div>
+        <div class="opt-divider"></div>
+        <ul class="opt-features">
+          <li><span class="feat-chk chk-def">✓</span>Agentes ilimitados</li>
+          <li><span class="feat-chk chk-def">✓</span>Fine-tuning del modelo</li>
+          <li><span class="feat-chk chk-def">✓</span>API privada dedicada</li>
+          <li><span class="feat-chk chk-def">✓</span>Alertas Slack + email</li>
+          <li><span class="feat-chk chk-def">✓</span>CSM dedicado</li>
+          <li><span class="feat-chk chk-def">✓</span>SLA 99.9% uptime</li>
+        </ul>
+        <button class="btn-select btn-sel-outline">Solicitar acceso</button>
+      </div>
+    </div>
+
+    <div class="ent-opt" onclick="goEnterprise()">
+      <div class="ent-opt-text">
+        <div class="ent-name">¿Necesitas Enterprise?</div>
+        <div class="ent-desc">Licencias corporativas, on-premise, integraciones a medida y equipo dedicado.</div>
+      </div>
+      <button class="btn-ent">Hablar con ventas →</button>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item"><span class="trust-icon">🔒</span> AES-256 cifrado</div>
+      <div class="trust-item"><span class="trust-icon">🇪🇺</span> Cumplimiento GDPR</div>
+      <div class="trust-item"><span class="trust-icon">✦</span> +340 agencias activas</div>
+      <div class="trust-item"><span class="trust-icon">↩</span> Sin permanencia</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- SCREEN 2: AUTH (SIGNUP / LOGIN)    -->
+  <!-- ═══════════════════════════════════ -->
+  <div class="screen" id="screen-auth">
+    <div class="steps-progress" style="margin-bottom:40px">
+      <div class="step-pill done" id="sp1b">
+        <span class="sp-num">✓</span>
+        <span>Plan elegido</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill current" id="sp2b">
+        <span class="sp-num">2</span>
+        <span>Crea tu cuenta</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill" id="sp3b">
+        <span class="sp-num">3</span>
+        <span>Pago</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill" id="sp4b">
+        <span class="sp-num">4</span>
+        <span>¡Todo listo!</span>
+      </div>
+    </div>
+
+    <div class="auth-layout">
+      <!-- Info side -->
+      <div class="auth-info">
+        <div class="auth-eyebrow">
+          <span class="eyebrow-dot"></span>
+          Registro seguro
+        </div>
+        <h1 class="auth-title">Comienza tu<br>prueba <em>gratuita</em></h1>
+        <p class="auth-subtitle">14 días sin compromiso para descubrir cómo Crabify transforma la inteligencia de tu agencia.</p>
+
+        <div class="selected-plan-chip" onclick="goBack('screen-plans')">
+          <div class="chip-icon">✦</div>
+          <div class="chip-info">
+            <div class="chip-plan" id="chip-plan-name">Agency Professional</div>
+            <div class="chip-price" id="chip-plan-price">$697 / mes · 14 días gratis</div>
+          </div>
+          <span class="chip-change">Cambiar →</span>
+        </div>
+
+        <ul class="auth-benefits">
+          <li>
+            <div class="benefit-icon bi-rose">📄</div>
+            Ingestión ilimitada de documentos de marca
+          </li>
+          <li>
+            <div class="benefit-icon bi-sage">📡</div>
+            Monitor de tendencias 24/7 activado
+          </li>
+          <li>
+            <div class="benefit-icon bi-lav">📊</div>
+            Primer reporte estratégico en menos de 10 min
+          </li>
+          <li>
+            <div class="benefit-icon bi-cham">✉️</div>
+            Envío automático configurado con tu equipo
+          </li>
+        </ul>
+      </div>
+
+      <!-- Form card -->
+      <div class="form-card">
+        <div class="form-tabs">
+          <button class="form-tab active" id="tab-signup" onclick="switchTab('signup')">Crear cuenta</button>
+          <button class="form-tab" id="tab-login" onclick="switchTab('login')">Iniciar sesión</button>
+        </div>
+
+        <!-- SIGNUP PANEL -->
+        <div class="signup-panel active" id="panel-signup">
+          <button class="btn-google" onclick="socialAuth('Google')">
+            <div class="google-icon"></div>
+            Continuar con Google
+          </button>
+          <div class="form-divider">o regístrate con email</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-input" id="inp-fname" placeholder="Alejandra" autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Apellido</label>
+              <input type="text" class="form-input" id="inp-lname" placeholder="Montoya" autocomplete="family-name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nombre de la agencia</label>
+            <input type="text" class="form-input" id="inp-agency" placeholder="Maison Digital" autocomplete="organization">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-input" id="inp-email-s" placeholder="alejandra@maisondigital.com" autocomplete="email">
+            <div class="error-msg" id="err-email-s">Introduce un correo válido.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <div class="input-with-icon">
+              <input type="password" class="form-input" id="inp-pass-s" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="checkStrength(this.value)">
+              <span class="input-icon" onclick="togglePass('inp-pass-s', this)">👁</span>
+            </div>
+            <div class="password-strength">
+              <div class="strength-bars">
+                <div class="strength-bar" id="bar1"></div>
+                <div class="strength-bar" id="bar2"></div>
+                <div class="strength-bar" id="bar3"></div>
+                <div class="strength-bar" id="bar4"></div>
+              </div>
+              <div class="strength-label" id="strength-label">Introduce una contraseña</div>
+            </div>
+          </div>
+
+          <div class="form-check">
+            <input type="checkbox" class="form-checkbox" id="chk-terms">
+            <label class="check-label" for="chk-terms">
+              Acepto los <a href="#">Términos de servicio</a> y la <a href="#">Política de privacidad</a> de Crabify.
+            </label>
+          </div>
+
+          <button class="btn-submit" id="btn-signup" onclick="handleSignup()">
+            <span class="btn-text">Crear cuenta y comenzar prueba →</span>
+            <div class="btn-spinner"></div>
+          </button>
+          <div class="sheet-status" id="sheet-status-signup"></div>
+          <div class="form-footer-note">
+            ¿Ya tienes cuenta? <a href="#" onclick="switchTab('login'); return false;">Inicia sesión aquí</a>
+          </div>
+        </div>
+
+        <!-- LOGIN PANEL -->
+        <div class="login-panel" id="panel-login">
+          <button class="btn-google" onclick="socialAuth('Google')">
+            <div class="google-icon"></div>
+            Continuar con Google
+          </button>
+          <div class="form-divider">o accede con email</div>
+
+          <div class="form-group">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" class="form-input" id="inp-email-l" placeholder="alejandra@maisondigital.com" autocomplete="email">
+            <div class="error-msg" id="err-email-l">Introduce un correo válido.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              Contraseña
+              <a href="#" class="forgot-link" onclick="showForgot(); return false;">¿Olvidaste tu contraseña?</a>
+            </label>
+            <div class="input-with-icon">
+              <input type="password" class="form-input" id="inp-pass-l" placeholder="Tu contraseña" autocomplete="current-password">
+              <span class="input-icon" onclick="togglePass('inp-pass-l', this)">👁</span>
+            </div>
+            <div class="error-msg" id="err-login">Correo o contraseña incorrectos. Inténtalo de nuevo.</div>
+          </div>
+
+          <div class="form-check" style="margin-bottom:14px">
+            <input type="checkbox" class="form-checkbox" id="chk-remember">
+            <label class="check-label" for="chk-remember">Recordar sesión en este dispositivo</label>
+          </div>
+
+          <button class="btn-submit" id="btn-login" onclick="handleLogin()">
+            <span class="btn-text">Iniciar sesión →</span>
+            <div class="btn-spinner"></div>
+          </button>
+          <div class="form-footer-note" style="margin-top:14px">
+            ¿Nuevo en Crabify? <a href="#" onclick="switchTab('signup'); return false;">Crea tu cuenta gratis</a>
+          </div>
+
+          <!-- Forgot password panel (inline) -->
+          <div class="forgot-panel" id="forgot-panel" style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(44,38,32,0.08)">
+            <a class="back-link" onclick="hideForgot()">← Volver al login</a>
+            <div class="form-group">
+              <label class="form-label">Tu correo electrónico</label>
+              <input type="email" class="form-input" id="inp-email-f" placeholder="alejandra@maisondigital.com">
+            </div>
+            <button class="btn-submit" onclick="handleForgot()">
+              <span class="btn-text">Enviar instrucciones →</span>
+              <div class="btn-spinner"></div>
+            </button>
+            <div class="form-footer-note" style="margin-top:12px">Te enviaremos un enlace para restablecer tu contraseña.</div>
+          </div>
+        </div>
+
+        <div class="trust-row" style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(44,38,32,0.06)">
+          <div class="trust-item"><span class="trust-icon">🔒</span> SSL seguro</div>
+          <div class="trust-item"><span class="trust-icon">🛡</span> GDPR</div>
+          <div class="trust-item"><span class="trust-icon">↩</span> 14 días gratis</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- SCREEN 3: PAYMENT                  -->
+  <!-- ═══════════════════════════════════ -->
+  <div class="screen" id="screen-payment">
+    <div class="steps-progress" style="margin-bottom:32px">
+      <div class="step-pill done">
+        <span class="sp-num">✓</span>
+        <span>Plan elegido</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill done">
+        <span class="sp-num">✓</span>
+        <span>Cuenta creada</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill current">
+        <span class="sp-num">3</span>
+        <span>Pago</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill">
+        <span class="sp-num">4</span>
+        <span>¡Todo listo!</span>
+      </div>
+    </div>
+
+    <div class="plan-selection-header">
+      <a class="back-link" onclick="goToAuthFromPayment()" style="display:inline-flex">← Volver a mis datos</a>
+      <div class="step-indicator">
+        <span class="step-dot"></span>
+        Paso 3 de 3
+      </div>
+      <h1 class="ps-title">Completa tu <em>pago</em></h1>
+      <p class="ps-sub" id="payment-plan-summary">Plan Agency Professional · $697 / mes</p>
+    </div>
+
+    <div class="pm-list">
+      <!-- PayPal -->
+      <div class="pm-card" id="pm-paypal">
+        <div class="pm-card-head" onclick="togglePaymentMethod('paypal')">
+          <div class="pm-icon pm-icon-paypal">💳</div>
+          <div class="pm-info">
+            <div class="pm-name">PayPal</div>
+            <div class="pm-desc">Activación inmediata en cuanto se confirme el pago</div>
+          </div>
+          <span class="pm-chevron">▾</span>
+        </div>
+        <div class="pm-body">
+          <p class="pm-note">Serás redirigida a PayPal para completar el pago de forma segura. Tu cuenta se activa al instante.</p>
+          <div id="paypal-button-container"></div>
+          <button class="btn-select btn-sel-outline" id="btn-paypal-fallback" onclick="handlePaypalFallback()" style="display:none">Ya pagué con PayPal →</button>
+        </div>
+      </div>
+
+      <!-- Transferencia bancaria -->
+      <div class="pm-card" id="pm-transfer">
+        <div class="pm-card-head" onclick="togglePaymentMethod('transfer')">
+          <div class="pm-icon pm-icon-bank">🏦</div>
+          <div class="pm-info">
+            <div class="pm-name">Transferencia bancaria</div>
+            <div class="pm-desc">Acceso completo al verificar tu comprobante (hasta 24h)</div>
+          </div>
+          <span class="pm-chevron">▾</span>
+        </div>
+        <div class="pm-body">
+          <div class="pm-bank-details">
+            <div class="pm-detail-row"><span>Banco</span><strong>Banco Nacional de Costa Rica</strong></div>
+            <div class="pm-detail-row"><span>Cuenta IBAN</span><strong>CR00-0000-0000-0000-0000-00</strong></div>
+            <div class="pm-detail-row"><span>Titular</span><strong>Crabify SRL</strong></div>
+            <div class="pm-detail-row"><span>Cédula jurídica</span><strong>3-102-000000</strong></div>
+            <div class="pm-detail-row"><span>Monto a transferir</span><strong id="pm-amount-transfer">$697.00</strong></div>
+          </div>
+          <p class="pm-note">Después de transferir, ingresa el número de comprobante para que podamos verificarlo. Mientras se verifica, tu cuenta queda con acceso pendiente.</p>
+          <div class="form-group">
+            <label class="form-label">Número de comprobante / referencia</label>
+            <input type="text" class="form-input" id="inp-ref-transfer" placeholder="Ej. 0123456789">
+          </div>
+          <button class="btn-select btn-sel-outline" onclick="handlePaymentPending('Transferencia bancaria','inp-ref-transfer')">Ya realicé la transferencia →</button>
+        </div>
+      </div>
+
+      <!-- SINPE Móvil -->
+      <div class="pm-card" id="pm-sinpe">
+        <div class="pm-card-head" onclick="togglePaymentMethod('sinpe')">
+          <div class="pm-icon pm-icon-sinpe">📱</div>
+          <div class="pm-info">
+            <div class="pm-name">SINPE Móvil <span class="pm-tag">Costa Rica</span></div>
+            <div class="pm-desc">Acceso completo al verificar tu comprobante (hasta 24h)</div>
+          </div>
+          <span class="pm-chevron">▾</span>
+        </div>
+        <div class="pm-body">
+          <div class="pm-bank-details">
+            <div class="pm-detail-row"><span>Número SINPE</span><strong>8888-0000</strong></div>
+            <div class="pm-detail-row"><span>A nombre de</span><strong>Crabify SRL</strong></div>
+            <div class="pm-detail-row"><span>Monto a enviar</span><strong id="pm-amount-sinpe">$697.00</strong></div>
+          </div>
+          <p class="pm-note">Después de hacer el SINPE, ingresa el número de referencia del mensaje de confirmación. Mientras se verifica, tu cuenta queda con acceso pendiente.</p>
+          <div class="form-group">
+            <label class="form-label">Número de referencia SINPE</label>
+            <input type="text" class="form-input" id="inp-ref-sinpe" placeholder="Ej. 987654">
+          </div>
+          <button class="btn-select btn-sel-outline" onclick="handlePaymentPending('SINPE Móvil','inp-ref-sinpe')">Ya realicé el SINPE →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-status" id="sheet-status-payment"></div>
+
+    <div class="trust-row">
+      <div class="trust-item"><span class="trust-icon">🔒</span> Pago seguro</div>
+      <div class="trust-item"><span class="trust-icon">🛡</span> Datos cifrados</div>
+      <div class="trust-item"><span class="trust-icon">↩</span> Verificación manual en hasta 24h</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- SCREEN 4: SUCCESS                  -->
+  <!-- ═══════════════════════════════════ -->
+  <div class="screen" id="screen-success">
+    <div class="steps-progress" style="margin-bottom:48px">
+      <div class="step-pill done">
+        <span class="sp-num">✓</span>
+        <span>Plan elegido</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill done">
+        <span class="sp-num">✓</span>
+        <span>Cuenta creada</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill done">
+        <span class="sp-num">✓</span>
+        <span>Pago</span>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-pill current">
+        <span class="sp-num">✦</span>
+        <span>¡Todo listo!</span>
+      </div>
+    </div>
+
+    <div class="success-center">
+      <div class="success-icon-wrap">✦</div>
+      <h1 class="success-title">Bienvenida a<br><em>Crabify</em></h1>
+      <p class="success-sub" id="success-sub">Tu cuenta ha sido creada. Tu motor de inteligencia estratégica está listo para comenzar a generar valor.</p>
+
+      <div class="success-card">
+        <div class="success-row">
+          <span class="sr-label">Plan activado</span>
+          <span class="sr-val" id="success-plan">Agency Professional</span>
+        </div>
+        <div class="success-row">
+          <span class="sr-label">Método de pago</span>
+          <span class="sr-val" id="success-payment-method">—</span>
+        </div>
+        <div class="success-row">
+          <span class="sr-label">Estado del pago</span>
+          <span class="sr-badge" id="success-payment-badge">Activo</span>
+        </div>
+        <div class="success-row">
+          <span class="sr-label">Cuenta</span>
+          <span class="sr-val" id="success-email">—</span>
+        </div>
+        <div class="success-row">
+          <span class="sr-label">Próximo paso</span>
+          <span class="sr-val" id="success-next-step">Configurar tu primer agente IA</span>
+        </div>
+      </div>
+
+      <a href="ai-training-engine.html" class="btn-dashboard" id="success-dashboard-btn">
+        Ir al Motor IA →
+      </a>
+      <div class="success-note" id="success-note">Hemos enviado un correo de bienvenida con tus credenciales y guía de inicio.</div>
+    </div>
+  </div>
+
+</div><!-- /auth-wrapper -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONFIGURACIÓN — Google Apps Script (guarda registros en Sheets)
+// ═══════════════════════════════════════════════════════
+// 1. Crea un Google Sheet nuevo.
+// 2. Extensiones → Apps Script → pega el código "Code.gs" (te lo entrego aparte).
+// 3. Implementar → Nueva implementación → Aplicación web
+//      - Ejecutar como: Yo
+//      - Quién tiene acceso: Cualquier usuario
+// 4. Copia la URL de la app web y pégala abajo.
+const GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzjmyw5OvKs_ppV2mocxLI_o7fi-T-ByzCbMi02vAxF_0bhs7rzUagbpz1VZqUxjfhnnQ/exec'; // ej: https://script.google.com/macros/s/XXXXXXXX/exec
+
+// PayPal — Client ID de tu app en https://developer.paypal.com (usa uno "Sandbox" para probar).
+// Sin configurar, el botón muestra una opción de "Ya pagué con PayPal" para simular el flujo.
+const PAYPAL_CLIENT_ID = 'AfRLmDY9oSYybfyi8OhKBkyvo-XqO0H6NQ_3zpvn0IsM7jsDCN0eAls92Ux01XlP2VOJ-wMwAEW-mAq5';
+
+// Envía datos al Google Sheet vía Apps Script.
+// Se usa Content-Type text/plain para evitar el preflight CORS que
+// Apps Script Web Apps no maneja bien con application/json.
+function sendToSheet(payload, statusElId) {
+  const statusEl = statusElId ? document.getElementById(statusElId) : null;
+  if (!GAS_WEBHOOK_URL || GAS_WEBHOOK_URL.includes('PEGA_AQUI')) {
+    console.warn('[Crabify] Configura GAS_WEBHOOK_URL para guardar registros en Google Sheets.');
+    return Promise.resolve({ ok: false, reason: 'not-configured' });
+  }
+  if (statusEl) { statusEl.textContent = 'Guardando tu registro…'; statusEl.classList.remove('err'); }
+  return fetch(GAS_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (statusEl) statusEl.textContent = data && data.status === 'ok' ? '✓ Registro guardado' : '';
+      return { ok: true, data };
+    })
+    .catch(err => {
+      console.error('[Crabify] Error enviando a Google Sheets:', err);
+      if (statusEl) {
+        statusEl.textContent = 'No pudimos sincronizar tu registro, pero tu cuenta se creó igual.';
+        statusEl.classList.add('err');
+      }
+      return { ok: false, error: err };
+    });
+}
+
+// ── STATE ──
+let state = {
+  plan: 'agency',
+  billing: false,
+  email: '',
+  payment: null // { method, status: 'Activo' | 'Pendiente de verificación', reference }
+};
+
+function getCurrentPrice() {
+  return prices[state.plan][state.billing ? 1 : 0];
+}
+
+const prices = {
+  studio:  [297, 238],
+  agency:  [697, 558],
+  premium: [1297, 1038]
+};
+
+const planNames = {
+  studio: 'Studio Essentials',
+  agency: 'Agency Professional',
+  premium: 'Prestige Premium'
+};
+
+// ── BILLING TOGGLE ──
+function toggleBilling(val) {
+  if (val === null) state.billing = !state.billing;
+  else state.billing = val;
+  const sw = document.getElementById('pl-toggle');
+  sw.classList.toggle('annual', state.billing);
+  document.getElementById('pl-lbl-m').classList.toggle('active', !state.billing);
+  document.getElementById('pl-lbl-a').classList.toggle('active', state.billing);
+  const i = state.billing ? 1 : 0;
+  document.getElementById('pl-price-studio').textContent  = prices.studio[i].toLocaleString();
+  document.getElementById('pl-price-agency').textContent  = prices.agency[i].toLocaleString();
+  document.getElementById('pl-price-premium').textContent = prices.premium[i].toLocaleString();
+}
+
+// ── PLAN SELECT ──
+function selectPlan(plan) {
+  state.plan = plan;
+  document.querySelectorAll('.plan-opt').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-' + plan).classList.add('selected');
+  setTimeout(() => goToAuth(), 300);
+}
+
+// ── SCREENS NAV ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const target = document.getElementById(id);
+  target.style.display = 'block';
+  setTimeout(() => target.classList.add('active'), 10);
+}
+
+function goToAuth() {
+  const i = state.billing ? 1 : 0;
+  const price = prices[state.plan][i];
+  const billing = state.billing ? 'año' : 'mes';
+  document.getElementById('chip-plan-name').textContent  = planNames[state.plan];
+  document.getElementById('chip-plan-price').textContent = `$${price.toLocaleString()} / ${billing} · 14 días gratis`;
+  showScreen('screen-auth');
+  document.getElementById('sp1').classList.remove('current'); document.getElementById('sp1').classList.add('done');
+  document.getElementById('sp2').classList.add('current');
+}
+
+function goBack(to) {
+  showScreen(to);
+  document.getElementById('sp1').classList.remove('done'); document.getElementById('sp1').classList.add('current');
+  document.getElementById('sp2').classList.remove('current');
+}
+
+function goEnterprise() {
+  alert('Conectando con el equipo de ventas…\n\nEn una implementación real, esto abriría un formulario de contacto o Calendly.');
+}
+
+// ── TAB SWITCH ──
+function switchTab(tab) {
+  document.getElementById('panel-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  hideForgot();
+}
+
+// ── PASSWORD TOGGLE ──
+function togglePass(inputId, icon) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') { inp.type = 'text'; icon.textContent = '🙈'; }
+  else { inp.type = 'password'; icon.textContent = '👁'; }
+}
+
+// ── PASSWORD STRENGTH ──
+function checkStrength(val) {
+  const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3'), document.getElementById('bar4')];
+  const lbl = document.getElementById('strength-label');
+  bars.forEach(b => { b.className = 'strength-bar'; });
+  if (!val) { lbl.textContent = 'Introduce una contraseña'; return; }
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const cls = score <= 1 ? 'filled-weak' : score <= 2 ? 'filled-medium' : 'filled-strong';
+  const labels = ['', 'Débil', 'Débil', 'Aceptable', 'Fuerte'];
+  for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+  lbl.textContent = labels[score] || '';
+}
+
+// ── VALIDATION ──
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function setError(inputId, msgId, show) {
+  const inp = document.getElementById(inputId);
+  const msg = document.getElementById(msgId);
+  if (show) { inp.classList.add('error'); msg.classList.add('visible'); }
+  else { inp.classList.remove('error'); msg.classList.remove('visible'); }
+}
+
+// ── SIGNUP ──
+function handleSignup() {
+  const email = document.getElementById('inp-email-s').value.trim();
+  let valid = true;
+  if (!isValidEmail(email)) { setError('inp-email-s', 'err-email-s', true); valid = false; }
+  else { setError('inp-email-s', 'err-email-s', false); }
+  if (!document.getElementById('chk-terms').checked) {
+    alert('Debes aceptar los términos de servicio para continuar.');
+    return;
+  }
+  if (!valid) return;
+  state.email = email;
+
+  const payload = {
+    action: 'signup',
+    nombre: document.getElementById('inp-fname').value.trim(),
+    apellido: document.getElementById('inp-lname').value.trim(),
+    agencia: document.getElementById('inp-agency').value.trim(),
+    email: email,
+    plan: planNames[state.plan],
+    facturacion: state.billing ? 'Anual' : 'Mensual',
+    precioUsd: getCurrentPrice(),
+    origen: 'crabify-auth.html'
+  };
+
+  const btn = document.getElementById('btn-signup');
+  btn.classList.add('loading');
+
+  // Guardamos el registro en el Sheet (estado "Pendiente de pago") y avanzamos
+  // al paso de pago sin bloquear al usuario por la latencia de Apps Script.
+  sendToSheet(payload, 'sheet-status-signup');
+
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    goToPayment();
+  }, 1800);
+}
+
+// ── PAYMENT SCREEN NAV ──
+function goToPayment() {
+  const price = getCurrentPrice();
+  const billing = state.billing ? 'año' : 'mes';
+  document.getElementById('payment-plan-summary').textContent =
+    `Plan ${planNames[state.plan]} · $${price.toLocaleString()} / ${billing}`;
+  document.getElementById('pm-amount-transfer').textContent = `$${price.toFixed(2)}`;
+  document.getElementById('pm-amount-sinpe').textContent = `$${price.toFixed(2)}`;
+  showScreen('screen-payment');
+  document.getElementById('sp2b').classList.remove('current'); document.getElementById('sp2b').classList.add('done');
+  document.getElementById('sp3b').classList.add('current');
+}
+
+function goToAuthFromPayment() {
+  showScreen('screen-auth');
+  document.getElementById('sp3b').classList.remove('current');
+  document.getElementById('sp2b').classList.remove('done'); document.getElementById('sp2b').classList.add('current');
+}
+
+// ── PAYMENT METHODS (accordion) ──
+function togglePaymentMethod(id) {
+  ['paypal', 'transfer', 'sinpe'].forEach(key => {
+    const card = document.getElementById('pm-' + key);
+    if (key === id) {
+      const willOpen = !card.classList.contains('open');
+      card.classList.toggle('open', willOpen);
+      if (willOpen && key === 'paypal') initPayPalButton();
+    } else {
+      card.classList.remove('open');
+    }
+  });
+}
+
+// ── PAYPAL ──
+function loadPayPalSdk(callback) {
+  if (window.paypal) { callback(); return; }
+  const script = document.createElement('script');
+  script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+  script.onload = callback;
+  script.onerror = () => console.error('[Crabify] No se pudo cargar el SDK de PayPal.');
+  document.body.appendChild(script);
+}
+
+function initPayPalButton() {
+  const container = document.getElementById('paypal-button-container');
+  const fallbackBtn = document.getElementById('btn-paypal-fallback');
+
+  if (!PAYPAL_CLIENT_ID || PAYPAL_CLIENT_ID.includes('PEGA_AQUI')) {
+    container.innerHTML = '<p class="pm-warning">Configura tu PAYPAL_CLIENT_ID para activar el botón real de PayPal. Mientras tanto, puedes simular el pago:</p>';
+    fallbackBtn.style.display = 'block';
+    return;
+  }
+  fallbackBtn.style.display = 'none';
+  if (container.dataset.rendered === '1') return; // evita re-renderizar el botón
+
+  loadPayPalSdk(() => {
+    paypal.Buttons({
+      style: { shape: 'pill', color: 'black', label: 'pay' },
+      createOrder: (data, actions) => actions.order.create({
+        purchase_units: [{ amount: { value: getCurrentPrice().toFixed(2) } }]
+      }),
+      onApprove: (data, actions) => actions.order.capture().then(details => {
+        handlePaymentSuccess('PayPal', details.id);
+      }),
+      onError: (err) => {
+        console.error('[Crabify] Error en PayPal:', err);
+        alert('Hubo un problema procesando el pago con PayPal. Intenta de nuevo.');
+      }
+    }).render('#paypal-button-container');
+    container.dataset.rendered = '1';
+  });
+}
+
+function handlePaypalFallback() {
+  handlePaymentSuccess('PayPal (simulado)', 'DEMO-' + Date.now());
+}
+
+// ── PAYMENT OUTCOMES ──
+function handlePaymentSuccess(method, reference) {
+  state.payment = { method, status: 'Activo', reference };
+  sendPaymentToSheet();
+  goToSuccess();
+}
+
+function handlePaymentPending(method, inputId) {
+  const ref = document.getElementById(inputId).value.trim();
+  if (!ref) { alert('Ingresa el número de comprobante o referencia antes de continuar.'); return; }
+  state.payment = { method, status: 'Pendiente de verificación', reference: ref };
+  sendPaymentToSheet();
+  goToSuccess();
+}
+
+function sendPaymentToSheet() {
+  const payload = {
+    action: 'payment',
+    email: state.email,
+    metodoPago: state.payment.method,
+    estado: state.payment.status,
+    referencia: state.payment.reference
+  };
+  sendToSheet(payload, 'sheet-status-payment');
+}
+
+// ── LOGIN ──
+function handleLogin() {
+  const email = document.getElementById('inp-email-l').value.trim();
+  let valid = true;
+  if (!isValidEmail(email)) { setError('inp-email-l', 'err-email-l', true); valid = false; }
+  else { setError('inp-email-l', 'err-email-l', false); }
+  if (!valid) return;
+  state.email = email;
+  const btn = document.getElementById('btn-login');
+  btn.classList.add('loading');
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    goToSuccess();
+  }, 1600);
+}
+
+// ── FORGOT PASSWORD ──
+function showForgot() {
+  document.getElementById('forgot-panel').classList.add('active');
+  document.getElementById('forgot-panel').style.display = 'block';
+}
+function hideForgot() {
+  const fp = document.getElementById('forgot-panel');
+  fp.classList.remove('active');
+  fp.style.display = 'none';
+}
+function handleForgot() {
+  const email = document.getElementById('inp-email-f').value.trim();
+  if (!isValidEmail(email)) { alert('Introduce un correo válido.'); return; }
+  alert(`✓ Hemos enviado las instrucciones a ${email}\n\nRevisa tu bandeja de entrada y sigue el enlace para restablecer tu contraseña.`);
+  hideForgot();
+}
+
+// ── SOCIAL AUTH ──
+function socialAuth(provider) {
+  alert(`Conectando con ${provider}…\n\nEn una implementación real, esto iniciaría el flujo OAuth de ${provider}.`);
+}
+
+// ── SUCCESS ──
+function goToSuccess() {
+  const email = state.email || document.getElementById('inp-email-s').value || document.getElementById('inp-email-l').value || '—';
+  document.getElementById('success-plan').textContent  = planNames[state.plan] || 'Agency Professional';
+  document.getElementById('success-email').textContent = email;
+
+  const badge    = document.getElementById('success-payment-badge');
+  const methodEl = document.getElementById('success-payment-method');
+  const subEl    = document.getElementById('success-sub');
+  const noteEl   = document.getElementById('success-note');
+  const nextEl   = document.getElementById('success-next-step');
+  const dashBtn  = document.getElementById('success-dashboard-btn');
+
+  if (state.payment && state.payment.status === 'Pendiente de verificación') {
+    methodEl.textContent = state.payment.method;
+    badge.textContent = 'Pendiente de verificación';
+    badge.classList.add('pending');
+    subEl.textContent = 'Tu cuenta fue creada. Activaremos el acceso completo en cuanto verifiquemos tu pago (hasta 24h).';
+    nextEl.textContent = 'Esperar confirmación del pago';
+    noteEl.textContent = 'Te avisaremos por correo en cuanto verifiquemos tu comprobante y activemos tu cuenta.';
+    dashBtn.textContent = 'Explorar mientras se verifica →';
+  } else {
+    methodEl.textContent = state.payment ? state.payment.method : '—';
+    badge.textContent = 'Activo';
+    badge.classList.remove('pending');
+    subEl.textContent = 'Tu cuenta y tu pago quedaron confirmados. Tu motor de inteligencia estratégica está listo para comenzar a generar valor.';
+    nextEl.textContent = 'Configurar tu primer agente IA';
+    noteEl.textContent = 'Hemos enviado un correo de bienvenida con tus credenciales y guía de inicio.';
+    dashBtn.textContent = 'Ir al Motor IA →';
+  }
+
+  showScreen('screen-success');
+}
+
+// ── INIT: preselect agency ──
+document.getElementById('opt-agency').classList.add('selected');
+</script>
+</body>
+</html>
