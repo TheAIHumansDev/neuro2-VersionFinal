@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Documento confidencial: no indexar -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate, noai, noimageai">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="referrer" content="no-referrer">
+<title>Propuesta GEO Bioland</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ee;--paper:#fff;--ink:#17241c;--muted:#5d6b62;--line:#e3dfd3;
+  --green:#2f6b45;--green2:#4f9a63;--leaf:#dcebd9;--deep:#0f2b1d;
+  --sun:#f2b33d;--sunsoft:#fdf0d3;--clay:#c7643c;--claysoft:#f8e1d6;--sky:#8fb7cf;
+  --ease:cubic-bezier(.2,.75,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:hidden}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.1;margin:0 0 .4em}
+h2{font-size:clamp(2rem,4.6vw,3.2rem)}
+h3{font-size:1.15rem}
+p{margin:0 0 .8em}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:110px 0;position:relative}
+.eyebrow{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:12px}
+.sub{font-size:1.1rem;color:var(--muted);max-width:620px}
+.dark{background:var(--deep);color:#eaf2ec}
+.dark .eyebrow{color:var(--sun)} .dark .sub{color:#a9c2b1}
+
+/* reveal: bidirectional */
+.rv{opacity:0;transform:translate3d(0,var(--dy,56px),0) scale(var(--sc,1));transition:opacity .9s var(--ease),transform .9s var(--ease);transition-delay:var(--d,0s)}
+body.up .rv{--dy:-56px}
+.rv.l{--dy:0;transform:translate3d(-80px,0,0)} .rv.r{--dy:0;transform:translate3d(80px,0,0)}
+.rv.z{--sc:.85}
+.rv.in{opacity:1;transform:none}
+.st>*{opacity:0;transform:translate3d(0,40px,0);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+body.up .st>*{transform:translate3d(0,-40px,0)}
+.st.in>*{opacity:1;transform:none}
+.st.in>*:nth-child(1){transition-delay:.05s}.st.in>*:nth-child(2){transition-delay:.13s}.st.in>*:nth-child(3){transition-delay:.21s}.st.in>*:nth-child(4){transition-delay:.29s}.st.in>*:nth-child(5){transition-delay:.37s}.st.in>*:nth-child(6){transition-delay:.45s}.st.in>*:nth-child(7){transition-delay:.53s}.st.in>*:nth-child(8){transition-delay:.61s}
+@media (prefers-reduced-motion:reduce){.rv,.st>*{opacity:1!important;transform:none!important;transition:none!important}}
+
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--sun),var(--green2));z-index:60}
+nav{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:12px}
+nav a{width:10px;height:10px;border-radius:50%;background:#c9c4b5;display:block;position:relative;transition:.3s}
+nav a.act{background:var(--green);transform:scale(1.4)}
+nav a span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:.75rem;background:var(--ink);color:#fff;padding:3px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:.2s}
+nav a:hover span{opacity:1}
+
+/* hero */
+.hero{min-height:100vh;display:flex;align-items:center;background:radial-gradient(circle at 80% 10%,#4f9a63 0,#2f6b45 30%,#0f2b1d 75%);color:#fff;overflow:hidden;padding:80px 0}
+.hero h1{font-size:clamp(2.6rem,7vw,5.4rem);max-width:900px}
+.hero h1 em{font-style:normal;color:var(--sun)}
+.hero .sub{color:#c3dacb}
+.orb{position:absolute;border-radius:50%;pointer-events:none}
+.o1{width:520px;height:520px;right:-160px;top:-140px;background:radial-gradient(circle,rgba(242,179,61,.35),transparent 70%)}
+.o2{width:300px;height:300px;left:-80px;bottom:-60px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.chip{padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-size:.85rem}
+.hstats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:56px}
+.hstats div{border-top:2px solid rgba(255,255,255,.25);padding-top:12px}
+.hstats b{font-family:Fraunces,serif;font-size:2.6rem;color:var(--sun);display:block;line-height:1}
+.hstats span{font-size:.85rem;color:#c3dacb}
+.mouse{position:absolute;bottom:28px;left:50%;width:22px;height:36px;border:2px solid #c3dacb;border-radius:12px;margin-left:-11px}
+.mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:7px;margin-left:-2px;background:#c3dacb;border-radius:2px;animation:w 1.6s infinite}
+@keyframes w{to{opacity:0;transform:translateY(12px)}}
+
+/* diagnostic */
+.diag{display:grid;grid-template-columns:320px 1fr;gap:50px;align-items:center;margin-top:40px}
+.gauge{position:relative;width:280px;height:280px;margin:auto}
+.gauge svg{transform:rotate(-90deg)}
+.gauge circle{fill:none;stroke-width:20}
+.gauge .bg{stroke:#e5e1d5}
+.gauge .fg{stroke:url(#gg);stroke-linecap:round;stroke-dasharray:754;stroke-dashoffset:754;transition:stroke-dashoffset 2s var(--ease)}
+.gauge .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.gauge .v b{font-family:Fraunces,serif;font-size:4.4rem;color:var(--clay);line-height:1;display:block}
+.gauge .v span{font-size:.82rem;color:var(--muted)}
+.bars>div{margin-bottom:16px}
+.bars .t{display:flex;justify-content:space-between;font-size:.92rem;font-weight:600;margin-bottom:6px}
+.trk{height:12px;background:#e5e1d5;border-radius:999px;overflow:hidden}
+.fill{height:100%;width:0;border-radius:999px;transition:width 1.5s var(--ease)}
+.st.in .fill{width:var(--v)}
+.lo{background:var(--clay)} .mi{background:var(--sun)}
+
+/* findings */
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
+.fc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px;position:relative;overflow:hidden}
+.fc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.fc .k{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
+.fc h3{font-family:Inter;font-weight:700;font-size:1.02rem;margin:8px 0 6px}
+.fc p{font-size:.9rem;color:var(--muted);margin:0}
+.red{--c:var(--clay)} .amb{--c:#d69a1c} .grn{--c:var(--green2)}
+
+/* insights */
+.ins{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:44px}
+.ic{border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:30px;background:rgba(255,255,255,.04)}
+.ic b{font-family:Fraunces,serif;font-size:3.4rem;color:var(--sun);line-height:1;display:block;margin-bottom:10px}
+.ic h3{color:#fff;font-size:1.3rem}
+.ic p{color:#a9c2b1;margin:0;font-size:.95rem}
+
+/* iceberg */
+.ice{margin-top:44px;border-radius:24px;overflow:hidden}
+.ice .up{background:#fff;padding:28px;text-align:center;border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}
+.ice .wl{height:16px;background:repeating-linear-gradient(90deg,#8fb7cf 0 22px,#6fa3c0 22px 44px);animation:wv 5s linear infinite}
+@keyframes wv{to{background-position:440px 0}}
+.ice .dn{background:linear-gradient(#0f3b4f,#08202b);padding:30px;color:#dcebf2}
+.pills{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.9rem;background:#fff}
+.dn .pill{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);color:#e6f1f6}
+.tagl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:14px;display:block}
+
+/* strategy layers */
+.layers{display:grid;gap:12px;margin-top:40px}
+.ly{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:18px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 22px}
+.ly .n{font-family:Fraunces,serif;font-size:2rem;color:var(--green2)}
+.ly h3{margin:0;font-size:1.1rem}
+.ly p{margin:2px 0 0;font-size:.9rem;color:var(--muted)}
+.ly .m{font-size:.75rem;font-weight:700;background:var(--leaf);color:var(--green);padding:4px 10px;border-radius:999px;white-space:nowrap}
+
+/* roadmap (scroll-linked) */
+.road{position:relative;margin-top:50px;padding-left:60px}
+.road .rail{position:absolute;left:21px;top:0;bottom:0;width:4px;background:#e1ddd0;border-radius:4px}
+.road .prog{position:absolute;left:21px;top:0;width:4px;height:0;background:linear-gradient(var(--green2),var(--sun));border-radius:4px}
+.ms{position:relative;margin-bottom:34px}
+.ms .dot{position:absolute;left:-49px;top:18px;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid #d4cfbf;transition:.4s}
+.ms.lit .dot{border-color:var(--green2);background:var(--sun);box-shadow:0 0 0 8px rgba(79,154,99,.15)}
+.ms .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px 24px}
+.ms .when{font-size:.78rem;font-weight:700;color:var(--green);letter-spacing:.08em;text-transform:uppercase}
+.ms h3{font-size:1.35rem;margin:6px 0 10px}
+.ms ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.ms li{font-size:.85rem;background:#f1f5ef;border-radius:999px;padding:5px 12px}
+.ms .out{margin-top:12px;font-size:.85rem;color:var(--muted)}
+.ms .out b{color:var(--ink)}
+
+/* gantt */
+.gantt{margin-top:46px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;overflow-x:auto}
+.gr{display:grid;grid-template-columns:200px repeat(12,minmax(32px,1fr));gap:3px;align-items:center;margin-bottom:7px;min-width:680px}
+.gr .lb{font-size:.82rem}
+.gr .hd{font-size:.72rem;color:var(--muted);text-align:center}
+.gb{height:16px;border-radius:4px;transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);transition-delay:calc(var(--i)*50ms)}
+.gr.in .gb{transform:scaleX(1)}
+.c1{background:var(--deep)}.c2{background:var(--green)}.c3{background:var(--green2)}.c4{background:var(--sun)}.c5{background:var(--clay)}.c6{background:var(--sky)}.e{background:transparent}
+
+/* matrix */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.cat{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center}
+.cat .em{font-size:2.2rem}
+.cat h3{margin:8px 0 4px}
+.cat p{font-size:.85rem;color:var(--muted);margin:0}
+.flags{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:30px}
+.flag{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 16px;font-size:.9rem;display:flex;align-items:center;gap:8px}
+.flag i{font-style:normal;font-size:1.4rem}
+.flag.us{border-color:#1f5576;background:#eaf2f8}
+
+/* pricing */
+.ctrls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:30px 0}
+.seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px}
+.seg button{border:0;background:transparent;font:600 .9rem Inter;padding:9px 18px;border-radius:999px;cursor:pointer;color:var(--muted);transition:.25s}
+.seg button.on{background:var(--green);color:#fff}
+.tg{display:inline-flex;align-items:center;gap:10px;font-size:.9rem;cursor:pointer;user-select:none}
+.sw{width:40px;height:22px;border-radius:999px;background:#cfd6cf;position:relative;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.tg.on .sw{background:var(--green)}.tg.on .sw::after{left:21px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.plan{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:28px;display:flex;flex-direction:column;position:relative}
+.plan.rec{border:2px solid var(--green);box-shadow:0 18px 40px rgba(47,107,69,.15)}
+.plan.rec::before{content:"Recomendado";position:absolute;top:-12px;left:24px;background:var(--green);color:#fff;font-size:.74rem;font-weight:700;padding:4px 12px;border-radius:999px}
+.plan .big{font-family:Fraunces,serif;font-size:3.2rem;line-height:1;color:var(--green)}
+.plan .big small{font-size:1rem;color:var(--muted);font-family:Inter}
+.plan .ctry{font-size:1.25rem;margin:10px 0 2px;min-height:32px;letter-spacing:2px}
+.plan .cn{font-size:.82rem;color:var(--muted);min-height:38px}
+.plan .pr{font-family:Fraunces,serif;font-size:2.4rem;margin-top:14px;transition:color .3s}
+.plan .pr.flash{color:var(--sun)}
+.plan .per{font-size:.82rem;color:var(--muted)}
+.plan .tot{background:#f1f5ef;border-radius:12px;padding:12px;margin:16px 0;font-size:.9rem}
+.plan .tot b{font-size:1.2rem;color:var(--green)}
+.plan ul{padding-left:18px;margin:0;font-size:.9rem;color:var(--muted);flex:1}
+.plan li{margin-bottom:5px}
+.plan .was{margin-top:14px;font-size:1rem;color:var(--muted);display:flex;align-items:center;gap:10px}
+.plan .was .off{background:var(--clay);color:#fff;font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:999px}
+.plan .free{color:var(--green)}
+.plan .tl{color:var(--muted);font-size:.85rem}
+.plan .sav{display:inline-block;margin-left:6px;font-size:.78rem;font-weight:700;color:var(--clay)}
+.plan .pr{margin-top:4px!important}
+.note{font-size:.88rem;color:var(--muted);margin-top:18px;padding:14px 18px;border-radius:12px;background:var(--sunsoft);border-left:4px solid var(--sun)}
+.cmp{width:100%;border-collapse:collapse;margin-top:26px;background:var(--paper);border-radius:16px;overflow:hidden;font-size:.9rem}
+.cmp th,.cmp td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left}
+.cmp th{background:#eef3ec;color:var(--green);font-size:.76rem;text-transform:uppercase;letter-spacing:.06em}
+.cmp tr:last-child td{border:0}
+
+/* kpis */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.kp{text-align:center;padding:26px 16px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
+.kp b{font-family:Fraunces,serif;font-size:2.6rem;color:var(--sun);display:block;line-height:1.1}
+.kp span{font-size:.88rem;color:#a9c2b1}
+
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+.stp{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px}
+.stp b{font-family:Fraunces,serif;font-size:2rem;color:var(--green2)}
+.stp h3{margin:6px 0 4px}.stp p{font-size:.9rem;color:var(--muted);margin:0}
+footer{padding:36px 0;color:var(--muted);font-size:.82rem;text-align:center}
+
+@media (max-width:900px){
+  .diag{grid-template-columns:1fr}.fgrid,.cats{grid-template-columns:1fr 1fr}
+  .plans,.steps{grid-template-columns:1fr}.kpis,.hstats{grid-template-columns:1fr 1fr}
+  nav{display:none}.ly{grid-template-columns:44px 1fr}.ly .m{grid-column:2;justify-self:start}
+}
+@media (max-width:600px){.fgrid,.cats,.ins{grid-template-columns:1fr}section{padding:72px 0}.road{padding-left:44px}.ms .dot{left:-37px}.road .rail,.road .prog{left:9px}}
+@media print{nav,#bar,.mouse{display:none}.rv,.st>*{opacity:1!important;transform:none!important}.gb{transform:none!important}.fill{width:var(--v)!important}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<nav>
+  <a href="#top"><span>Inicio</span></a><a href="#diag"><span>Diagnóstico</span></a><a href="#hall"><span>Hallazgos</span></a>
+  <a href="#insights"><span>Insights</span></a><a href="#estrategia"><span>Estrategia</span></a><a href="#ruta"><span>Hoja de ruta</span></a>
+  <a href="#alcance"><span>Alcance</span></a><a href="#precios"><span>Inversión</span></a><a href="#metas"><span>Metas</span></a>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <span class="orb o1" data-p=".3"></span><span class="orb o2" data-p="-.2"></span>
+  <div class="wrap" style="position:relative">
+    <div class="eyebrow rv" style="color:var(--sun)">Propuesta GEO · AI Humans SRL</div>
+    <h1 class="rv" style="--d:.1s">Que la IA <em>recomiende</em> Bioland.</h1>
+    <p class="sub rv" style="--d:.2s">Cuando alguien le pregunte a ChatGPT, Gemini o Perplexity por cuidado capilar, facial, corporal o solar.</p>
+    <div class="chips rv" style="--d:.3s"><span class="chip">12 meses</span><span class="chip">4 categorías</span><span class="chip">1, 4 u 8 países</span><span class="chip">LATAM y EE. UU.</span></div>
+    <div class="hstats st">
+      <div><b data-n="6">0</b><span>motores de IA</span></div>
+      <div><b data-n="4">0</b><span>categorías</span></div>
+      <div><b data-n="960">0</b><span>preguntas medidas al mes</span></div>
+      <div><b data-n="12">0</b><span>meses</span></div>
+    </div>
+  </div>
+  <div class="mouse"></div>
+</header>
+
+<!-- DIAGNÓSTICO -->
+<section id="diag">
+  <div class="wrap">
+    <div class="eyebrow rv">01 · Diagnóstico</div>
+    <h2 class="rv">Hoy, la IA casi no puede leer a Bioland.</h2>
+    <p class="sub rv">Revisión de bio-land.com, us.bio-land.com y retailers · 19 oct 2026</p>
+    <div class="diag">
+      <div class="gauge rv z" id="gauge">
+        <svg width="280" height="280" viewBox="0 0 280 280">
+          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7643c"/><stop offset="1" stop-color="#f2b33d"/></linearGradient></defs>
+          <circle class="bg" cx="140" cy="140" r="120"/><circle class="fg" cx="140" cy="140" r="120" data-s="27"/>
+        </svg>
+        <div class="v"><div><b data-n="27">0</b><span>de 100<br>Preparación GEO</span></div></div>
+      </div>
+      <div class="bars st">
+        <div><div class="t"><span>Indexación técnica</span><span>20</span></div><div class="trk"><div class="fill lo" style="--v:20%"></div></div></div>
+        <div><div class="t"><span>Datos de producto</span><span>25</span></div><div class="trk"><div class="fill lo" style="--v:25%"></div></div></div>
+        <div><div class="t"><span>Contenido de respuesta</span><span>10</span></div><div class="trk"><div class="fill lo" style="--v:10%"></div></div></div>
+        <div><div class="t"><span>Localización por país</span><span>15</span></div><div class="trk"><div class="fill lo" style="--v:15%"></div></div></div>
+        <div><div class="t"><span>Entidad de marca</span><span>45</span></div><div class="trk"><div class="fill mi" style="--v:45%"></div></div></div>
+        <div><div class="t"><span>Autoridad en terceros</span><span>45</span></div><div class="trk"><div class="fill mi" style="--v:45%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HALLAZGOS -->
+<section id="hall" style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow rv">02 · Hallazgos</div>
+    <h2 class="rv">Lo que encontramos</h2>
+    <div class="fgrid st">
+      <div class="fc red"><span class="k">Crítico</span><h3>Sin robots.txt ni sitemap</h3><p>Ambos dan error 404. Los bots no tienen un mapa del catálogo.</p></div>
+      <div class="fc red"><span class="k">Crítico</span><h3>Fichas incompletas</h3><p>Sin ingredientes completos, precio, modo de uso ni dónde comprar.</p></div>
+      <div class="fc red"><span class="k">Crítico</span><h3>Cero contenido de respuesta</h3><p>No hay guías, FAQs ni blog que la IA pueda citar.</p></div>
+      <div class="fc amb"><span class="k">Mejorable</span><h3>Metadatos genéricos</h3><p>El título es solo “BioLand” y las imágenes dicen “product image”.</p></div>
+      <div class="fc amb"><span class="k">Mejorable</span><h3>Sin versiones por país</h3><p>No hay hreflang ni “dónde comprar” por mercado.</p></div>
+      <div class="fc amb"><span class="k">Validar</span><h3>Sin línea con SPF visible</h3><p>Solo aparece un gel after sun para la categoría solar.</p></div>
+      <div class="fc grn"><span class="k">Fortaleza</span><h3>Marca con historia</h3><p>Fabricante costarricense desde 1982, con retail en LATAM.</p></div>
+      <div class="fc grn"><span class="k">Fortaleza</span><h3>Texto legible por bots</h3><p>El sitio entrega el contenido renderizado desde el servidor.</p></div>
+      <div class="fc grn"><span class="k">Fortaleza</span><h3>Pie en EE. UU.</h3><p>Sitio propio y 4.6★ en Amazon con el Gel Aloe Vera.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- INSIGHTS -->
+<section id="insights" class="dark">
+  <div class="wrap">
+    <div class="eyebrow rv">03 · Insights</div>
+    <h2 class="rv">Lo que eso significa</h2>
+    <div class="ins">
+      <div class="ic rv l"><b>80%</b><h3>del GEO es técnico, no contenido</h3><p>Si la IA no puede rastrear ni entender las páginas, más posts no sirven.</p></div>
+      <div class="ic rv r"><b>2</b><h3>caminos hacia la respuesta</h3><p>La memoria del modelo tarda meses en actualizarse; la búsqueda en vivo responde en semanas. Hay que trabajar ambos.</p></div>
+      <div class="ic rv l"><b>3–5</b><h3>marcas por respuesta</h3><p>Fuera de esa lista corta, Bioland no existe en el momento de compra.</p></div>
+      <div class="ic rv r"><b>1º</b><h3>se gana el nicho</h3><p>Las preguntas con “natural”, “sin parabenos” o “aloe” son más fáciles de ganar que “mejor champú”.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ICEBERG -->
+<section style="padding-bottom:40px">
+  <div class="wrap">
+    <div class="eyebrow rv">04 · No es solo contenido</div>
+    <h2 class="rv">Hay que indexar para la IA.</h2>
+    <div class="ice rv z">
+      <div class="up"><span class="tagl" style="color:var(--green)">Lo visible</span>
+        <div class="pills st"><span class="pill">Guías</span><span class="pill">FAQs</span><span class="pill">Comparativas</span><span class="pill">Redes</span></div></div>
+      <div class="wl"></div>
+      <div class="dn"><span class="tagl" style="color:#8fb7cf;text-align:center">Lo que hace que la IA lo use</span>
+        <div class="pills st"><span class="pill">robots.txt para bots de IA</span><span class="pill">Sitemaps por país</span><span class="pill">IndexNow</span><span class="pill">Search Console + Bing</span><span class="pill">Schema Product · Brand · FAQ</span><span class="pill">Merchant Center</span><span class="pill">hreflang</span><span class="pill">llms.txt</span><span class="pill">URLs en español</span><span class="pill">Logs de bots de IA</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ESTRATEGIA -->
+<section id="estrategia">
+  <div class="wrap">
+    <div class="eyebrow rv">05 · Estrategia</div>
+    <h2 class="rv">7 capas, de abajo hacia arriba</h2>
+    <div class="layers">
+      <div class="ly rv l"><span class="n">01</span><div><h3>Indexación técnica</h3><p>Que los bots encuentren y lean el 100% del catálogo.</p></div><span class="m">Mes 1–2</span></div>
+      <div class="ly rv r"><span class="n">02</span><div><h3>Entidad de marca</h3><p>Wikidata, schema Organization y unificación de dominios.</p></div><span class="m">Mes 1–3</span></div>
+      <div class="ly rv l"><span class="n">03</span><div><h3>Datos de producto</h3><p>Fichas completas, schema Product y feeds por país.</p></div><span class="m">Mes 2–5</span></div>
+      <div class="ly rv r"><span class="n">04</span><div><h3>Contenido de respuesta</h3><p>Guías, FAQs y comparativas como Pantene vs Bioland.</p></div><span class="m">Mes 2–12</span></div>
+      <div class="ly rv l"><span class="n">05</span><div><h3>Localización</h3><p>Versión por país, vocabulario local y dónde comprar.</p></div><span class="m">Mes 2–6</span></div>
+      <div class="ly rv r"><span class="n">06</span><div><h3>Autoridad</h3><p>PR digital, rankings, reseñas y creadores.</p></div><span class="m">Mes 3–12</span></div>
+      <div class="ly rv l"><span class="n">07</span><div><h3>Medición</h3><p>Panel de preguntas en 6 motores, cada mes.</p></div><span class="m">Mes 1–12</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOJA DE RUTA -->
+<section id="ruta" style="background:#fbfaf6">
+  <div class="wrap">
+    <div class="eyebrow rv">06 · Hoja de ruta</div>
+    <h2 class="rv">12 meses, 4 fases</h2>
+    <div class="road" id="road">
+      <div class="rail"></div><div class="prog" id="prog"></div>
+      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 1–2</div><h3>Base técnica</h3>
+        <ul><li>Línea base en 6 motores</li><li>robots.txt + sitemaps</li><li>Search Console + Bing</li><li>Metadatos y URLs</li><li>Wikidata</li></ul>
+        <div class="out">Resultado: <b>sitio 100% indexable</b></div></div></div>
+      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 2–4</div><h3>Datos y contenido</h3>
+        <ul><li>Fichas enriquecidas</li><li>Schema Product</li><li>Feeds por país</li><li>4 hubs de categoría</li><li>Pantene vs Bioland</li></ul>
+        <div class="out">Resultado: <b>primeras citas en búsqueda en vivo</b></div></div></div>
+      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 4–9</div><h3>Autoridad y expansión</h3>
+        <ul><li>PR digital</li><li>Rankings y reseñas</li><li>Creadores</li><li>Resto de países</li><li>Campaña solar</li></ul>
+        <div class="out">Resultado: <b>Bioland mencionada en respuestas de nicho</b></div></div></div>
+      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 9–12</div><h3>Optimización</h3>
+        <ul><li>Cerrar brechas</li><li>Nuevas comparativas</li><li>Formatos más citados</li><li>Plan año 2</li></ul>
+        <div class="out">Resultado: <b>presencia estable en las 4 categorías</b></div></div></div>
+    </div>
+
+    <div class="gantt rv">
+      <div class="gr in"><div class="hd" style="text-align:left">Plan completo</div><div class="hd">M1</div><div class="hd">M2</div><div class="hd">M3</div><div class="hd">M4</div><div class="hd">M5</div><div class="hd">M6</div><div class="hd">M7</div><div class="hd">M8</div><div class="hd">M9</div><div class="hd">M10</div><div class="hd">M11</div><div class="hd">M12</div></div>
+      <div class="gr" data-g="c1:1-2"><div class="lb">Indexación técnica</div></div>
+      <div class="gr" data-g="c2:1-3"><div class="lb">Entidad de marca</div></div>
+      <div class="gr" data-g="c3:2-5,9,12"><div class="lb">Datos de producto</div></div>
+      <div class="gr" data-g="c3:2-12"><div class="lb">Contenido</div></div>
+      <div class="gr" data-g="c4:2-6"><div class="lb">Localización</div></div>
+      <div class="gr" data-g="c5:3,6,9"><div class="lb">Comparativas</div></div>
+      <div class="gr" data-g="c4:3-12"><div class="lb">PR y autoridad</div></div>
+      <div class="gr" data-g="c6:1-12"><div class="lb">Medición mensual</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ALCANCE -->
+<section id="alcance">
+  <div class="wrap">
+    <div class="eyebrow rv">07 · Alcance</div>
+    <h2 class="rv">4 categorías en todos los planes</h2>
+    <div class="cats st">
+      <div class="cat"><div class="em">💆</div><h3>Capilar</h3><p>Champús, acondicionadores y tratamientos</p></div>
+      <div class="cat"><div class="em">✨</div><h3>Facial</h3><p>Limpiadores, hidratantes y sérums</p></div>
+      <div class="cat"><div class="em">🧴</div><h3>Corporal</h3><p>Jabones, cremas, lociones y exfoliantes</p></div>
+      <div class="cat"><div class="em">☀️</div><h3>Solar</h3><p>Protección y cuidado después del sol</p></div>
+    </div>
+    <div class="flags st">
+      <span class="flag"><i>🇨🇷</i>Costa Rica</span><span class="flag"><i>🇵🇪</i>Perú</span><span class="flag"><i>🇵🇦</i>Panamá</span><span class="flag"><i>🇬🇹</i>Guatemala</span>
+      <span class="flag"><i>🇸🇻</i>El Salvador</span><span class="flag"><i>🇭🇳</i>Honduras</span><span class="flag"><i>🇳🇮</i>Nicaragua</span><span class="flag"><i>🇩🇴</i>Rep. Dominicana</span>
+      <span class="flag us"><i>🇺🇸</i>Estados Unidos</span>
+    </div>
+  </div>
+</section>
+
+<!-- PRECIOS -->
+<section id="precios" style="background:#fbfaf6">
+  <div class="wrap">
+    <div class="eyebrow rv">08 · Inversión</div>
+    <h2 class="rv">Elige el alcance</h2>
+    <p class="sub rv">USD, sin IVA · 12 mensualidades · <b style="color:var(--clay)">30% de descuento y configuración sin costo</b></p>
+    <div class="ctrls rv">
+      <div class="seg" id="reg"><button class="on" data-r="latam">🌎 Solo LATAM</button><button data-r="us">🇺🇸 Incluye EE. UU.</button></div>
+      <div class="tg" id="anual" role="switch" aria-checked="false" tabindex="0"><span class="sw"></span>Pago anual (−8%)</div>
+    </div>
+    <div class="plans">
+      <div class="plan rv" style="--d:.05s" data-k="p1">
+        <div class="big">1 <small>país</small></div>
+        <div class="ctry"></div><div class="cn"></div>
+        <div class="was"><s>$<span class="pl"></span></s><span class="off">−30%</span></div>
+        <div class="pr">$<span class="pm"></span></div><div class="per">al mes · Configuración <s>$<span class="ps"></span></s> <b class="free">incluida</b></div>
+        <div class="tot">Total 12 meses: <s class="tl">$<span class="ptl"></span></s><br><b>$<span class="pt"></span></b> <span class="sav">ahorras $<span class="pv"></span></span></div>
+        <ul><li>4 categorías</li><li>Indexación técnica completa</li><li>120 preguntas medidas</li><li>4 contenidos al mes</li><li>Pantene vs Bioland</li><li>1 mención de PR al mes</li></ul>
+      </div>
+      <div class="plan rec rv" style="--d:.15s" data-k="p4">
+        <div class="big">4 <small>países</small></div>
+        <div class="ctry"></div><div class="cn"></div>
+        <div class="was"><s>$<span class="pl"></span></s><span class="off">−30%</span></div>
+        <div class="pr">$<span class="pm"></span></div><div class="per">al mes · Configuración <s>$<span class="ps"></span></s> <b class="free">incluida</b></div>
+        <div class="tot">Total 12 meses: <s class="tl">$<span class="ptl"></span></s><br><b>$<span class="pt"></span></b> <span class="sav">ahorras $<span class="pv"></span></span></div>
+        <ul><li>4 categorías</li><li>Indexación + hreflang por país</li><li>480 preguntas medidas</li><li>8 contenidos al mes</li><li>Pantene vs Bioland + 1 comparativa</li><li>2 menciones de PR al mes</li><li>Reseñas en retailers</li></ul>
+      </div>
+      <div class="plan rv" style="--d:.25s" data-k="p8">
+        <div class="big">8 <small>países</small></div>
+        <div class="ctry"></div><div class="cn"></div>
+        <div class="was"><s>$<span class="pl"></span></s><span class="off">−30%</span></div>
+        <div class="pr">$<span class="pm"></span></div><div class="per">al mes · Configuración <s>$<span class="ps"></span></s> <b class="free">incluida</b></div>
+        <div class="tot">Total 12 meses: <s class="tl">$<span class="ptl"></span></s><br><b>$<span class="pt"></span></b> <span class="sav">ahorras $<span class="pv"></span></span></div>
+        <ul><li>4 categorías</li><li>Indexación + hreflang + feeds</li><li>960 preguntas medidas</li><li>12 contenidos al mes</li><li>3 comparativas</li><li>4 menciones de PR al mes</li><li>Creadores y tablero en vivo</li></ul>
+      </div>
+    </div>
+    <div class="note rv" id="regnote"></div>
+    <table class="cmp rv">
+      <thead><tr><th></th><th>LATAM</th><th>Estados Unidos</th></tr></thead>
+      <tbody>
+        <tr><td><b>Idioma</b></td><td>Español localizado por país</td><td>Inglés y español (mercado hispano)</td></tr>
+        <tr><td><b>Competencia en IA</b></td><td>Media: pocas marcas naturales regionales</td><td>Muy alta: cientos de marcas naturales</td></tr>
+        <tr><td><b>PR y medios</b></td><td>Costo medio</td><td>Costo de 2 a 3 veces mayor</td></tr>
+        <tr><td><b>Canal clave</b></td><td>Retail: Walmart, Siman, Plaza Vea</td><td>Amazon y retail online</td></tr>
+        <tr><td><b>Punto de partida</b></td><td>Marca conocida en CR</td><td>Solo el Gel Aloe Vera en Amazon</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- METAS -->
+<section id="metas" class="dark">
+  <div class="wrap">
+    <div class="eyebrow rv">09 · Metas a 12 meses</div>
+    <h2 class="rv">Lo que vamos a medir</h2>
+    <div class="kpis st">
+      <div class="kp"><b><span data-n="100">0</span>%</b><span>del catálogo indexado</span></div>
+      <div class="kp"><b>35–50%</b><span>de las preguntas de nicho mencionan a Bioland</span></div>
+      <div class="kp"><b>15–25%</b><span>de las preguntas genéricas la mencionan</span></div>
+      <div class="kp"><b>Mensual</b><span>reporte de visibilidad por país y categoría</span></div>
+    </div>
+    <p class="rv" style="margin-top:26px;color:#a9c2b1;font-size:.88rem">Son metas de referencia que se ajustan con la línea base del mes 1. Ningún proveedor puede garantizar qué responde una IA; nosotros garantizamos la ejecución y la medición.</p>
+  </div>
+</section>
+
+<!-- PASOS -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow rv">10 · Siguientes pasos</div>
+    <h2 class="rv">Arrancamos en 2 semanas</h2>
+    <div class="steps st">
+      <div class="stp"><b>1</b><h3>Validación</h3><p>Países, catálogo y canales.</p></div>
+      <div class="stp"><b>2</b><h3>Firma y accesos</h3><p>Sitio, repositorio y analítica.</p></div>
+      <div class="stp"><b>3</b><h3>Línea base</h3><p>Informe en 30 días y sitio indexable.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>AI Humans SRL · Propuesta confidencial para Bioland · Octubre 2026 · Vigencia 30 días</footer>
+
+<script>
+(function(){
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* gantt bars */
+  document.querySelectorAll('.gr[data-g]').forEach(function(r){
+    var s=r.dataset.g.split(':'),on={};
+    s[1].split(',').forEach(function(p){var a=p.split('-'),x=+a[0],y=+(a[1]||a[0]);for(var i=x;i<=y;i++)on[i]=1;});
+    for(var m=1;m<=12;m++){var d=document.createElement('div');d.className='gb '+(on[m]?s[0]:'e');d.style.setProperty('--i',m);r.appendChild(d);}
+  });
+
+  /* counters */
+  function count(el,to){
+    if(reduce){el.textContent=to;return;}
+    cancelAnimationFrame(el._r);var t0=null;
+    (function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/1400,1),e=1-Math.pow(1-p,3);
+      el.textContent=Math.round(to*e).toLocaleString('es');if(p<1)el._r=requestAnimationFrame(f);})(performance.now());
+  }
+  var fg=document.querySelector('.gauge .fg');
+  function gauge(on){fg.style.strokeDashoffset=on?754-754*fg.dataset.s/100:754;}
+
+  /* bidirectional reveal */
+  var els=document.querySelectorAll('.rv,.st,.gr[data-g]');
+  if(reduce){els.forEach(function(e){e.classList.add('in');});document.querySelectorAll('[data-n]').forEach(function(e){e.textContent=e.dataset.n;});gauge(true);}
+  else{
+    var io=new IntersectionObserver(function(es){es.forEach(function(en){
+      var el=en.target,on=en.isIntersecting;
+      el.classList.toggle('in',on);
+      el.querySelectorAll('[data-n]').forEach(function(c){if(on)count(c,+c.dataset.n);else{cancelAnimationFrame(c._r);c.textContent='0';}});
+      if(el.id==='gauge')gauge(on);
+    });},{threshold:.15,rootMargin:'0px 0px -5% 0px'});
+    els.forEach(function(e){io.observe(e);});
+  }
+
+  /* scroll: direction, progress, parallax, roadmap, nav */
+  var lastY=scrollY,tick=false,bar=document.getElementById('bar'),road=document.getElementById('road'),prog=document.getElementById('prog');
+  var ms=[].slice.call(document.querySelectorAll('.ms')),orbs=document.querySelectorAll('[data-p]');
+  var dots=[].slice.call(document.querySelectorAll('nav a')),secs=dots.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  function onS(){
+    var y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
+    if(Math.abs(y-lastY)>2){document.body.classList.toggle('up',y<lastY);lastY=y;}
+    bar.style.width=(h>0?y/h*100:0)+'%';
+    if(!reduce)orbs.forEach(function(o){o.style.transform='translate3d(0,'+y*o.dataset.p+'px,0)';});
+    var r=road.getBoundingClientRect(),mid=innerHeight*.6,p=Math.max(0,Math.min(1,(mid-r.top)/r.height));
+    prog.style.height=(p*r.height)+'px';
+    ms.forEach(function(m){m.classList.toggle('lit',m.getBoundingClientRect().top+20<mid);});
+    var cur=0;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<innerHeight*.4)cur=i;});
+    dots.forEach(function(d,i){d.classList.toggle('act',i===cur);});
+    tick=false;
+  }
+  addEventListener('scroll',function(){if(!tick){requestAnimationFrame(onS);tick=true;}},{passive:true});
+  addEventListener('resize',onS);onS();
+
+  /* pricing */
+  var P={
+    latam:{p1:{m:2900,s:4500,f:'🇨🇷',n:'Costa Rica'},
+           p4:{m:5400,s:7500,f:'🇨🇷🇵🇪🇵🇦🇬🇹',n:'Costa Rica, Perú, Panamá, Guatemala'},
+           p8:{m:8900,s:10500,f:'🇨🇷🇵🇪🇵🇦🇬🇹🇸🇻🇭🇳🇳🇮🇩🇴',n:'Los 8 países de LATAM'},
+           note:'<b>Solo LATAM:</b> contenido en español localizado por país. El plan de 1 país puede ser cualquiera de los 8.'},
+    us:{p1:{m:5900,s:8500,f:'🇺🇸',n:'Estados Unidos'},
+        p4:{m:8400,s:11000,f:'🇺🇸🇨🇷🇵🇪🇵🇦',n:'EE. UU. + Costa Rica, Perú, Panamá'},
+        p8:{m:11900,s:14000,f:'🇺🇸🇨🇷🇵🇪🇵🇦🇬🇹🇸🇻🇭🇳🇩🇴',n:'EE. UU. + 7 países de LATAM'},
+        note:'<b>Con EE. UU.:</b> contenido en inglés y español, PR en medios estadounidenses y foco en Amazon. Es un mercado más caro y con más competencia.'}
+  };
+  var reg='latam',anual=false,D=0.7;
+  function fmt(n){return Math.round(n).toLocaleString('en-US');}
+  function render(){
+    var d=P[reg],f=anual?.92:1;
+    document.querySelectorAll('.plan').forEach(function(pl){
+      var x=d[pl.dataset.k];
+      pl.querySelector('.ctry').textContent=x.f;pl.querySelector('.cn').textContent=x.n;
+      var list=x.m, real=x.m*D*f, listTot=list*12+x.s, tot=real*12;
+      pl.querySelector('.pl').textContent=fmt(list);
+      pl.querySelector('.pm').textContent=fmt(real);pl.querySelector('.ps').textContent=fmt(x.s);
+      pl.querySelector('.ptl').textContent=fmt(listTot);pl.querySelector('.pt').textContent=fmt(tot);
+      pl.querySelector('.pv').textContent=fmt(listTot-tot);
+      var pr=pl.querySelector('.pr');pr.classList.add('flash');setTimeout(function(){pr.classList.remove('flash');},350);
+    });
+    document.getElementById('regnote').innerHTML=d.note;
+  }
+  document.querySelectorAll('#reg button').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('#reg button').forEach(function(x){x.classList.toggle('on',x===b);});reg=b.dataset.r;render();});});
+  var tg=document.getElementById('anual');
+  function flip(){anual=!anual;tg.classList.toggle('on',anual);tg.setAttribute('aria-checked',anual);render();}
+  tg.addEventListener('click',flip);tg.addEventListener('keydown',function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}});
+  render();
+})();
+</script>
+</body>
+</html>
