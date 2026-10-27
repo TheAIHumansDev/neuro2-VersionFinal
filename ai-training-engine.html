@@ -3,6 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<script>
+// Guardia de acceso: si no hay sesión válida, regresa al login
+(function () {
+  var s = null;
+  try {
+    var raw = localStorage.getItem('iatrainings_session') || sessionStorage.getItem('iatrainings_session');
+    s = raw ? JSON.parse(raw) : null;
+  } catch (e) {}
+  if (!s || !s.token || Date.now() > s.expira) {
+    window.location.replace('login.html');
+  }
+  // Para el botón de salir
+  window.cerrarSesion = function () {
+    try { localStorage.removeItem('iatrainings_session'); sessionStorage.removeItem('iatrainings_session'); } catch (e) {}
+    window.location.replace('login.html');
+  };
+})();
+</script>
+
+  
 <title>IA Trainings — Motor de IA conversacional</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
