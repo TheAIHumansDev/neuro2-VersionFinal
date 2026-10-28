@@ -8,307 +8,539 @@
 <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
 <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="referrer" content="no-referrer">
-<title>Propuesta GEO Bioland</title>
+<title>Propuesta GEO BioLand y Terre de Vie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f6f4ee;--paper:#fff;--ink:#17241c;--muted:#5d6b62;--line:#e3dfd3;
-  --green:#2f6b45;--green2:#4f9a63;--leaf:#dcebd9;--deep:#0f2b1d;
-  --sun:#f2b33d;--sunsoft:#fdf0d3;--clay:#c7643c;--claysoft:#f8e1d6;--sky:#8fb7cf;
+  --bg:#f6f8f4;--paper:rgba(255,255,255,.72);--solid:#fff;--ink:#14241a;--muted:#5b6a60;--line:rgba(20,36,26,.09);
+  --g:#2f6b45;--g2:#4f9a63;--g3:#9fd3ad;--leaf:#e3f1e5;
+  --p:#7a4e8c;--p2:#b48ac4;--p3:#e7d6ee;--psoft:#f4ecf7;
+  --sun:#e9a92f;--sunsoft:#fff3d9;--clay:#c7643c;--claysoft:#fbe7dd;
   --ease:cubic-bezier(.2,.75,.2,1);
+  --glass:0 1px 0 rgba(255,255,255,.9) inset,0 20px 50px -20px rgba(20,36,26,.18);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:hidden}
-h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.1;margin:0 0 .4em}
-h2{font-size:clamp(2rem,4.6vw,3.2rem)}
-h3{font-size:1.15rem}
-p{margin:0 0 .8em}
-.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
-section{padding:110px 0;position:relative}
-.eyebrow{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:12px}
-.sub{font-size:1.1rem;color:var(--muted);max-width:620px}
-.dark{background:var(--deep);color:#eaf2ec}
-.dark .eyebrow{color:var(--sun)} .dark .sub{color:#a9c2b1}
 
-/* reveal: bidirectional */
-.rv{opacity:0;transform:translate3d(0,var(--dy,56px),0) scale(var(--sc,1));transition:opacity .9s var(--ease),transform .9s var(--ease);transition-delay:var(--d,0s)}
-body.up .rv{--dy:-56px}
-.rv.l{--dy:0;transform:translate3d(-80px,0,0)} .rv.r{--dy:0;transform:translate3d(80px,0,0)}
-.rv.z{--sc:.85}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(900px 600px at 8% 0%,rgba(79,154,99,.16),transparent 60%),
+  radial-gradient(800px 600px at 100% 30%,rgba(180,138,196,.16),transparent 60%),
+  radial-gradient(700px 500px at 40% 100%,rgba(233,169,47,.10),transparent 60%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(rgba(20,36,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(20,36,26,.035) 1px,transparent 1px);
+  background-size:56px 56px;mask-image:radial-gradient(circle at 50% 30%,#000 30%,transparent 85%)}
+h1,h2,h3,h4{font-family:Sora,Inter,sans-serif;line-height:1.08;margin:0 0 .4em;letter-spacing:-.02em}
+h2{font-size:clamp(2rem,4.4vw,3.2rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0 0 .8em}
+a{color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+section{padding:120px 0;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 .74rem Sora;letter-spacing:.18em;text-transform:uppercase;color:var(--g);margin-bottom:14px}
+.eyebrow::before{content:"";width:22px;height:2px;background:linear-gradient(90deg,var(--g2),var(--p2));border-radius:2px}
+.sub{font-size:1.08rem;color:var(--muted);max-width:640px}
+.grad{background:linear-gradient(100deg,var(--g) 0%,var(--g2) 40%,var(--p) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.glass{background:var(--paper);backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);border:1px solid rgba(255,255,255,.8);box-shadow:var(--glass);border-radius:22px}
+
+/* ===== reveal: direction by exit side (no overlap) ===== */
+.rv{opacity:0;transform:translate3d(0,48px,0) scale(var(--sc,1));transition:opacity .85s var(--ease),transform .85s var(--ease);transition-delay:var(--d,0s)}
+.rv.above{transform:translate3d(0,-48px,0) scale(var(--sc,1))}
+.rv.l{transform:translate3d(-70px,0,0)} .rv.r{transform:translate3d(70px,0,0)}
+.rv.z{--sc:.9}
 .rv.in{opacity:1;transform:none}
-.st>*{opacity:0;transform:translate3d(0,40px,0);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-body.up .st>*{transform:translate3d(0,-40px,0)}
+.st>*{opacity:0;transform:translate3d(0,34px,0);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.st.above>*{transform:translate3d(0,-34px,0)}
 .st.in>*{opacity:1;transform:none}
-.st.in>*:nth-child(1){transition-delay:.05s}.st.in>*:nth-child(2){transition-delay:.13s}.st.in>*:nth-child(3){transition-delay:.21s}.st.in>*:nth-child(4){transition-delay:.29s}.st.in>*:nth-child(5){transition-delay:.37s}.st.in>*:nth-child(6){transition-delay:.45s}.st.in>*:nth-child(7){transition-delay:.53s}.st.in>*:nth-child(8){transition-delay:.61s}
+.st.in>*:nth-child(2){transition-delay:.08s}.st.in>*:nth-child(3){transition-delay:.16s}.st.in>*:nth-child(4){transition-delay:.24s}.st.in>*:nth-child(5){transition-delay:.32s}.st.in>*:nth-child(6){transition-delay:.4s}.st.in>*:nth-child(7){transition-delay:.48s}.st.in>*:nth-child(8){transition-delay:.56s}.st.in>*:nth-child(9){transition-delay:.64s}
 @media (prefers-reduced-motion:reduce){.rv,.st>*{opacity:1!important;transform:none!important;transition:none!important}}
 
-#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--sun),var(--green2));z-index:60}
-nav{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:12px}
-nav a{width:10px;height:10px;border-radius:50%;background:#c9c4b5;display:block;position:relative;transition:.3s}
-nav a.act{background:var(--green);transform:scale(1.4)}
-nav a span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:.75rem;background:var(--ink);color:#fff;padding:3px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:.2s}
-nav a:hover span{opacity:1}
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--g2),var(--sun),var(--p2));z-index:60}
+nav.dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:12px}
+nav.dots a{width:9px;height:9px;border-radius:50%;background:rgba(20,36,26,.18);display:block;position:relative;transition:.3s}
+nav.dots a.act{background:var(--g2);box-shadow:0 0 0 5px rgba(79,154,99,.18)}
+nav.dots a span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:.74rem;background:#fff;color:var(--ink);padding:4px 9px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.1);opacity:0;pointer-events:none;transition:.2s}
+nav.dots a:hover span{opacity:1}
 
-/* hero */
-.hero{min-height:100vh;display:flex;align-items:center;background:radial-gradient(circle at 80% 10%,#4f9a63 0,#2f6b45 30%,#0f2b1d 75%);color:#fff;overflow:hidden;padding:80px 0}
-.hero h1{font-size:clamp(2.6rem,7vw,5.4rem);max-width:900px}
-.hero h1 em{font-style:normal;color:var(--sun)}
-.hero .sub{color:#c3dacb}
-.orb{position:absolute;border-radius:50%;pointer-events:none}
-.o1{width:520px;height:520px;right:-160px;top:-140px;background:radial-gradient(circle,rgba(242,179,61,.35),transparent 70%)}
-.o2{width:300px;height:300px;left:-80px;bottom:-60px;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
-.chip{padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.12);font-size:.85rem}
+/* ===== hero ===== */
+.hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:90px 0;overflow:hidden}
+.hero h1{font-size:clamp(2.6rem,6.6vw,5.4rem);font-weight:800;max-width:980px}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(79,154,99,.22);pointer-events:none}
+.ring.r1{width:620px;height:620px;right:-180px;top:-120px}
+.ring.r2{width:420px;height:420px;right:-80px;top:-20px;border-color:rgba(180,138,196,.28)}
+.ring.r3{width:240px;height:240px;right:10px;top:70px;border-style:dashed;border-color:rgba(233,169,47,.35);animation:spin 40s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.orbdot{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--g2);box-shadow:0 0 0 6px rgba(79,154,99,.15);right:230px;top:120px}
+.brands{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.bchip{display:flex;align-items:center;gap:12px;padding:12px 18px}
+.bchip b{font-family:Sora;font-size:1.1rem}
+.bchip span{font-size:.8rem;color:var(--muted)}
+.bchip i{width:12px;height:12px;border-radius:50%;display:block}
 .hstats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:56px}
-.hstats div{border-top:2px solid rgba(255,255,255,.25);padding-top:12px}
-.hstats b{font-family:Fraunces,serif;font-size:2.6rem;color:var(--sun);display:block;line-height:1}
-.hstats span{font-size:.85rem;color:#c3dacb}
-.mouse{position:absolute;bottom:28px;left:50%;width:22px;height:36px;border:2px solid #c3dacb;border-radius:12px;margin-left:-11px}
-.mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:7px;margin-left:-2px;background:#c3dacb;border-radius:2px;animation:w 1.6s infinite}
+.hstats div{padding:18px}
+.hstats b{font-family:Sora;font-size:2.4rem;font-weight:700;display:block;line-height:1}
+.hstats span{font-size:.84rem;color:var(--muted)}
+.mouse{position:absolute;bottom:26px;left:50%;width:22px;height:36px;border:2px solid rgba(20,36,26,.3);border-radius:12px;margin-left:-11px}
+.mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:7px;margin-left:-2px;background:rgba(20,36,26,.45);border-radius:2px;animation:w 1.6s infinite}
 @keyframes w{to{opacity:0;transform:translateY(12px)}}
 
-/* diagnostic */
-.diag{display:grid;grid-template-columns:320px 1fr;gap:50px;align-items:center;margin-top:40px}
-.gauge{position:relative;width:280px;height:280px;margin:auto}
+/* ===== stats ===== */
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.sc{padding:26px;position:relative;overflow:hidden}
+.sc .num{font-family:Sora;font-weight:800;font-size:3.2rem;line-height:1;letter-spacing:-.03em}
+.sc h3{margin:10px 0 6px;font-size:1rem}
+.sc p{font-size:.88rem;color:var(--muted);margin:0}
+.sc small{display:block;margin-top:14px;font-size:.72rem;color:#8a978e}
+.sc small a{color:var(--g)}
+.sc .meter{height:6px;border-radius:6px;background:rgba(20,36,26,.07);margin-top:14px;overflow:hidden}
+.sc .meter i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--g2),var(--p2));transition:width 1.6s var(--ease) .2s}
+.st.in .sc .meter i{width:var(--v)}
+.sc.hl{background:linear-gradient(150deg,rgba(227,241,229,.9),rgba(244,236,247,.9))}
+.journey{margin-top:26px;padding:24px 26px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+.journey .bar2{display:flex;height:42px;border-radius:12px;overflow:hidden;font:600 .8rem Sora}
+.journey .bar2 div{display:flex;align-items:center;justify-content:center;color:#fff;width:0;white-space:nowrap;overflow:hidden;transition:width 1.4s var(--ease)}
+.journey.in .bar2 div{width:var(--v)}
+.quote{margin-top:46px;font-family:Sora;font-weight:600;font-size:clamp(1.4rem,3vw,2.2rem);max-width:900px}
+
+/* tabs */
+.tabs{display:inline-flex;padding:5px;margin:22px 0 6px;border-radius:999px}
+.tabs button{border:0;background:transparent;font:600 .9rem Sora;padding:10px 22px;border-radius:999px;cursor:pointer;color:var(--muted);transition:.3s}
+.tabs button.on.bl{background:var(--g);color:#fff;box-shadow:0 8px 20px -6px rgba(47,107,69,.6)}
+.tabs button.on.td{background:var(--p);color:#fff;box-shadow:0 8px 20px -6px rgba(122,78,140,.6)}
+.pane{display:none}.pane.show{display:block;animation:fu .6s var(--ease)}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* diag */
+.dcompare{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:40px}
+.dcard{padding:28px;display:grid;grid-template-columns:190px 1fr;gap:24px;align-content:start;align-items:center}
+.dcard h3{grid-column:1/-1;margin:0;display:flex;align-items:center;gap:10px;font-size:1.25rem}
+.dcard h3 small{font-family:Inter;font-size:.78rem;color:var(--muted);font-weight:500}
+.gauge{position:relative;width:180px;height:180px;margin:auto}
 .gauge svg{transform:rotate(-90deg)}
-.gauge circle{fill:none;stroke-width:20}
-.gauge .bg{stroke:#e5e1d5}
-.gauge .fg{stroke:url(#gg);stroke-linecap:round;stroke-dasharray:754;stroke-dashoffset:754;transition:stroke-dashoffset 2s var(--ease)}
+.gauge circle{fill:none;stroke-width:14}
+.gauge .bg{stroke:rgba(20,36,26,.07)}
+.gauge .fg{stroke-linecap:round;stroke-dasharray:478;stroke-dashoffset:478;transition:stroke-dashoffset 2s var(--ease)}
 .gauge .v{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
-.gauge .v b{font-family:Fraunces,serif;font-size:4.4rem;color:var(--clay);line-height:1;display:block}
-.gauge .v span{font-size:.82rem;color:var(--muted)}
-.bars>div{margin-bottom:16px}
-.bars .t{display:flex;justify-content:space-between;font-size:.92rem;font-weight:600;margin-bottom:6px}
-.trk{height:12px;background:#e5e1d5;border-radius:999px;overflow:hidden}
+.gauge .v b{font-family:Sora;font-weight:800;font-size:3rem;line-height:1;display:block;color:var(--clay)}
+.gauge .v span{font-size:.74rem;color:var(--muted)}
+.bars>div{margin-bottom:11px}
+.bars .t{display:flex;justify-content:space-between;font-size:.82rem;font-weight:600;margin-bottom:5px}
+.trk{height:8px;background:rgba(20,36,26,.07);border-radius:999px;overflow:hidden}
 .fill{height:100%;width:0;border-radius:999px;transition:width 1.5s var(--ease)}
 .st.in .fill{width:var(--v)}
-.lo{background:var(--clay)} .mi{background:var(--sun)}
+.lo{background:linear-gradient(90deg,var(--clay),#e08b5f)} .mi{background:linear-gradient(90deg,var(--sun),#f3c56a)}
+.alert{grid-column:1/-1;border-radius:14px;padding:12px 16px;font-size:.88rem;background:var(--claysoft);color:#7a2f12;border:1px solid rgba(199,100,60,.25)}
+code{font-family:ui-monospace,Menlo,monospace;font-size:.85em;background:rgba(47,107,69,.08);padding:1px 6px;border-radius:6px}
 
 /* findings */
-.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
-.fc{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px;position:relative;overflow:hidden}
-.fc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
-.fc .k{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--c)}
-.fc h3{font-family:Inter;font-weight:700;font-size:1.02rem;margin:8px 0 6px}
-.fc p{font-size:.9rem;color:var(--muted);margin:0}
-.red{--c:var(--clay)} .amb{--c:#d69a1c} .grn{--c:var(--green2)}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}
+.fc{padding:22px;position:relative;overflow:hidden}
+.fc .k{display:inline-flex;align-items:center;gap:6px;font:600 .7rem Sora;letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.fc .k::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 18%,transparent)}
+.fc h3{font-family:Inter;font-weight:700;font-size:1rem;margin:10px 0 6px}
+.fc p{font-size:.88rem;color:var(--muted);margin:0}
+.red{--c:var(--clay)} .amb{--c:#cf9420} .grn{--c:var(--g2)}
 
 /* insights */
-.ins{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;margin-top:44px}
-.ic{border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:30px;background:rgba(255,255,255,.04)}
-.ic b{font-family:Fraunces,serif;font-size:3.4rem;color:var(--sun);line-height:1;display:block;margin-bottom:10px}
-.ic h3{color:#fff;font-size:1.3rem}
-.ic p{color:#a9c2b1;margin:0;font-size:.95rem}
+.ins{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.ic{padding:24px}
+.ic b{font-family:Sora;font-weight:800;font-size:2.6rem;line-height:1;display:block;margin-bottom:10px}
+.ic h3{font-size:1rem}.ic p{color:var(--muted);margin:0;font-size:.88rem}
 
-/* iceberg */
-.ice{margin-top:44px;border-radius:24px;overflow:hidden}
-.ice .up{background:#fff;padding:28px;text-align:center;border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}
-.ice .wl{height:16px;background:repeating-linear-gradient(90deg,#8fb7cf 0 22px,#6fa3c0 22px 44px);animation:wv 5s linear infinite}
-@keyframes wv{to{background-position:440px 0}}
-.ice .dn{background:linear-gradient(#0f3b4f,#08202b);padding:30px;color:#dcebf2}
-.pills{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
-.pill{border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.9rem;background:#fff}
-.dn .pill{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);color:#e6f1f6}
-.tagl{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:14px;display:block}
+/* stack */
+.stack{margin-top:40px;display:grid;grid-template-columns:1fr 1.6fr;gap:20px}
+.stack .vis{padding:26px}
+.stack .deep{padding:26px;background:linear-gradient(160deg,rgba(227,241,229,.95),rgba(244,236,247,.95))}
+.tagl{font:600 .7rem Sora;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:14px}
+.pills{display:flex;flex-wrap:wrap;gap:9px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:8px 15px;font-size:.86rem;background:rgba(255,255,255,.8)}
+.deep .pill{border-color:rgba(47,107,69,.18)}
+.deep .pill.hot{background:var(--p);color:#fff;border-color:var(--p)}
+.pct{font-family:Sora;font-weight:800;font-size:2.2rem;line-height:1.1;margin-bottom:12px}
 
-/* strategy layers */
+/* layers */
 .layers{display:grid;gap:12px;margin-top:40px}
-.ly{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:18px;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 22px}
-.ly .n{font-family:Fraunces,serif;font-size:2rem;color:var(--green2)}
-.ly h3{margin:0;font-size:1.1rem}
-.ly p{margin:2px 0 0;font-size:.9rem;color:var(--muted)}
-.ly .m{font-size:.75rem;font-weight:700;background:var(--leaf);color:var(--green);padding:4px 10px;border-radius:999px;white-space:nowrap}
+.ly{display:grid;grid-template-columns:60px 1fr auto auto;align-items:center;gap:18px;padding:16px 22px}
+.ly .n{font-family:Sora;font-weight:800;font-size:1.7rem}
+.ly h3{margin:0;font-size:1.05rem}
+.ly p{margin:2px 0 0;font-size:.88rem;color:var(--muted)}
+.ly .m{font:600 .72rem Sora;background:var(--leaf);color:var(--g);padding:5px 11px;border-radius:999px;white-space:nowrap}
+.ly .b{font:600 .7rem Sora;padding:5px 11px;border-radius:999px;white-space:nowrap;background:var(--psoft);color:var(--p)}
 
-/* roadmap (scroll-linked) */
+/* scope */
+.matrix{margin-top:40px;overflow:hidden;padding:0}
+.mx{display:grid;grid-template-columns:180px repeat(4,1fr);border-bottom:1px solid var(--line)}
+.mx:last-child{border-bottom:0}
+.mx>div{padding:16px;font-size:.88rem;display:flex;align-items:center;gap:8px}
+.mx.h>div{font:600 .74rem Sora;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mx .brand{font-family:Sora;font-weight:700}
+.ok{color:var(--g);font-weight:600}.vl{color:#a87405;font-weight:600;font-size:.82rem}
+.flags{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+.fbox{padding:20px}
+.fbox h3{font-size:.95rem;margin-bottom:12px}
+.fl{display:flex;flex-wrap:wrap;gap:8px}
+.flag{border:1px solid var(--line);border-radius:12px;padding:7px 12px;font-size:.84rem;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.8)}
+.flag.on{border-color:var(--g2);background:var(--leaf)}
+.flag i{font-style:normal;font-size:1.15rem}
+
+/* ===== FUTURISTIC SHOP ===== */
+#shop{padding-bottom:40px}
+.story{position:relative;height:340vh;margin-top:30px}
+.stage{position:sticky;top:0;height:100vh;display:flex;align-items:center}
+.frame{width:100%;height:min(86vh,760px);border-radius:30px;overflow:hidden;position:relative;
+  background:linear-gradient(160deg,#ffffff 0%,var(--tint1) 55%,var(--tint2) 100%);border:1px solid rgba(255,255,255,.9);box-shadow:0 40px 90px -30px rgba(20,36,26,.28)}
+.frame{--a:var(--g);--a2:var(--g2);--tint1:#eef7ef;--tint2:#e5f0e7;--asoft:var(--leaf)}
+.frame.tdv{--a:var(--p);--a2:var(--p2);--tint1:#f6eff9;--tint2:#efe4f4;--asoft:var(--psoft)}
+.fbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;z-index:5}
+.flogo{font-family:Sora;font-weight:800;font-size:1.3rem;color:var(--a);display:flex;align-items:center;gap:10px}
+.flogo img{height:26px}
+.fnav{display:flex;gap:6px;padding:5px;border-radius:999px}
+.fnav span{font:500 .8rem Inter;padding:7px 13px;border-radius:999px;color:var(--muted)}
+.fnav span.on{background:#fff;color:var(--a);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.cart{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.08);position:relative;font-size:1rem}
+.cart b{position:absolute;top:-4px;right:-4px;background:var(--a);color:#fff;font-size:.65rem;width:18px;height:18px;border-radius:50%;display:grid;place-items:center}
+.scene{position:absolute;inset:0;display:grid;grid-template-columns:1.05fr 1fr;align-items:center;padding:80px 40px 40px}
+.pz{position:relative;height:100%;display:grid;place-items:center}
+.halo{position:absolute;width:min(46vh,420px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,var(--asoft) 0%,rgba(255,255,255,0) 70%)}
+.orbit{position:absolute;width:min(56vh,520px);aspect-ratio:1;border-radius:50%;border:1px dashed color-mix(in srgb,var(--a2) 45%,transparent)}
+.orbit.o2{width:min(66vh,620px);border-style:solid;border-color:color-mix(in srgb,var(--a2) 18%,transparent)}
+.orbit i{position:absolute;top:50%;left:-6px;width:12px;height:12px;border-radius:50%;background:var(--a2);box-shadow:0 0 0 6px color-mix(in srgb,var(--a2) 20%,transparent)}
+.prodimg{position:relative;width:min(44vh,400px);aspect-ratio:1;border-radius:28px;overflow:hidden;background:#fff;box-shadow:0 40px 70px -25px rgba(20,36,26,.35);will-change:transform}
+.prodimg img{width:100%;height:100%;object-fit:cover}
+.prodimg.contain img{object-fit:contain;padding:18px}
+.prodimg .fb{display:none;position:absolute;inset:0;place-items:center;text-align:center;padding:20px;font:700 1.2rem Sora;color:var(--a);background:linear-gradient(135deg,var(--asoft),#fff)}
+.prodimg.err img{display:none}.prodimg.err .fb{display:grid}
+.floatchip{position:absolute;padding:10px 14px;font-size:.78rem;border-radius:14px;display:flex;gap:8px;align-items:center;will-change:transform}
+.floatchip b{font-family:Sora;color:var(--a)}
+.fc1{left:4%;top:20%}.fc2{right:2%;top:58%}.fc3{left:10%;bottom:12%}
+.panels{position:relative;height:72%}
+.pnl{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateY(30px);transition:opacity .6s var(--ease),transform .6s var(--ease);pointer-events:none}
+.pnl.on{opacity:1;transform:none;pointer-events:auto}
+.pnl.past{opacity:0;transform:translateY(-30px)}
+.pnl small{font:600 .72rem Sora;letter-spacing:.16em;text-transform:uppercase;color:var(--a)}
+.pnl h3{font-size:clamp(1.8rem,3.4vw,2.8rem);font-weight:800;margin:10px 0}
+.pnl p{color:var(--muted);max-width:440px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chips span{font-size:.8rem;background:#fff;border-radius:999px;padding:6px 12px;border:1px solid var(--line)}
+.ing{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;max-width:460px}
+.ing div{background:rgba(255,255,255,.85);border-radius:14px;padding:12px 14px;font-size:.84rem;border:1px solid var(--line)}
+.ing b{display:block;font-family:Sora;color:var(--a);font-size:.9rem}
+.price{font-family:Sora;font-weight:800;font-size:3rem;color:var(--ink);line-height:1;margin:8px 0}
+.price small{font:500 .85rem Inter;color:var(--muted);letter-spacing:0;text-transform:none}
+.ctyp{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
+.ctyp button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font:600 .78rem Inter;cursor:pointer;transition:.2s}
+.ctyp button.on{background:var(--a);color:#fff;border-color:var(--a)}
+.buy{display:inline-flex;align-items:center;gap:10px;background:var(--a);color:#fff;border:0;border-radius:999px;padding:13px 24px;font:700 .9rem Sora;cursor:pointer;box-shadow:0 14px 28px -10px color-mix(in srgb,var(--a) 70%,transparent);width:max-content}
+.stores{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.stores span{font-size:.78rem;background:var(--asoft);color:var(--a);border-radius:10px;padding:6px 10px;font-weight:600}
+.ai{margin-top:6px;max-width:460px}
+.ai .q{background:var(--a);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;font-size:.86rem;margin-left:auto;width:max-content;max-width:90%}
+.ai .a{background:#fff;border:1px solid var(--line);border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:.85rem;margin-top:10px}
+.ai .a b{color:var(--a)}
+.ai .src{display:flex;gap:6px;margin-top:8px}.ai .src span{font-size:.68rem;background:var(--asoft);color:var(--a);border-radius:999px;padding:3px 8px;font-weight:600}
+.steps-ind{position:absolute;left:28px;bottom:24px;display:flex;gap:8px;z-index:5}
+.steps-ind i{width:26px;height:4px;border-radius:4px;background:rgba(20,36,26,.12);transition:.3s}
+.steps-ind i.on{background:var(--a);width:44px}
+.shoptabs{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.rail{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:26px}
+.rc{overflow:hidden;padding:0;transition:transform .35s var(--ease)}
+.rc:hover{transform:translateY(-8px)}
+.rc .im{aspect-ratio:4/3;background:#fff;position:relative;overflow:hidden}
+.rc .im img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.rc .im.contain img{object-fit:contain;padding:12px}
+.rc:hover .im img{transform:scale(1.07)}
+.rc .im .fb{display:none;position:absolute;inset:0;place-items:center;text-align:center;padding:14px;font:700 1rem Sora;color:var(--a);background:linear-gradient(135deg,var(--asoft),#fff)}
+.rc .im.err img{display:none}.rc .im.err .fb{display:grid}
+.rc .bd{padding:14px 16px}
+.rc h4{font-size:.95rem;margin:0 0 4px}
+.rc p{font-size:.8rem;color:var(--muted);margin:0 0 8px}
+.rc .pr{font:700 1rem Sora}
+.prodimg.real img{object-fit:contain;padding:18px;background:#fff}
+.rc .im img{object-fit:cover}.rc .im.real img{object-fit:contain;padding:12px;background:#fff}
+.railwrap{--a:var(--g);--asoft:var(--leaf)} .railwrap.tdv{--a:var(--p);--asoft:var(--psoft)}
+.mnote{font-size:.78rem;color:var(--muted);margin-top:16px;text-align:center}
+
+/* roadmap */
 .road{position:relative;margin-top:50px;padding-left:60px}
-.road .rail{position:absolute;left:21px;top:0;bottom:0;width:4px;background:#e1ddd0;border-radius:4px}
-.road .prog{position:absolute;left:21px;top:0;width:4px;height:0;background:linear-gradient(var(--green2),var(--sun));border-radius:4px}
-.ms{position:relative;margin-bottom:34px}
-.ms .dot{position:absolute;left:-49px;top:18px;width:26px;height:26px;border-radius:50%;background:#fff;border:4px solid #d4cfbf;transition:.4s}
-.ms.lit .dot{border-color:var(--green2);background:var(--sun);box-shadow:0 0 0 8px rgba(79,154,99,.15)}
-.ms .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px 24px}
-.ms .when{font-size:.78rem;font-weight:700;color:var(--green);letter-spacing:.08em;text-transform:uppercase}
-.ms h3{font-size:1.35rem;margin:6px 0 10px}
+.road .rail2{position:absolute;left:21px;top:0;bottom:0;width:3px;background:rgba(20,36,26,.08);border-radius:3px}
+.road .prog{position:absolute;left:21px;top:0;width:3px;height:0;background:linear-gradient(var(--g2),var(--sun),var(--p2));border-radius:3px}
+.ms{position:relative;margin-bottom:26px}
+.ms .dot{position:absolute;left:-48px;top:20px;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid rgba(20,36,26,.15);transition:.4s}
+.ms.lit .dot{border-color:var(--g2);background:var(--g2);box-shadow:0 0 0 8px rgba(79,154,99,.15)}
+.ms .card{padding:22px 24px}
+.ms .when{font:600 .72rem Sora;color:var(--g);letter-spacing:.12em;text-transform:uppercase}
+.ms h3{font-size:1.3rem;margin:6px 0 10px}
 .ms ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
-.ms li{font-size:.85rem;background:#f1f5ef;border-radius:999px;padding:5px 12px}
-.ms .out{margin-top:12px;font-size:.85rem;color:var(--muted)}
-.ms .out b{color:var(--ink)}
-
-/* gantt */
-.gantt{margin-top:46px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;overflow-x:auto}
-.gr{display:grid;grid-template-columns:200px repeat(12,minmax(32px,1fr));gap:3px;align-items:center;margin-bottom:7px;min-width:680px}
-.gr .lb{font-size:.82rem}
-.gr .hd{font-size:.72rem;color:var(--muted);text-align:center}
-.gb{height:16px;border-radius:4px;transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);transition-delay:calc(var(--i)*50ms)}
+.ms li{font-size:.84rem;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.ms li.t{background:var(--psoft);color:var(--p);border-color:transparent}
+.ms .out{margin-top:12px;font-size:.85rem;color:var(--muted)}.ms .out b{color:var(--ink)}
+.gantt{margin-top:36px;padding:20px;overflow-x:auto}
+.gr{display:grid;grid-template-columns:220px repeat(12,minmax(32px,1fr));gap:3px;align-items:center;margin-bottom:7px;min-width:700px}
+.gr .lb{font-size:.82rem}.gr .hd{font:600 .7rem Sora;color:var(--muted);text-align:center}
+.gb{height:14px;border-radius:7px;transform:scaleX(0);transform-origin:left;transition:transform .6s var(--ease);transition-delay:calc(var(--i)*45ms)}
 .gr.in .gb{transform:scaleX(1)}
-.c1{background:var(--deep)}.c2{background:var(--green)}.c3{background:var(--green2)}.c4{background:var(--sun)}.c5{background:var(--clay)}.c6{background:var(--sky)}.e{background:transparent}
+.c1{background:#1f4d31}.c2{background:var(--g)}.c3{background:var(--g2)}.c4{background:var(--sun)}.c5{background:var(--clay)}.c6{background:#9cc3d6}.c7{background:var(--p)}.e{background:transparent}
 
-/* matrix */
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
-.cat{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px;text-align:center}
-.cat .em{font-size:2.2rem}
-.cat h3{margin:8px 0 4px}
-.cat p{font-size:.85rem;color:var(--muted);margin:0}
-.flags{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:30px}
-.flag{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 16px;font-size:.9rem;display:flex;align-items:center;gap:8px}
-.flag i{font-style:normal;font-size:1.4rem}
-.flag.us{border-color:#1f5576;background:#eaf2f8}
-
-/* pricing */
-.ctrls{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:30px 0}
-.seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px}
-.seg button{border:0;background:transparent;font:600 .9rem Inter;padding:9px 18px;border-radius:999px;cursor:pointer;color:var(--muted);transition:.25s}
-.seg button.on{background:var(--green);color:#fff}
-.tg{display:inline-flex;align-items:center;gap:10px;font-size:.9rem;cursor:pointer;user-select:none}
-.sw{width:40px;height:22px;border-radius:999px;background:#cfd6cf;position:relative;transition:.2s}
-.sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
-.tg.on .sw{background:var(--green)}.tg.on .sw::after{left:21px}
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-.plan{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:28px;display:flex;flex-direction:column;position:relative}
-.plan.rec{border:2px solid var(--green);box-shadow:0 18px 40px rgba(47,107,69,.15)}
-.plan.rec::before{content:"Recomendado";position:absolute;top:-12px;left:24px;background:var(--green);color:#fff;font-size:.74rem;font-weight:700;padding:4px 12px;border-radius:999px}
-.plan .big{font-family:Fraunces,serif;font-size:3.2rem;line-height:1;color:var(--green)}
-.plan .big small{font-size:1rem;color:var(--muted);font-family:Inter}
-.plan .ctry{font-size:1.25rem;margin:10px 0 2px;min-height:32px;letter-spacing:2px}
-.plan .cn{font-size:.82rem;color:var(--muted);min-height:38px}
-.plan .pr{font-family:Fraunces,serif;font-size:2.4rem;margin-top:14px;transition:color .3s}
-.plan .pr.flash{color:var(--sun)}
-.plan .per{font-size:.82rem;color:var(--muted)}
-.plan .tot{background:#f1f5ef;border-radius:12px;padding:12px;margin:16px 0;font-size:.9rem}
-.plan .tot b{font-size:1.2rem;color:var(--green)}
-.plan ul{padding-left:18px;margin:0;font-size:.9rem;color:var(--muted);flex:1}
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+.plan{padding:30px;display:flex;flex-direction:column;position:relative}
+.plan.rec{background:linear-gradient(160deg,rgba(255,255,255,.95),rgba(227,241,229,.95));border:1.5px solid var(--g2)}
+.plan.rec::before{content:"Recomendado";position:absolute;top:-12px;left:26px;background:var(--g);color:#fff;font:600 .72rem Sora;padding:5px 12px;border-radius:999px}
+.plan .nm{font:600 .78rem Sora;letter-spacing:.16em;text-transform:uppercase;color:var(--g)}
+.plan h3{font-size:1.7rem;font-weight:800;margin:6px 0 18px}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.spec div{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:14px;padding:12px}
+.spec b{display:block;font-family:Sora;font-weight:800;font-size:1.7rem;line-height:1;color:var(--ink)}
+.spec span{font-size:.76rem;color:var(--muted)}
+.spec .wide{grid-column:1/-1}
+.spec .wide b{font-size:1.05rem;font-weight:700}
+.plan ul{padding-left:18px;margin:0;font-size:.88rem;color:var(--muted);flex:1}
 .plan li{margin-bottom:5px}
-.plan .was{margin-top:14px;font-size:1rem;color:var(--muted);display:flex;align-items:center;gap:10px}
-.plan .was .off{background:var(--clay);color:#fff;font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:999px}
-.plan .free{color:var(--green)}
-.plan .tl{color:var(--muted);font-size:.85rem}
-.plan .sav{display:inline-block;margin-left:6px;font-size:.78rem;font-weight:700;color:var(--clay)}
-.plan .pr{margin-top:4px!important}
-.note{font-size:.88rem;color:var(--muted);margin-top:18px;padding:14px 18px;border-radius:12px;background:var(--sunsoft);border-left:4px solid var(--sun)}
-.cmp{width:100%;border-collapse:collapse;margin-top:26px;background:var(--paper);border-radius:16px;overflow:hidden;font-size:.9rem}
-.cmp th,.cmp td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left}
-.cmp th{background:#eef3ec;color:var(--green);font-size:.76rem;text-transform:uppercase;letter-spacing:.06em}
-.cmp tr:last-child td{border:0}
+.plan .cta{margin-top:18px;text-align:center;font:600 .85rem Sora;border-radius:999px;padding:12px;border:1px solid var(--g2);color:var(--g)}
+.plan.rec .cta{background:var(--g);color:#fff;border-color:var(--g)}
+.pnote{margin-top:18px;padding:16px 20px;font-size:.88rem;color:var(--muted)}
 
 /* kpis */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
-.kp{text-align:center;padding:26px 16px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
-.kp b{font-family:Fraunces,serif;font-size:2.6rem;color:var(--sun);display:block;line-height:1.1}
-.kp span{font-size:.88rem;color:#a9c2b1}
-
+.kp{text-align:center;padding:26px 16px}
+.kp b{font-family:Sora;font-weight:800;font-size:2.3rem;display:block;line-height:1.1}
+.kp>span{font-size:.86rem;color:var(--muted)}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
-.stp{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px}
-.stp b{font-family:Fraunces,serif;font-size:2rem;color:var(--green2)}
+.stp{padding:22px}
+.stp b{font-family:Sora;font-weight:800;font-size:1.8rem}
 .stp h3{margin:6px 0 4px}.stp p{font-size:.9rem;color:var(--muted);margin:0}
-footer{padding:36px 0;color:var(--muted);font-size:.82rem;text-align:center}
+.srcs{columns:2;gap:30px;font-size:.8rem;color:var(--muted);margin-top:16px;padding-left:18px}
+.srcs li{margin-bottom:6px;break-inside:avoid}
+footer{padding:36px 0;color:var(--muted);font-size:.8rem;text-align:center}
 
-@media (max-width:900px){
-  .diag{grid-template-columns:1fr}.fgrid,.cats{grid-template-columns:1fr 1fr}
+@media (max-width:980px){
+  .dcompare,.flags,.stack{grid-template-columns:1fr}
+  .fgrid,.statgrid,.ins,.rail{grid-template-columns:1fr 1fr}
   .plans,.steps{grid-template-columns:1fr}.kpis,.hstats{grid-template-columns:1fr 1fr}
-  nav{display:none}.ly{grid-template-columns:44px 1fr}.ly .m{grid-column:2;justify-self:start}
+  nav.dots{display:none}.ly{grid-template-columns:44px 1fr}.ly .m,.ly .b{grid-column:2;justify-self:start}
+  .mx{grid-template-columns:110px repeat(4,1fr)}.mx>div{padding:10px;font-size:.76rem}
+  .scene{grid-template-columns:1fr;grid-template-rows:42% 58%;padding:70px 22px 40px}
+  .prodimg{width:min(30vh,260px)}.orbit{width:min(36vh,330px)}.orbit.o2{width:min(42vh,390px)}.halo{width:min(32vh,300px)}
+  .floatchip{display:none}.fnav{display:none}
+  .journey{grid-template-columns:1fr}
 }
-@media (max-width:600px){.fgrid,.cats,.ins{grid-template-columns:1fr}section{padding:72px 0}.road{padding-left:44px}.ms .dot{left:-37px}.road .rail,.road .prog{left:9px}}
-@media print{nav,#bar,.mouse{display:none}.rv,.st>*{opacity:1!important;transform:none!important}.gb{transform:none!important}.fill{width:var(--v)!important}}
+@media (max-width:620px){
+  .fgrid,.statgrid,.ins,.rail{grid-template-columns:1fr}section{padding:76px 0}
+  .dcard{grid-template-columns:1fr}.road{padding-left:44px}.ms .dot{left:-36px}.road .rail2,.road .prog{left:9px}
+  .srcs{columns:1}.pnl h3{font-size:1.6rem}.price{font-size:2.2rem}.ing{grid-template-columns:1fr}
+  .story{height:300vh}
+}
+.jleg{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:.8rem;color:var(--muted)}
+.jleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+@supports (height:100svh){.stage{height:100svh}}
+@media (max-width:620px){
+  body{font-size:15px}
+  .wrap{padding:0 16px}
+  .hero{padding:70px 0 90px}
+  .hero h1{font-size:2.35rem}
+  .ring.r1{width:360px;height:360px;right:-170px;top:-90px}.ring.r2{width:240px;height:240px;right:-90px;top:-20px}.ring.r3{width:150px;height:150px;right:-30px;top:30px}.orbdot{right:60px;top:90px}
+  .hstats{gap:10px;margin-top:36px}.hstats div{padding:14px}.hstats b{font-size:2rem}
+  .brands{gap:10px}.bchip{padding:10px 14px;width:100%}
+  h2{font-size:1.85rem}
+  .sub{font-size:1rem}
+  .sc{padding:20px}.sc .num{font-size:2.6rem}
+  .journey{padding:18px}
+  .quote{font-size:1.3rem}
+  .tabs{display:flex;width:100%}.tabs button{flex:1;padding:10px 8px}
+  .dcard{padding:20px;gap:16px}.gauge{width:150px;height:150px}.gauge svg{width:150px;height:150px}
+  .fc{padding:18px}
+  .ic b{font-size:2.2rem}
+  .ly{padding:14px 16px;gap:10px}.ly .n{font-size:1.4rem}
+  .ly .b,.ly .m{grid-column:2;justify-self:start;margin-top:-2px}
+  /* scope table -> stacked cards */
+  .matrix{background:transparent;box-shadow:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;display:grid;gap:12px}
+  .mx.h{display:none}
+  .mx{grid-template-columns:1fr 1fr;border:1px solid rgba(255,255,255,.8);border-radius:18px;background:var(--paper);box-shadow:var(--glass);overflow:hidden}
+  .mx>div{padding:10px 14px;font-size:.82rem;flex-direction:column;align-items:flex-start;gap:2px}
+  .mx>div.brand{grid-column:1/-1;font-size:1.15rem;padding-top:14px;border-bottom:1px solid var(--line)}
+  .mx>div:not(.brand)::before{content:attr(data-h);font:600 .66rem Sora;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .flags{gap:12px}.flag{font-size:.8rem;padding:6px 10px}
+  /* shop story */
+  .story{height:420vh}
+  .stage .wrap{padding:0 10px}
+  .frame{height:calc(100svh - 20px);border-radius:24px}
+  .fbar{padding:14px 16px}.flogo{font-size:1.1rem}.flogo img{height:20px}
+  .scene{grid-template-rows:38% 62%;padding:58px 16px 34px}
+  .prodimg{width:min(28vh,220px);border-radius:22px}
+  .orbit{width:min(33vh,270px)}.orbit.o2{width:min(38vh,320px)}.halo{width:min(30vh,250px)}
+  .panels{height:100%}
+  .pnl{justify-content:flex-start;padding-top:6px}
+  .pnl h3{font-size:1.45rem;margin:6px 0 8px}
+  .pnl p{font-size:.9rem;margin-bottom:6px}
+  .chips span{font-size:.74rem;padding:5px 10px}
+  .ing{gap:8px}.ing div{padding:9px 11px;font-size:.78rem}
+  .price{font-size:2rem;margin:4px 0}
+  .ctyp{margin:4px 0 10px}.ctyp button{padding:6px 10px}
+  .buy{padding:11px 20px;font-size:.85rem}
+  .stores{margin-top:10px;gap:6px}.stores span{font-size:.72rem;padding:5px 8px}
+  .ai .q,.ai .a{font-size:.8rem}
+  .steps-ind{left:16px;bottom:14px}
+  .shoptabs .tabs{margin-top:16px}
+  .rail{grid-template-columns:1fr 1fr;gap:12px}
+  .rc .bd{padding:10px 12px}.rc h4{font-size:.82rem}.rc p{font-size:.72rem}.rc .pr{font-size:.85rem}
+  /* roadmap + gantt */
+  .ms .card{padding:18px}.ms h3{font-size:1.15rem}.ms li{font-size:.78rem;padding:4px 10px}
+  .gantt{padding:14px;overflow:visible}
+  .gr{grid-template-columns:96px repeat(12,1fr);gap:2px;min-width:0;margin-bottom:6px}
+  .gr .lb{font-size:.66rem;line-height:1.15}.gr .hd{font-size:.56rem}
+  .gb{height:10px;border-radius:5px}
+  /* plans */
+  .plan{padding:22px}.plan h3{font-size:1.45rem}.spec b{font-size:1.45rem}
+  .kpis{gap:10px}.kp{padding:18px 10px}.kp b{font-size:1.7rem}
+  .steps{gap:12px}
+}
+@media (max-width:380px){
+  .hero h1{font-size:2.05rem}
+  .hstats b{font-size:1.7rem}
+  .rail{grid-template-columns:1fr}
+  .ing{grid-template-columns:1fr 1fr}
+}
+@media (max-width:620px){
+  .rv.l,.rv.r{transform:translate3d(0,40px,0)}
+  .rv.l.above,.rv.r.above{transform:translate3d(0,-40px,0)}
+  .rv.l.in,.rv.r.in{transform:none}
+}
 </style>
 </head>
 <body>
 <div id="bar"></div>
-<nav>
-  <a href="#top"><span>Inicio</span></a><a href="#diag"><span>Diagnóstico</span></a><a href="#hall"><span>Hallazgos</span></a>
-  <a href="#insights"><span>Insights</span></a><a href="#estrategia"><span>Estrategia</span></a><a href="#ruta"><span>Hoja de ruta</span></a>
-  <a href="#alcance"><span>Alcance</span></a><a href="#precios"><span>Inversión</span></a><a href="#metas"><span>Metas</span></a>
+<nav class="dots">
+  <a href="#top"><span>Inicio</span></a><a href="#ia"><span>La IA decide</span></a><a href="#diag"><span>Diagnóstico</span></a>
+  <a href="#hall"><span>Hallazgos</span></a><a href="#insights"><span>Insights</span></a><a href="#estrategia"><span>Estrategia</span></a>
+  <a href="#alcance"><span>Alcance</span></a><a href="#shop"><span>E-commerce</span></a><a href="#ruta"><span>Hoja de ruta</span></a>
+  <a href="#planes"><span>Planes</span></a><a href="#metas"><span>Metas</span></a>
 </nav>
 
 <!-- HERO -->
 <header class="hero" id="top">
-  <span class="orb o1" data-p=".3"></span><span class="orb o2" data-p="-.2"></span>
+  <span class="ring r1" data-p=".12"></span><span class="ring r2" data-p=".2"></span><span class="ring r3"></span><span class="orbdot" data-p=".3"></span>
   <div class="wrap" style="position:relative">
-    <div class="eyebrow rv" style="color:var(--sun)">Propuesta GEO · AI Humans SRL</div>
-    <h1 class="rv" style="--d:.1s">Que la IA <em>recomiende</em> Bioland.</h1>
-    <p class="sub rv" style="--d:.2s">Cuando alguien le pregunte a ChatGPT, Gemini o Perplexity por cuidado capilar, facial, corporal o solar.</p>
-    <div class="chips rv" style="--d:.3s"><span class="chip">12 meses</span><span class="chip">4 categorías</span><span class="chip">1, 4 u 8 países</span><span class="chip">LATAM y EE. UU.</span></div>
+    <div class="eyebrow rv">Propuesta SEO + GEO · AI Humans SRL</div>
+    <h1 class="rv" style="--d:.1s">Dos marcas. Una meta: que la IA las <span class="grad">recomiende</span>.</h1>
+    <p class="sub rv" style="--d:.2s">Estrategia de 12 meses para que ChatGPT, Gemini, Google AI Mode y Perplexity encuentren, entiendan y citen a BioLand y Terre de Vie.</p>
+    <div class="brands st">
+      <div class="bchip glass"><i style="background:var(--g2)"></i><div><b style="color:var(--g)">BioLand</b><br><span>Capilar · Facial · Corporal · Solar</span></div></div>
+      <div class="bchip glass"><i style="background:var(--p2)"></i><div><b style="color:var(--p)">Terre de Vie</b><br><span>Cuidado capilar natural</span></div></div>
+    </div>
     <div class="hstats st">
-      <div><b data-n="6">0</b><span>motores de IA</span></div>
-      <div><b data-n="4">0</b><span>categorías</span></div>
-      <div><b data-n="960">0</b><span>preguntas medidas al mes</span></div>
-      <div><b data-n="12">0</b><span>meses</span></div>
+      <div class="glass"><b class="grad" data-n="2">0</b><span>marcas</span></div>
+      <div class="glass"><b class="grad" data-n="6">0</b><span>motores de IA medidos</span></div>
+      <div class="glass"><b class="grad" data-n="8">0</b><span>países, LATAM + EE. UU.</span></div>
+      <div class="glass"><b class="grad" data-n="12">0</b><span>meses</span></div>
     </div>
   </div>
   <div class="mouse"></div>
 </header>
 
+<!-- IA DECIDE -->
+<section id="ia">
+  <div class="wrap">
+    <div class="eyebrow rv">01 · La IA ya decide compras</div>
+    <h2 class="rv">El consumidor le pregunta a la IA <span class="grad">antes de comprar</span>.</h2>
+    <div class="statgrid st">
+      <div class="sc glass hl"><div class="num grad"><span data-n="78">0</span>%</div><h3>usó IA para decidir una compra</h3><p>Consumidores de EE. UU. en los últimos 6 meses; el 43% lo hace cada semana.</p><div class="meter"><i style="--v:78%"></i></div><small><a href="https://www.techwyse.com/news/ai-search/ai-shopping-adoption-consumer-distrust-autonomous-spending-2026" target="_blank" rel="noopener">Exploding Topics (Semrush)</a>, n=1 009, abr. 2026</small></div>
+      <div class="sc glass"><div class="num grad"><span data-n="69">0</span>%</div><h3>compró algo por recomendación de la IA</h3><p>Algo que de otro modo no habría comprado.</p><div class="meter"><i style="--v:69%"></i></div><small>Exploding Topics (Semrush), abr. 2026</small></div>
+      <div class="sc glass"><div class="num grad"><span data-n="58">0</span>%</div><h3>compró la marca que le recomendó el chatbot</h3><p>Entre quienes usan IA. Sube a 80% en quienes la usan varias veces por semana.</p><div class="meter"><i style="--v:58%"></i></div><small><a href="https://www.semrush.com/blog/ai-chatbots-talk-ai-users-out-of-buying/" target="_blank" rel="noopener">Semrush</a>, n=2 338, jul. 2026</small></div>
+      <div class="sc glass"><div class="num" style="color:var(--clay)"><span data-n="58">0</span>%</div><h3>desistió de una compra por lo que dijo la IA</h3><p>La IA también descarta marcas: si no tiene datos de la suya, recomienda otra.</p><div class="meter"><i style="--v:58%;background:linear-gradient(90deg,var(--clay),#e08b5f)"></i></div><small>Semrush, jul. 2026</small></div>
+      <div class="sc glass"><div class="num grad"><span data-n="83">0</span>%</div><h3>confía mucho en la IA para formar opinión</h3><p>De los usuarios activos de IA. El 76% de los consumidores de belleza acepta un asistente de compras con IA.</p><div class="meter"><i style="--v:83%"></i></div><small><a href="https://www.cosmeticsdesign.com/Article/2025/10/09/report-76-of-beauty-consumers-open-to-ai-shopping" target="_blank" rel="noopener">Accenture</a>, oct. 2025</small></div>
+      <div class="sc glass"><div class="num grad">+<span data-n="60">0</span>%</div><h3>más conversión del tráfico desde IA</h3><p>Y 53% más ingresos por visita que el resto del tráfico en retail.</p><div class="meter"><i style="--v:60%"></i></div><small><a href="https://www.digitalcommerce360.com/2026/08/19/adobe-ai-referral-traffic-data-july-2026/" target="_blank" rel="noopener">Adobe</a>, ago. 2026</small></div>
+    </div>
+    <div class="journey glass rv">
+      <div><h3 style="margin:0">Así empieza hoy la compra</h3><p style="margin:0;font-size:.84rem;color:var(--muted)">Consumidores que usan IA al comprar · Exploding Topics</p></div>
+      <div><div class="bar2"><div style="--v:44%;background:var(--g)">44%</div><div style="--v:45%;background:var(--p2)">45%</div><div style="--v:11%;background:#c9d2cc;color:var(--ink)">11%</div></div><div class="jleg"><span><i style="background:var(--g)"></i>Empieza en la IA</span><span><i style="background:var(--p2)"></i>La usa como apoyo</span><span><i style="background:#c9d2cc"></i>Otro</span></div></div>
+    </div>
+    <p class="quote rv">Si la IA no puede leer su catálogo, recomienda <span class="grad">el de otra marca</span>.</p>
+  </div>
+</section>
+
 <!-- DIAGNÓSTICO -->
 <section id="diag">
   <div class="wrap">
-    <div class="eyebrow rv">01 · Diagnóstico</div>
-    <h2 class="rv">Hoy, la IA casi no puede leer a Bioland.</h2>
-    <p class="sub rv">Revisión de bio-land.com, us.bio-land.com y retailers · 19 oct 2026</p>
-    <div class="diag">
-      <div class="gauge rv z" id="gauge">
-        <svg width="280" height="280" viewBox="0 0 280 280">
-          <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7643c"/><stop offset="1" stop-color="#f2b33d"/></linearGradient></defs>
-          <circle class="bg" cx="140" cy="140" r="120"/><circle class="fg" cx="140" cy="140" r="120" data-s="27"/>
-        </svg>
-        <div class="v"><div><b data-n="27">0</b><span>de 100<br>Preparación GEO</span></div></div>
+    <div class="eyebrow rv">02 · Diagnóstico</div>
+    <h2 class="rv">Hoy, la IA casi no puede leer a ninguna de las dos.</h2>
+    <p class="sub rv">Revisión externa de bio-land.com, us.bio-land.com, terredevie.co y fichas en retailers · oct. 2026</p>
+    <div class="dcompare">
+      <div class="dcard glass rv l">
+        <h3><span style="color:var(--g)">BioLand</span> <small>bio-land.com</small></h3>
+        <div class="gauge" data-g="27"><svg width="180" height="180" viewBox="0 0 180 180"><circle class="bg" cx="90" cy="90" r="76"/><circle class="fg" cx="90" cy="90" r="76" stroke="#d98a3a"/></svg><div class="v"><div><b data-n="27">0</b><span>de 100</span></div></div></div>
+        <div class="bars st">
+          <div><div class="t"><span>Indexación técnica</span><span>20</span></div><div class="trk"><div class="fill lo" style="--v:20%"></div></div></div>
+          <div><div class="t"><span>Datos de producto</span><span>25</span></div><div class="trk"><div class="fill lo" style="--v:25%"></div></div></div>
+          <div><div class="t"><span>Contenido de respuesta</span><span>10</span></div><div class="trk"><div class="fill lo" style="--v:10%"></div></div></div>
+          <div><div class="t"><span>Localización</span><span>15</span></div><div class="trk"><div class="fill lo" style="--v:15%"></div></div></div>
+          <div><div class="t"><span>Entidad de marca</span><span>45</span></div><div class="trk"><div class="fill mi" style="--v:45%"></div></div></div>
+          <div><div class="t"><span>Autoridad</span><span>45</span></div><div class="trk"><div class="fill mi" style="--v:45%"></div></div></div>
+        </div>
       </div>
-      <div class="bars st">
-        <div><div class="t"><span>Indexación técnica</span><span>20</span></div><div class="trk"><div class="fill lo" style="--v:20%"></div></div></div>
-        <div><div class="t"><span>Datos de producto</span><span>25</span></div><div class="trk"><div class="fill lo" style="--v:25%"></div></div></div>
-        <div><div class="t"><span>Contenido de respuesta</span><span>10</span></div><div class="trk"><div class="fill lo" style="--v:10%"></div></div></div>
-        <div><div class="t"><span>Localización por país</span><span>15</span></div><div class="trk"><div class="fill lo" style="--v:15%"></div></div></div>
-        <div><div class="t"><span>Entidad de marca</span><span>45</span></div><div class="trk"><div class="fill mi" style="--v:45%"></div></div></div>
-        <div><div class="t"><span>Autoridad en terceros</span><span>45</span></div><div class="trk"><div class="fill mi" style="--v:45%"></div></div></div>
+      <div class="dcard glass rv r">
+        <h3><span style="color:var(--p)">Terre de Vie</span> <small>terredevie.co</small></h3>
+        <div class="gauge" data-g="12"><svg width="180" height="180" viewBox="0 0 180 180"><circle class="bg" cx="90" cy="90" r="76"/><circle class="fg" cx="90" cy="90" r="76" stroke="#c7643c"/></svg><div class="v"><div><b data-n="12">0</b><span>de 100</span></div></div></div>
+        <div class="bars st">
+          <div><div class="t"><span>Indexación técnica</span><span>0</span></div><div class="trk"><div class="fill lo" style="--v:2%"></div></div></div>
+          <div><div class="t"><span>Datos de producto</span><span>5</span></div><div class="trk"><div class="fill lo" style="--v:5%"></div></div></div>
+          <div><div class="t"><span>Contenido de respuesta</span><span>0</span></div><div class="trk"><div class="fill lo" style="--v:2%"></div></div></div>
+          <div><div class="t"><span>Localización</span><span>10</span></div><div class="trk"><div class="fill lo" style="--v:10%"></div></div></div>
+          <div><div class="t"><span>Entidad de marca</span><span>15</span></div><div class="trk"><div class="fill lo" style="--v:15%"></div></div></div>
+          <div><div class="t"><span>Autoridad (retail)</span><span>40</span></div><div class="trk"><div class="fill mi" style="--v:40%"></div></div></div>
+        </div>
+        <div class="alert"><b>Alerta:</b> la portada tiene la etiqueta <code>noindex</code>, que pide a Google y a la IA no indexarla.</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- HALLAZGOS -->
-<section id="hall" style="padding-top:0">
+<section id="hall">
   <div class="wrap">
-    <div class="eyebrow rv">02 · Hallazgos</div>
+    <div class="eyebrow rv">03 · Hallazgos</div>
     <h2 class="rv">Lo que encontramos</h2>
-    <div class="fgrid st">
-      <div class="fc red"><span class="k">Crítico</span><h3>Sin robots.txt ni sitemap</h3><p>Ambos dan error 404. Los bots no tienen un mapa del catálogo.</p></div>
-      <div class="fc red"><span class="k">Crítico</span><h3>Fichas incompletas</h3><p>Sin ingredientes completos, precio, modo de uso ni dónde comprar.</p></div>
-      <div class="fc red"><span class="k">Crítico</span><h3>Cero contenido de respuesta</h3><p>No hay guías, FAQs ni blog que la IA pueda citar.</p></div>
-      <div class="fc amb"><span class="k">Mejorable</span><h3>Metadatos genéricos</h3><p>El título es solo “BioLand” y las imágenes dicen “product image”.</p></div>
-      <div class="fc amb"><span class="k">Mejorable</span><h3>Sin versiones por país</h3><p>No hay hreflang ni “dónde comprar” por mercado.</p></div>
-      <div class="fc amb"><span class="k">Validar</span><h3>Sin línea con SPF visible</h3><p>Solo aparece un gel after sun para la categoría solar.</p></div>
-      <div class="fc grn"><span class="k">Fortaleza</span><h3>Marca con historia</h3><p>Fabricante costarricense desde 1982, con retail en LATAM.</p></div>
-      <div class="fc grn"><span class="k">Fortaleza</span><h3>Texto legible por bots</h3><p>El sitio entrega el contenido renderizado desde el servidor.</p></div>
-      <div class="fc grn"><span class="k">Fortaleza</span><h3>Pie en EE. UU.</h3><p>Sitio propio y 4.6★ en Amazon con el Gel Aloe Vera.</p></div>
-    </div>
+    <div class="tabs glass rv"><button class="bl on" data-t="f-bl">BioLand</button><button class="td" data-t="f-td">Terre de Vie</button></div>
+    <div class="pane show" id="f-bl"><div class="fgrid st">
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Sin robots.txt ni sitemap</h3><p>Ambos dan error 404. Los bots no tienen mapa del catálogo.</p></div>
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Fichas incompletas</h3><p>Sin ingredientes completos, precio, modo de uso ni dónde comprar.</p></div>
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Cero contenido de respuesta</h3><p>No hay guías, FAQs ni blog que la IA pueda citar.</p></div>
+      <div class="fc glass amb"><span class="k">Mejorable</span><h3>Metadatos genéricos</h3><p>Título “BioLand” e imágenes con texto alternativo “product image”.</p></div>
+      <div class="fc glass amb"><span class="k">Mejorable</span><h3>Sin versiones por país</h3><p>No hay hreflang ni “dónde comprar” por mercado.</p></div>
+      <div class="fc glass amb"><span class="k">Validar</span><h3>Sin línea con SPF visible</h3><p>En solar solo aparece un gel after sun.</p></div>
+      <div class="fc glass grn"><span class="k">Fortaleza</span><h3>Marca desde 1982</h3><p>Historia sólida y retail en Costa Rica y Perú.</p></div>
+      <div class="fc glass grn"><span class="k">Fortaleza</span><h3>Fotografía propia</h3><p>us.bio-land.com tiene fotos de producto y de plantación listas para usar.</p></div>
+      <div class="fc glass grn"><span class="k">Fortaleza</span><h3>Pie en EE. UU.</h3><p>Gel Aloe Vera con 4.6★ en Amazon.</p></div>
+    </div></div>
+    <div class="pane" id="f-td"><div class="fgrid st">
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Portada con noindex</h3><p>La etiqueta <code>robots: noindex</code> pide a buscadores e IA no indexar el sitio.</p></div>
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Invisible en Google</h3><p>Una búsqueda <code>site:terredevie.co</code> no devuelve páginas.</p></div>
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Sin productos en el sitio</h3><p>Solo un selector de región y el logo: sin fotos, textos ni schema.</p></div>
+      <div class="fc glass red"><span class="k">Crítico</span><h3>Solo EE. UU. como región</h3><p>No aparecen los países donde ya se vende.</p></div>
+      <div class="fc glass amb"><span class="k">Mejorable</span><h3>Fichas de retail dispares</h3><p>Cada retailer describe distinto el mismo producto.</p></div>
+      <div class="fc glass amb"><span class="k">Validar</span><h3>Catálogo solo capilar</h3><p>Confirmar si hay otras categorías.</p></div>
+      <div class="fc glass grn"><span class="k">Fortaleza</span><h3>Retail en 4 países</h3><p>Walmart, Paiz, La Despensa de Don Juan, Siman, Más x Menos, Automercado y Arrocha.</p></div>
+      <div class="fc glass grn"><span class="k">Fortaleza</span><h3>Claims claros</h3><p>Sin sal, sin SLS, sin parabenos, botánicos.</p></div>
+      <div class="fc glass grn"><span class="k">Fortaleza</span><h3>Misma casa que BioLand</h3><p>Ambas usan el prefijo de código de barras 7451110.</p></div>
+    </div></div>
   </div>
 </section>
 
 <!-- INSIGHTS -->
-<section id="insights" class="dark">
+<section id="insights">
   <div class="wrap">
-    <div class="eyebrow rv">03 · Insights</div>
+    <div class="eyebrow rv">04 · Insights</div>
     <h2 class="rv">Lo que eso significa</h2>
-    <div class="ins">
-      <div class="ic rv l"><b>80%</b><h3>del GEO es técnico, no contenido</h3><p>Si la IA no puede rastrear ni entender las páginas, más posts no sirven.</p></div>
-      <div class="ic rv r"><b>2</b><h3>caminos hacia la respuesta</h3><p>La memoria del modelo tarda meses en actualizarse; la búsqueda en vivo responde en semanas. Hay que trabajar ambos.</p></div>
-      <div class="ic rv l"><b>3–5</b><h3>marcas por respuesta</h3><p>Fuera de esa lista corta, Bioland no existe en el momento de compra.</p></div>
-      <div class="ic rv r"><b>1º</b><h3>se gana el nicho</h3><p>Las preguntas con “natural”, “sin parabenos” o “aloe” son más fáciles de ganar que “mejor champú”.</p></div>
+    <div class="ins st">
+      <div class="ic glass"><b class="grad">0</b><h3>páginas de Terre de Vie citables</h3><p>La IA solo la conoce por los retailers.</p></div>
+      <div class="ic glass"><b class="grad">1+1</b><h3>una infraestructura, dos marcas</h3><p>Se construye una vez y se replica.</p></div>
+      <div class="ic glass"><b class="grad">80%</b><h3>del GEO es técnico</h3><p>Sin indexación, el contenido no llega.</p></div>
+      <div class="ic glass"><b class="grad">1º</b><h3>se gana el nicho</h3><p>“Champú de romero sin sal” antes que “mejor champú”.</p></div>
     </div>
-  </div>
-</section>
-
-<!-- ICEBERG -->
-<section style="padding-bottom:40px">
-  <div class="wrap">
-    <div class="eyebrow rv">04 · No es solo contenido</div>
-    <h2 class="rv">Hay que indexar para la IA.</h2>
-    <div class="ice rv z">
-      <div class="up"><span class="tagl" style="color:var(--green)">Lo visible</span>
-        <div class="pills st"><span class="pill">Guías</span><span class="pill">FAQs</span><span class="pill">Comparativas</span><span class="pill">Redes</span></div></div>
-      <div class="wl"></div>
-      <div class="dn"><span class="tagl" style="color:#8fb7cf;text-align:center">Lo que hace que la IA lo use</span>
-        <div class="pills st"><span class="pill">robots.txt para bots de IA</span><span class="pill">Sitemaps por país</span><span class="pill">IndexNow</span><span class="pill">Search Console + Bing</span><span class="pill">Schema Product · Brand · FAQ</span><span class="pill">Merchant Center</span><span class="pill">hreflang</span><span class="pill">llms.txt</span><span class="pill">URLs en español</span><span class="pill">Logs de bots de IA</span></div></div>
+    <div class="stack">
+      <div class="vis glass rv l"><span class="tagl">Lo visible · 20%</span><div class="pct grad">Contenido</div><div class="pills st"><span class="pill">Guías</span><span class="pill">FAQs</span><span class="pill">Comparativas</span><span class="pill">Redes</span></div></div>
+      <div class="deep glass rv r"><span class="tagl">Lo que hace que la IA lo use · 80%</span><div class="pct grad">Indexación para IA</div>
+        <div class="pills st"><span class="pill hot">Quitar noindex</span><span class="pill">robots.txt para bots de IA</span><span class="pill">Sitemaps por país</span><span class="pill">IndexNow</span><span class="pill">Search Console + Bing</span><span class="pill">Schema Product · Brand · FAQ</span><span class="pill">Merchant Center</span><span class="pill">hreflang</span><span class="pill">llms.txt</span><span class="pill">Logs de bots</span></div></div>
     </div>
   </div>
 </section>
@@ -319,40 +551,101 @@ footer{padding:36px 0;color:var(--muted);font-size:.82rem;text-align:center}
     <div class="eyebrow rv">05 · Estrategia</div>
     <h2 class="rv">7 capas, de abajo hacia arriba</h2>
     <div class="layers">
-      <div class="ly rv l"><span class="n">01</span><div><h3>Indexación técnica</h3><p>Que los bots encuentren y lean el 100% del catálogo.</p></div><span class="m">Mes 1–2</span></div>
-      <div class="ly rv r"><span class="n">02</span><div><h3>Entidad de marca</h3><p>Wikidata, schema Organization y unificación de dominios.</p></div><span class="m">Mes 1–3</span></div>
-      <div class="ly rv l"><span class="n">03</span><div><h3>Datos de producto</h3><p>Fichas completas, schema Product y feeds por país.</p></div><span class="m">Mes 2–5</span></div>
-      <div class="ly rv r"><span class="n">04</span><div><h3>Contenido de respuesta</h3><p>Guías, FAQs y comparativas como Pantene vs Bioland.</p></div><span class="m">Mes 2–12</span></div>
-      <div class="ly rv l"><span class="n">05</span><div><h3>Localización</h3><p>Versión por país, vocabulario local y dónde comprar.</p></div><span class="m">Mes 2–6</span></div>
-      <div class="ly rv r"><span class="n">06</span><div><h3>Autoridad</h3><p>PR digital, rankings, reseñas y creadores.</p></div><span class="m">Mes 3–12</span></div>
-      <div class="ly rv l"><span class="n">07</span><div><h3>Medición</h3><p>Panel de preguntas en 6 motores, cada mes.</p></div><span class="m">Mes 1–12</span></div>
+      <div class="ly glass rv l"><span class="n grad">01</span><div><h3>Indexación técnica</h3><p>Que los bots lean el 100% de ambos catálogos.</p></div><span class="b">TdV: quitar noindex</span><span class="m">Mes 1–2</span></div>
+      <div class="ly glass rv r"><span class="n grad">02</span><div><h3>Entidad de marca</h3><p>Wikidata, schema Organization y relación entre marcas.</p></div><span class="b">Marcas hermanas</span><span class="m">Mes 1–3</span></div>
+      <div class="ly glass rv l"><span class="n grad">03</span><div><h3>Datos de producto</h3><p>Fichas completas, schema Product y feeds por país.</p></div><span class="b">TdV: catálogo propio</span><span class="m">Mes 2–5</span></div>
+      <div class="ly glass rv r"><span class="n grad">04</span><div><h3>Contenido de respuesta</h3><p>Guías, FAQs y comparativas como Pantene vs BioLand.</p></div><span class="b">TdV: guías capilares</span><span class="m">Mes 2–12</span></div>
+      <div class="ly glass rv l"><span class="n grad">05</span><div><h3>Localización</h3><p>Versión por país, idioma y dónde comprar.</p></div><span class="b">TdV: CR · GT · SV · PA</span><span class="m">Mes 2–6</span></div>
+      <div class="ly glass rv r"><span class="n grad">06</span><div><h3>Autoridad</h3><p>PR digital, rankings, reseñas y creadores.</p></div><span class="b">Fichas en retailers</span><span class="m">Mes 3–12</span></div>
+      <div class="ly glass rv l"><span class="n grad">07</span><div><h3>Medición</h3><p>Panel de preguntas en 6 motores, cada mes.</p></div><span class="b">Tablero unificado</span><span class="m">Mes 1–12</span></div>
     </div>
   </div>
 </section>
 
-<!-- HOJA DE RUTA -->
-<section id="ruta" style="background:#fbfaf6">
+<!-- ALCANCE -->
+<section id="alcance">
   <div class="wrap">
-    <div class="eyebrow rv">06 · Hoja de ruta</div>
-    <h2 class="rv">12 meses, 4 fases</h2>
-    <div class="road" id="road">
-      <div class="rail"></div><div class="prog" id="prog"></div>
-      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 1–2</div><h3>Base técnica</h3>
-        <ul><li>Línea base en 6 motores</li><li>robots.txt + sitemaps</li><li>Search Console + Bing</li><li>Metadatos y URLs</li><li>Wikidata</li></ul>
-        <div class="out">Resultado: <b>sitio 100% indexable</b></div></div></div>
-      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 2–4</div><h3>Datos y contenido</h3>
-        <ul><li>Fichas enriquecidas</li><li>Schema Product</li><li>Feeds por país</li><li>4 hubs de categoría</li><li>Pantene vs Bioland</li></ul>
-        <div class="out">Resultado: <b>primeras citas en búsqueda en vivo</b></div></div></div>
-      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 4–9</div><h3>Autoridad y expansión</h3>
-        <ul><li>PR digital</li><li>Rankings y reseñas</li><li>Creadores</li><li>Resto de países</li><li>Campaña solar</li></ul>
-        <div class="out">Resultado: <b>Bioland mencionada en respuestas de nicho</b></div></div></div>
-      <div class="ms rv"><span class="dot"></span><div class="card"><div class="when">Meses 9–12</div><h3>Optimización</h3>
-        <ul><li>Cerrar brechas</li><li>Nuevas comparativas</li><li>Formatos más citados</li><li>Plan año 2</li></ul>
-        <div class="out">Resultado: <b>presencia estable en las 4 categorías</b></div></div></div>
+    <div class="eyebrow rv">06 · Alcance</div>
+    <h2 class="rv">Categorías y países por marca</h2>
+    <div class="matrix glass rv">
+      <div class="mx h"><div>Marca</div><div>💆 Capilar</div><div>✨ Facial</div><div>🧴 Corporal</div><div>☀️ Solar</div></div>
+      <div class="mx"><div class="brand" style="color:var(--g)">BioLand</div><div data-h="Capilar" class="ok">✓ Champús, acondicionadores, tratamientos</div><div data-h="Facial" class="ok">✓ Vitamin C, hialurónico</div><div data-h="Corporal" class="ok">✓ Aloe, jabones, cremas</div><div data-h="Solar" class="ok">✓ After sun <span class="vl">· SPF por validar</span></div></div>
+      <div class="mx"><div class="brand" style="color:var(--p)">Terre de Vie</div><div data-h="Capilar" class="ok">✓ 8 líneas de shampoo y acondicionador</div><div data-h="Facial" class="vl">Por validar</div><div data-h="Corporal" class="vl">Por validar</div><div data-h="Solar" class="vl">Por validar</div></div>
     </div>
+    <div class="flags">
+      <div class="fbox glass rv l"><h3 style="color:var(--g)">BioLand</h3><div class="fl st"><span class="flag on"><i>🇨🇷</i>Costa Rica</span><span class="flag on"><i>🇵🇪</i>Perú</span><span class="flag on"><i>🇵🇦</i>Panamá</span><span class="flag"><i>🇬🇹</i>Guatemala</span><span class="flag"><i>🇸🇻</i>El Salvador</span><span class="flag"><i>🇭🇳</i>Honduras</span><span class="flag"><i>🇳🇮</i>Nicaragua</span><span class="flag"><i>🇩🇴</i>Rep. Dom.</span><span class="flag on"><i>🇺🇸</i>EE. UU.</span></div></div>
+      <div class="fbox glass rv r"><h3 style="color:var(--p)">Terre de Vie</h3><div class="fl st"><span class="flag on"><i>🇨🇷</i>Costa Rica</span><span class="flag on"><i>🇬🇹</i>Guatemala</span><span class="flag on"><i>🇸🇻</i>El Salvador</span><span class="flag on"><i>🇵🇦</i>Panamá</span><span class="flag"><i>🇵🇪</i>Perú</span><span class="flag"><i>🇭🇳</i>Honduras</span><span class="flag"><i>🇳🇮</i>Nicaragua</span><span class="flag"><i>🇩🇴</i>Rep. Dom.</span><span class="flag"><i>🇺🇸</i>EE. UU.</span></div></div>
+    </div>
+    <p class="rv" style="font-size:.8rem;color:var(--muted);margin-top:12px">En verde, países con venta confirmada en nuestra revisión.</p>
+  </div>
+</section>
 
-    <div class="gantt rv">
+<!-- FUTURISTIC SHOP -->
+<section id="shop">
+  <div class="wrap">
+    <div class="eyebrow rv">07 · Así se vería</div>
+    <div class="shoptabs">
+      <h2 class="rv" style="margin:0">Una ficha de producto que <span class="grad">la IA entiende</span>.</h2>
+      <div class="tabs glass rv" id="shoptab"><button class="bl on" data-b="bl">BioLand</button><button class="td" data-b="td">Terre de Vie</button></div>
+    </div>
+    <p class="sub rv">Desliza: la ficha avanza con el scroll, hacia abajo y hacia arriba.</p>
+  </div>
+  <div class="story" id="story">
+    <div class="stage"><div class="wrap" style="width:100%">
+      <div class="frame" id="frame">
+        <div class="fbar">
+          <div class="flogo" id="flogo">BioLand</div>
+          <div class="fnav glass" id="fnav"></div>
+          <div class="cart">🛍<b>1</b></div>
+        </div>
+        <div class="scene">
+          <div class="pz">
+            <div class="halo"></div>
+            <div class="orbit o2" id="orb2"><i></i></div>
+            <div class="orbit" id="orb1"><i></i></div>
+            <div class="prodimg" id="pimg"><img id="pimgEl" alt=""><div class="fb" id="pfb"></div></div>
+            <div class="floatchip glass fc1" data-f="-1"><b id="ch1a"></b><span id="ch1b"></span></div>
+            <div class="floatchip glass fc2" data-f="1.2"><b id="ch2a"></b><span id="ch2b"></span></div>
+            <div class="floatchip glass fc3" data-f="-.7"><b id="ch3a"></b><span id="ch3b"></span></div>
+          </div>
+          <div class="panels" id="panels"></div>
+        </div>
+        <div class="steps-ind" id="sind"><i class="on"></i><i></i><i></i><i></i></div>
+      </div>
+    </div></div>
+  </div>
+  <div class="wrap">
+    <div class="railwrap" id="railwrap">
+      <h3 class="rv" style="margin-top:10px">También en la tienda</h3>
+      <div class="rail st" id="rail"></div>
+    </div>
+    <p class="mnote rv" id="mnote"></p>
+  </div>
+</section>
+
+<!-- HOJA DE RUTA -->
+<section id="ruta">
+  <div class="wrap">
+    <div class="eyebrow rv">08 · Hoja de ruta</div>
+    <h2 class="rv">12 meses, 4 fases, 2 marcas</h2>
+    <div class="road" id="road">
+      <div class="rail2"></div><div class="prog" id="prog"></div>
+      <div class="ms rv"><span class="dot"></span><div class="card glass"><div class="when">Meses 1–2</div><h3>Base técnica</h3>
+        <ul><li class="t">Quitar noindex de Terre de Vie</li><li>Línea base en 6 motores</li><li>robots.txt + sitemaps</li><li>Search Console + Bing</li><li>Metadatos y URLs</li><li>Wikidata</li></ul>
+        <div class="out">Resultado: <b>ambos sitios indexables</b></div></div></div>
+      <div class="ms rv"><span class="dot"></span><div class="card glass"><div class="when">Meses 2–4</div><h3>Catálogo y contenido</h3>
+        <ul><li class="t">Catálogo Terre de Vie por país</li><li>Fichas enriquecidas</li><li>Schema Product</li><li>Feeds por país</li><li>Hubs de categoría</li><li>Pantene vs BioLand</li></ul>
+        <div class="out">Resultado: <b>primeras citas en búsqueda en vivo</b></div></div></div>
+      <div class="ms rv"><span class="dot"></span><div class="card glass"><div class="when">Meses 4–9</div><h3>Autoridad y expansión</h3>
+        <ul><li>PR digital</li><li>Rankings y reseñas</li><li class="t">Fichas homologadas en retailers</li><li>Creadores</li><li>Más países</li><li>Campaña solar</li></ul>
+        <div class="out">Resultado: <b>ambas marcas en respuestas de nicho</b></div></div></div>
+      <div class="ms rv"><span class="dot"></span><div class="card glass"><div class="when">Meses 9–12</div><h3>Optimización</h3>
+        <ul><li>Cerrar brechas</li><li>Nuevas comparativas</li><li>Formatos más citados</li><li>Plan año 2</li></ul>
+        <div class="out">Resultado: <b>presencia estable por marca, país y categoría</b></div></div></div>
+    </div>
+    <div class="gantt glass rv">
       <div class="gr in"><div class="hd" style="text-align:left">Plan completo</div><div class="hd">M1</div><div class="hd">M2</div><div class="hd">M3</div><div class="hd">M4</div><div class="hd">M5</div><div class="hd">M6</div><div class="hd">M7</div><div class="hd">M8</div><div class="hd">M9</div><div class="hd">M10</div><div class="hd">M11</div><div class="hd">M12</div></div>
+      <div class="gr" data-g="c7:1"><div class="lb">Terre de Vie: quitar noindex</div></div>
       <div class="gr" data-g="c1:1-2"><div class="lb">Indexación técnica</div></div>
       <div class="gr" data-g="c2:1-3"><div class="lb">Entidad de marca</div></div>
       <div class="gr" data-g="c3:2-5,9,12"><div class="lb">Datos de producto</div></div>
@@ -365,191 +658,305 @@ footer{padding:36px 0;color:var(--muted);font-size:.82rem;text-align:center}
   </div>
 </section>
 
-<!-- ALCANCE -->
-<section id="alcance">
+<!-- PLANES -->
+<section id="planes">
   <div class="wrap">
-    <div class="eyebrow rv">07 · Alcance</div>
-    <h2 class="rv">4 categorías en todos los planes</h2>
-    <div class="cats st">
-      <div class="cat"><div class="em">💆</div><h3>Capilar</h3><p>Champús, acondicionadores y tratamientos</p></div>
-      <div class="cat"><div class="em">✨</div><h3>Facial</h3><p>Limpiadores, hidratantes y sérums</p></div>
-      <div class="cat"><div class="em">🧴</div><h3>Corporal</h3><p>Jabones, cremas, lociones y exfoliantes</p></div>
-      <div class="cat"><div class="em">☀️</div><h3>Solar</h3><p>Protección y cuidado después del sol</p></div>
-    </div>
-    <div class="flags st">
-      <span class="flag"><i>🇨🇷</i>Costa Rica</span><span class="flag"><i>🇵🇪</i>Perú</span><span class="flag"><i>🇵🇦</i>Panamá</span><span class="flag"><i>🇬🇹</i>Guatemala</span>
-      <span class="flag"><i>🇸🇻</i>El Salvador</span><span class="flag"><i>🇭🇳</i>Honduras</span><span class="flag"><i>🇳🇮</i>Nicaragua</span><span class="flag"><i>🇩🇴</i>Rep. Dominicana</span>
-      <span class="flag us"><i>🇺🇸</i>Estados Unidos</span>
-    </div>
-  </div>
-</section>
-
-<!-- PRECIOS -->
-<section id="precios" style="background:#fbfaf6">
-  <div class="wrap">
-    <div class="eyebrow rv">08 · Inversión</div>
-    <h2 class="rv">Elige el alcance</h2>
-    <p class="sub rv">USD, sin IVA · 12 mensualidades · <b style="color:var(--clay)">30% de descuento y configuración sin costo</b></p>
-    <div class="ctrls rv">
-      <div class="seg" id="reg"><button class="on" data-r="latam">🌎 Solo LATAM</button><button data-r="us">🇺🇸 Incluye EE. UU.</button></div>
-      <div class="tg" id="anual" role="switch" aria-checked="false" tabindex="0"><span class="sw"></span>Pago anual (−8%)</div>
-    </div>
+    <div class="eyebrow rv">09 · Planes</div>
+    <h2 class="rv">Tres niveles de alcance</h2>
+    <p class="sub rv">Aplican a una o a ambas marcas. La inversión se cotiza según el plan elegido.</p>
     <div class="plans">
-      <div class="plan rv" style="--d:.05s" data-k="p1">
-        <div class="big">1 <small>país</small></div>
-        <div class="ctry"></div><div class="cn"></div>
-        <div class="was"><s>$<span class="pl"></span></s><span class="off">−30%</span></div>
-        <div class="pr">$<span class="pm"></span></div><div class="per">al mes · Configuración <s>$<span class="ps"></span></s> <b class="free">incluida</b></div>
-        <div class="tot">Total 12 meses: <s class="tl">$<span class="ptl"></span></s><br><b>$<span class="pt"></span></b> <span class="sav">ahorras $<span class="pv"></span></span></div>
-        <ul><li>4 categorías</li><li>Indexación técnica completa</li><li>120 preguntas medidas</li><li>4 contenidos al mes</li><li>Pantene vs Bioland</li><li>1 mención de PR al mes</li></ul>
+      <div class="plan glass rv" style="--d:.05s">
+        <div class="nm">Esencial</div><h3>Arranque</h3>
+        <div class="spec st">
+          <div><b data-n="1">0</b><span>país</span></div>
+          <div><b data-n="2">0</b><span>categorías</span></div>
+          <div><b data-n="4">0</b><span>productos optimizados</span></div>
+          <div><b>ES</b><span>1 idioma</span></div>
+          <div class="wide"><b>🇨🇷 Costa Rica</b><span>o el país que se elija</span></div>
+        </div>
+        <ul><li>Indexación técnica completa</li><li>4 contenidos al mes</li><li>1 comparativa</li><li>Reporte mensual</li></ul>
+        <div class="cta">Solicitar cotización</div>
       </div>
-      <div class="plan rec rv" style="--d:.15s" data-k="p4">
-        <div class="big">4 <small>países</small></div>
-        <div class="ctry"></div><div class="cn"></div>
-        <div class="was"><s>$<span class="pl"></span></s><span class="off">−30%</span></div>
-        <div class="pr">$<span class="pm"></span></div><div class="per">al mes · Configuración <s>$<span class="ps"></span></s> <b class="free">incluida</b></div>
-        <div class="tot">Total 12 meses: <s class="tl">$<span class="ptl"></span></s><br><b>$<span class="pt"></span></b> <span class="sav">ahorras $<span class="pv"></span></span></div>
-        <ul><li>4 categorías</li><li>Indexación + hreflang por país</li><li>480 preguntas medidas</li><li>8 contenidos al mes</li><li>Pantene vs Bioland + 1 comparativa</li><li>2 menciones de PR al mes</li><li>Reseñas en retailers</li></ul>
+      <div class="plan glass rec rv" style="--d:.15s">
+        <div class="nm">Crecimiento</div><h3>Regional</h3>
+        <div class="spec st">
+          <div><b data-n="4">0</b><span>países</span></div>
+          <div><b data-n="4">0</b><span>categorías</span></div>
+          <div><b data-n="8">0</b><span>productos optimizados</span></div>
+          <div><b>ES</b><span>1 idioma, localizado</span></div>
+          <div class="wide"><b>🇨🇷 🇵🇪 🇵🇦 🇬🇹 · 🇸🇻</b><span>según la marca</span></div>
+        </div>
+        <ul><li>Indexación + hreflang por país</li><li>8 contenidos al mes</li><li>2 comparativas</li><li>Fichas en retailers</li><li>Sesión trimestral</li></ul>
+        <div class="cta">Solicitar cotización</div>
       </div>
-      <div class="plan rv" style="--d:.25s" data-k="p8">
-        <div class="big">8 <small>países</small></div>
-        <div class="ctry"></div><div class="cn"></div>
-        <div class="was"><s>$<span class="pl"></span></s><span class="off">−30%</span></div>
-        <div class="pr">$<span class="pm"></span></div><div class="per">al mes · Configuración <s>$<span class="ps"></span></s> <b class="free">incluida</b></div>
-        <div class="tot">Total 12 meses: <s class="tl">$<span class="ptl"></span></s><br><b>$<span class="pt"></span></b> <span class="sav">ahorras $<span class="pv"></span></span></div>
-        <ul><li>4 categorías</li><li>Indexación + hreflang + feeds</li><li>960 preguntas medidas</li><li>12 contenidos al mes</li><li>3 comparativas</li><li>4 menciones de PR al mes</li><li>Creadores y tablero en vivo</li></ul>
+      <div class="plan glass rv" style="--d:.25s">
+        <div class="nm">Liderazgo</div><h3>LATAM + EE. UU.</h3>
+        <div class="spec st">
+          <div><b data-n="8">0</b><span>países</span></div>
+          <div><b data-n="10">0</b><span>categorías</span></div>
+          <div><b data-n="12">0</b><span>productos optimizados</span></div>
+          <div><b>ES · EN</b><span>2 idiomas</span></div>
+          <div class="wide"><b>7 LATAM + 🇺🇸</b><span>con foco en Amazon en EE. UU.</span></div>
+        </div>
+        <ul><li>Indexación + hreflang + feeds</li><li>12 contenidos al mes</li><li>3 comparativas</li><li>Creadores y PR en EE. UU.</li><li>Tablero en vivo</li></ul>
+        <div class="cta">Solicitar cotización</div>
       </div>
     </div>
-    <div class="note rv" id="regnote"></div>
-    <table class="cmp rv">
-      <thead><tr><th></th><th>LATAM</th><th>Estados Unidos</th></tr></thead>
-      <tbody>
-        <tr><td><b>Idioma</b></td><td>Español localizado por país</td><td>Inglés y español (mercado hispano)</td></tr>
-        <tr><td><b>Competencia en IA</b></td><td>Media: pocas marcas naturales regionales</td><td>Muy alta: cientos de marcas naturales</td></tr>
-        <tr><td><b>PR y medios</b></td><td>Costo medio</td><td>Costo de 2 a 3 veces mayor</td></tr>
-        <tr><td><b>Canal clave</b></td><td>Retail: Walmart, Siman, Plaza Vea</td><td>Amazon y retail online</td></tr>
-        <tr><td><b>Punto de partida</b></td><td>Marca conocida en CR</td><td>Solo el Gel Aloe Vera en Amazon</td></tr>
-      </tbody>
-    </table>
+    <div class="pnote glass rv"><b>Productos optimizados</b> son las fichas que se trabajan a fondo (schema, contenido, feeds y medición); el resto del catálogo recibe la indexación técnica base. <b>Categorías</b> pueden ser las grandes (capilar, facial…) o subcategorías como “anticaída” o “after sun”.</div>
   </div>
 </section>
 
 <!-- METAS -->
-<section id="metas" class="dark">
+<section id="metas">
   <div class="wrap">
-    <div class="eyebrow rv">09 · Metas a 12 meses</div>
+    <div class="eyebrow rv">10 · Metas a 12 meses</div>
     <h2 class="rv">Lo que vamos a medir</h2>
     <div class="kpis st">
-      <div class="kp"><b><span data-n="100">0</span>%</b><span>del catálogo indexado</span></div>
-      <div class="kp"><b>35–50%</b><span>de las preguntas de nicho mencionan a Bioland</span></div>
-      <div class="kp"><b>15–25%</b><span>de las preguntas genéricas la mencionan</span></div>
-      <div class="kp"><b>Mensual</b><span>reporte de visibilidad por país y categoría</span></div>
+      <div class="kp glass"><b class="grad"><span data-n="100">0</span>%</b><span>de ambos catálogos indexados</span></div>
+      <div class="kp glass"><b class="grad">35–50%</b><span>de preguntas de nicho mencionan la marca</span></div>
+      <div class="kp glass"><b class="grad">15–25%</b><span>de preguntas genéricas la mencionan</span></div>
+      <div class="kp glass"><b class="grad">Mensual</b><span>reporte por marca, país y categoría</span></div>
     </div>
-    <p class="rv" style="margin-top:26px;color:#a9c2b1;font-size:.88rem">Son metas de referencia que se ajustan con la línea base del mes 1. Ningún proveedor puede garantizar qué responde una IA; nosotros garantizamos la ejecución y la medición.</p>
+    <p class="rv" style="margin-top:22px;color:var(--muted);font-size:.86rem">Metas de referencia que se ajustan con la línea base del mes 1. Ningún proveedor puede garantizar qué responde una IA; garantizamos la ejecución y la medición.</p>
   </div>
 </section>
 
 <!-- PASOS -->
 <section>
   <div class="wrap">
-    <div class="eyebrow rv">10 · Siguientes pasos</div>
+    <div class="eyebrow rv">11 · Siguientes pasos</div>
     <h2 class="rv">Arrancamos en 2 semanas</h2>
     <div class="steps st">
-      <div class="stp"><b>1</b><h3>Validación</h3><p>Países, catálogo y canales.</p></div>
-      <div class="stp"><b>2</b><h3>Firma y accesos</h3><p>Sitio, repositorio y analítica.</p></div>
-      <div class="stp"><b>3</b><h3>Línea base</h3><p>Informe en 30 días y sitio indexable.</p></div>
+      <div class="stp glass"><b class="grad">1</b><h3>Validación</h3><p>Marcas, plan, países y catálogo.</p></div>
+      <div class="stp glass"><b class="grad">2</b><h3>Firma y accesos</h3><p>Sitios, repositorios y analítica.</p></div>
+      <div class="stp glass"><b class="grad">3</b><h3>Semana 1</h3><p>Terre de Vie deja de bloquear a Google y la IA.</p></div>
     </div>
+    <h3 class="rv" style="margin-top:56px;font-size:.95rem">Fuentes</h3>
+    <ul class="srcs rv">
+      <li><a href="https://www.techwyse.com/news/ai-search/ai-shopping-adoption-consumer-distrust-autonomous-spending-2026" target="_blank" rel="noopener">Exploding Topics (Semrush): 77.6% usa IA para comprar, abr. 2026</a></li>
+      <li><a href="https://www.semrush.com/blog/ai-chatbots-talk-ai-users-out-of-buying/" target="_blank" rel="noopener">Semrush: chatbots y decisiones de compra, jul. 2026</a></li>
+      <li><a href="https://www.digitalcommerce360.com/2026/08/19/adobe-ai-referral-traffic-data-july-2026/" target="_blank" rel="noopener">Adobe vía Digital Commerce 360: conversión del tráfico de IA</a></li>
+      <li><a href="https://business.adobe.com/blog/ai-traffic-surge-retail-sites-not-machine-readable" target="_blank" rel="noopener">Adobe: tráfico de IA y legibilidad de sitios, abr. 2026</a></li>
+      <li><a href="https://www.cosmeticsdesign.com/Article/2025/10/09/report-76-of-beauty-consumers-open-to-ai-shopping" target="_blank" rel="noopener">Accenture vía CosmeticsDesign: belleza e IA</a></li>
+      <li><a href="https://www.tvn-2.com/economia/empresas/publirreportajes/terre-vie-panama-nueva-productos-capilares-cuidado-femenino-cabello-natural_1_2104265.html" target="_blank" rel="noopener">TVN: Terre de Vie llega a Panamá</a></li>
+    </ul>
   </div>
 </section>
 
-<footer>AI Humans SRL · Propuesta confidencial para Bioland · Octubre 2026 · Vigencia 30 días</footer>
+<footer>AI Humans SRL · Propuesta confidencial para BioLand y Terre de Vie · Octubre 2026 · Vigencia 30 días</footer>
 
 <script>
 (function(){
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function $(s,c){return (c||document).querySelector(s);} function $$(s,c){return [].slice.call((c||document).querySelectorAll(s));}
+  var BLIMG=function(p){return 'https://www.bio-land.com/_next/image?url='+encodeURIComponent(p)+'&w=1080&q=80';};
 
-  /* gantt bars */
-  document.querySelectorAll('.gr[data-g]').forEach(function(r){
+
+  /* ===== Inline product renders (always visible, no external requests) ===== */
+  function wrap(t,n){var w=t.split(' '),L=[],c='';w.forEach(function(x){if((c+' '+x).trim().length>n){if(c)L.push(c);c=x;}else c=(c+' '+x).trim();});if(c)L.push(c);return L.slice(0,3);}
+  function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function label(o,x,y,w,h){
+    var L=wrap(o.name,13),ty=y+h/2-((L.length-1)*13)/2+8,out='';
+    out+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="10" fill="'+(o.label||'#fff')+'" opacity=".96"/>';
+    out+='<text x="'+(x+w/2)+'" y="'+(y+22)+'" text-anchor="middle" font-family="Sora,Arial,sans-serif" font-weight="800" font-size="'+(o.bs||15)+'" fill="'+o.ink+'">'+esc(o.brand)+'</text>';
+    out+='<rect x="'+(x+w/2-14)+'" y="'+(y+30)+'" width="28" height="2" rx="1" fill="'+o.accent+'"/>';
+    L.forEach(function(l,i){out+='<text x="'+(x+w/2)+'" y="'+(ty+i*13)+'" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="11" fill="#22302a">'+esc(l)+'</text>';});
+    out+='<text x="'+(x+w/2)+'" y="'+(y+h-10)+'" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" fill="#6b7a70">'+esc(o.sub||'')+'</text>';
+    out+='<path d="M'+(x+w-26)+' '+(y+h-34)+' q10 -14 20 -4 q-6 14 -20 4z" fill="'+o.accent+'" opacity=".8"/>';
+    return out;
+  }
+  function body(o,shape,dx,dy,sc){
+    var g='<g transform="translate('+dx+' '+dy+') scale('+sc+')">',id='b'+Math.random().toString(36).slice(2,7);
+    g+='<defs><linearGradient id="'+id+'" x1="0" x2="1"><stop offset="0" stop-color="'+o.c1+'"/><stop offset=".55" stop-color="'+o.c2+'"/><stop offset="1" stop-color="'+o.c1+'"/></linearGradient></defs>';
+    if(shape==='tube'){
+      g+='<rect x="146" y="70" width="108" height="16" rx="3" fill="'+o.c2+'"/>';
+      g+='<path d="M150 84 L250 84 L262 300 Q200 316 138 300 Z" fill="url(#'+id+')"/>';
+      g+='<rect x="164" y="300" width="72" height="52" rx="12" fill="'+o.cap+'"/><rect x="164" y="300" width="72" height="10" rx="4" fill="#000" opacity=".12"/>';
+      g+=label(o,160,130,80,140);
+      g+='<rect x="156" y="96" width="9" height="190" rx="4.5" fill="#fff" opacity=".35"/>';
+    }else if(shape==='pump'){
+      g+='<rect x="186" y="64" width="28" height="54" rx="5" fill="'+o.cap+'"/><rect x="186" y="58" width="72" height="16" rx="6" fill="'+o.cap+'"/><rect x="176" y="112" width="48" height="22" rx="6" fill="'+o.cap+'"/>';
+      g+='<rect x="146" y="132" width="108" height="220" rx="26" fill="url(#'+id+')"/>';
+      g+=label(o,158,180,84,140);
+      g+='<rect x="156" y="146" width="9" height="190" rx="4.5" fill="#fff" opacity=".35"/>';
+    }else{
+      g+='<rect x="162" y="62" width="76" height="38" rx="11" fill="'+o.cap+'"/><rect x="162" y="62" width="76" height="9" rx="4" fill="#fff" opacity=".2"/><rect x="176" y="96" width="48" height="22" rx="5" fill="'+o.cap+'"/>';
+      g+='<path d="M150 150 Q150 116 182 116 L218 116 Q250 116 250 150 L250 338 Q250 356 232 356 L168 356 Q150 356 150 338 Z" fill="url(#'+id+')"/>';
+      g+=label(o,160,176,80,150);
+      g+='<rect x="158" y="132" width="9" height="210" rx="4.5" fill="#fff" opacity=".35"/>';
+    }
+    return g+'</g>';
+  }
+  function pack(o){
+    var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">';
+    s+='<defs><radialGradient id="bg" cx=".5" cy=".42" r=".65"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="'+o.bg+'"/></radialGradient></defs>';
+    s+='<rect width="400" height="400" fill="url(#bg)"/>';
+    s+='<circle cx="200" cy="200" r="150" fill="none" stroke="'+o.accent+'" stroke-opacity=".18" stroke-dasharray="4 6"/>';
+    s+='<path d="M60 330 q40 -90 120 -60 q-40 70 -120 60z" fill="'+o.accent+'" opacity=".16"/><path d="M340 120 q-30 70 -100 50 q30 -60 100 -50z" fill="'+o.accent+'" opacity=".14"/>';
+    s+='<ellipse cx="200" cy="362" rx="'+(o.group?150:80)+'" ry="12" fill="#14241a" opacity=".12"/>';
+    if(o.group){o.group.forEach(function(v,i){var off=[-88,0,88][i],sc=i===1?.9:.78,yy=i===1?30:70;s+=body(Object.assign({},o,v),v.shape||o.shape,200+off-200*sc,yy-0*sc+ (1-sc)*40,sc);});}
+    else s+=body(o,o.shape,0,0,1);
+    return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s+'</svg>');
+  }
+
+  /* ===== SHOP DATA ===== */
+  var BLP={brand:'BioLand',ink:'#2f6b45',accent:'#4f9a63',bg:'#e3f1e5'},TDP={brand:'Terre de Vie',bs:12,ink:'#7a4e8c',accent:'#b48ac4',bg:'#f1e6f5'};
+  function P(base,o){return pack(Object.assign({},base,o));}
+  var SHOP={
+    bl:{logo:'BioLand',nav:['Capilar','Facial','Corporal','Solar'],navOn:2,
+      pk:P(BLP,{shape:'tube',name:'Gel Aloe Vera',sub:'300 ml · Corporal',c1:'#cfe8d3',c2:'#eef8ef',cap:'#2f6b45'}),real:['https://us.bio-land.com/assets/aloe-tube.webp',BLIMG('/wp-content/uploads/2024/09/Artboard-1-copy-23.jpg')],
+      chips:[['4.6★','74 reseñas'],['24 h','de la cosecha'],['0%','colorantes']],
+      panels:[
+        {k:'Corporal · 300 ml',h:'Gel Aloe Vera',p:'Sábila procesada en frío dentro de las 24 horas de la cosecha. Se absorbe rápido y no deja sensación pegajosa.',chips:['Rostro','Cuerpo','Cabello','After sun']},
+        {k:'Lo que contiene',h:'Natural, de verdad.',ing:[['Aloe vera','Procesado en frío'],['Agua de manantial','Base de la fórmula'],['Sin parabenos','Ni alcohol etílico'],['Sin colorantes','El gel real es transparente']]},
+        {k:'Precio y disponibilidad',price:{us:['$21','Amazon EE. UU.'],cr:['Consultar','Precio local'],pe:['Consultar','Precio local']},stores:{us:['Amazon','us.bio-land.com'],cr:['Siman','Supermercados'],pe:['Plaza Vea · 78 tiendas']}},
+        {k:'Lo que ve la IA',ai:{q:'¿Qué gel de aloe vera puro me recomiendas para después del sol?',a:'Una buena opción es el <b>Gel Aloe Vera de BioLand</b> (300 ml): procesado en frío, sin colorantes ni alcohol, fabricado en Costa Rica desde 1982 y con 4.6★ en Amazon.',src:['bio-land.com','amazon.com']}}
+      ],
+      rail:[
+        {n:'Acondicionador Concentrado Argán',d:'Humectación · 180 ml',pk:P(BLP,{shape:'bottle',name:'Concentrado Argán',sub:'180 ml · Humectación',c1:'#e7b96a',c2:'#f7e1b3',cap:'#2f6b45'}),real:[BLIMG('/wp-content/uploads/2024/06/BANNER-BL-PAG-WEB-06_4_11zon.jpg')],pr:'Ver en tienda'},
+        {n:'Gel Hidratante Facial Hialurónico',d:'Tratamiento facial',pk:P(BLP,{shape:'pump',name:'Gel Hidratante Hialurónico',sub:'Facial',c1:'#d4e5f2',c2:'#f2f8fc',cap:'#2f6b45'}),real:[BLIMG('/wp-content/uploads/2024/06/BANNER-BL-PAG-WEB-10.jpg')],pr:'Ver en tienda'},
+        {n:'Línea capilar',d:'Romero · Pro Keratina · Argán',pk:P(BLP,{shape:'bottle',name:'',sub:'',group:[{name:'Romero',sub:'Shampoo',c1:'#b9d8b0',c2:'#e3f0dd',cap:'#2f6b45'},{name:'Pro Keratina',sub:'Shampoo',c1:'#e9cf8f',c2:'#f8ecc8',cap:'#2f6b45'},{name:'Argán',sub:'Acondicionador',c1:'#e2a75c',c2:'#f5d7a6',cap:'#2f6b45'}]}),real:['https://us.bio-land.com/assets/coming/hair.png'],pr:'Desde ₡6 750'},
+        {n:'Línea Vitamin C',d:'Micelar · Sérum · Crema',pk:P(BLP,{shape:'pump',name:'',sub:'',group:[{shape:'bottle',name:'Agua Micelar',sub:'Vitamin C',c1:'#f6c58a',c2:'#fde9cf',cap:'#e58a2b'},{shape:'pump',name:'Sérum Vitamin C',sub:'Antimanchas',c1:'#f3b26a',c2:'#fde3c2',cap:'#e58a2b'},{shape:'pump',name:'Crema Vitamin C',sub:'Humectante',c1:'#f7d2a2',c2:'#fff0dc',cap:'#e58a2b'}]}),real:['https://us.bio-land.com/assets/coming/facial.png'],pr:'Ver en tienda'}
+      ],
+      note:'Ilustraciones de empaque incluidas en el archivo; si el navegador permite cargar las fotos de bio-land.com, se muestran las fotos reales. Precio de EE. UU. según us.bio-land.com (Amazon); línea capilar según Más x Menos, oct. 2026.'},
+    td:{logo:'<img src="https://www.terredevie.co/logo.png" alt="" onerror="this.remove()">Terre de Vie',nav:['Caída','Reparación','Hidratación','Frizz'],navOn:0,
+      pk:P(TDP,{shape:'bottle',name:'Shampoo Romero Control Caída',sub:'400 ml',c1:'#cbb3d8',c2:'#f1e8f6',cap:'#7a4e8c',accent:'#6aa36f'}),real:['https://walmartcr.vtexassets.com/arquivos/ids/923861/80462_01.jpg'],
+      chips:[['400 ml','formato'],['0%','sal y SLS'],['4','países']],
+      panels:[
+        {k:'Caída · 400 ml',h:'Shampoo Romero Control Caída',p:'Alta concentración de extracto de romero, nutrientes y vitaminas para reactivar el crecimiento desde la raíz.',chips:['Caída','Crecimiento','Todo tipo de cabello']},
+        {k:'Lo que contiene',h:'Botánico y limpio.',ing:[['Extracto de romero','Alta concentración'],['Vitaminas','Fortalece la hebra'],['Sin sal','Ni siliconas'],['Sin SLS','Ni parabenos']]},
+        {k:'Precio y disponibilidad',price:{cr:['₡7 300','Walmart CR'],gt:['Q78.50','Paiz'],sv:['$9.80','La Despensa de Don Juan'],pa:['$10.95','Farmacias Arrocha']},stores:{cr:['Walmart','Más x Menos','Siman','Automercado'],gt:['Paiz','Walmart'],sv:['La Despensa de Don Juan'],pa:['Farmacias Arrocha']}},
+        {k:'Lo que ve la IA',ai:{q:'¿Qué champú de romero sin sal sirve para la caída en Guatemala?',a:'Puedes probar el <b>Shampoo Romero Control Caída de Terre de Vie</b> (400 ml, ≈ Q78.50): sin sal, siliconas ni SLS. Está en Paiz y Walmart Guatemala.',src:['terredevie.co','paiz.com.gt']}}
+      ],
+      rail:[
+        {n:'Shampoo Ortiga Reparación Total',d:'Reparación · 400 ml',pk:P(TDP,{shape:'bottle',name:'Shampoo Ortiga Reparación Total',sub:'400 ml',c1:'#a9cf9e',c2:'#e4f2df',cap:'#7a4e8c',accent:'#4f9a63'}),real:['https://siman.vtexassets.com/arquivos/ids/6332551-800-auto?v=638665010807130000&width=800&height=auto&aspect=true'],pr:'₡8 100 · Siman CR',c:1},
+        {n:'Shampoo Coco Extra Hidratante',d:'Hidratación · 400 ml',pk:P(TDP,{shape:'bottle',name:'Shampoo Coco Extra Hidratante',sub:'400 ml',c1:'#e6d8c4',c2:'#fbf5ec',cap:'#7a4e8c',accent:'#a57a4e'}),real:['https://arrocha.com/cdn/shop/files/product-3340499.jpg?v=1754955956&width=800'],pr:'$10.95 · Arrocha PA',c:1},
+        {n:'Shampoo Bio Collagen Anti Frizz',d:'Frizz · 400 ml',pk:P(TDP,{shape:'bottle',name:'Shampoo Bio Collagen Anti Frizz',sub:'400 ml',c1:'#efc2cf',c2:'#fbe8ee',cap:'#7a4e8c',accent:'#d0708d'}),real:['https://arrocha.com/cdn/shop/files/product-6552063.jpg?v=1754956067&width=800'],pr:'$10.95 · Arrocha PA',c:1},
+        {n:'Más líneas Terre de Vie',d:'Keratina · Aloe Vera · Monoi · Aceite de Coco',pk:P(TDP,{shape:'bottle',name:'',sub:'',group:[{name:'Keratina',sub:'Shampoo',c1:'#e8d29a',c2:'#f8eecf',cap:'#7a4e8c'},{name:'Aloe Vera',sub:'Shampoo',c1:'#bfe0c4',c2:'#e9f6eb',cap:'#7a4e8c'},{name:'Monoi de Tahití',sub:'Shampoo',c1:'#f2dcb8',c2:'#fdf3e2',cap:'#7a4e8c'}]}),real:[],pr:'$10.95 · Arrocha PA',c:1}
+      ],
+      note:'terredevie.co no publica imágenes de producto. Ilustraciones de empaque incluidas en el archivo; si el navegador lo permite, se muestran las fotos de Walmart, Siman y Farmacias Arrocha. Precios de esos retailers, oct. 2026.'}
+  };
+  var CTY={us:'🇺🇸 US',cr:'🇨🇷 CR',pe:'🇵🇪 PE',gt:'🇬🇹 GT',sv:'🇸🇻 SV',pa:'🇵🇦 PA'};
+  var cur='bl',ctyK={bl:'us',td:'cr'},step=-1;
+
+  function panelHTML(d){
+    return d.panels.map(function(x,i){
+      var h='<div class="pnl" data-i="'+i+'"><small>'+x.k+'</small>';
+      if(x.h)h+='<h3>'+x.h+'</h3>';
+      if(x.p)h+='<p>'+x.p+'</p>';
+      if(x.chips)h+='<div class="chips">'+x.chips.map(function(c){return '<span>'+c+'</span>';}).join('')+'</div>';
+      if(x.ing)h+='<div class="ing">'+x.ing.map(function(c){return '<div><b>'+c[0]+'</b>'+c[1]+'</div>';}).join('')+'</div>';
+      if(x.price){
+        h+='<h3>Elige tu país</h3><div class="ctyp">'+Object.keys(x.price).map(function(k){return '<button data-k="'+k+'">'+CTY[k]+'</button>';}).join('')+'</div>'+
+           '<div class="price" id="pval"></div><button class="buy">Comprar ahora →</button><div class="stores" id="pst"></div>';
+      }
+      if(x.ai)h+='<h3>Respuesta objetivo</h3><div class="ai"><div class="q">'+x.ai.q+'</div><div class="a">'+x.ai.a+'<div class="src">'+x.ai.src.map(function(s){return '<span>'+s+'</span>';}).join('')+'</div></div></div><p style="font-size:.72rem;color:#8a978e;margin-top:8px">Simulación de cómo debería responder la IA tras el proyecto.</p>';
+      return h+'</div>';
+    }).join('');
+  }
+  function setPrice(){
+    var d=SHOP[cur],pp=d.panels[2],k=ctyK[cur];if(!pp.price[k])k=Object.keys(pp.price)[0];ctyK[cur]=k;
+    $$('#panels .ctyp button').forEach(function(b){b.classList.toggle('on',b.dataset.k===k);});
+    var v=pp.price[k];$('#pval').innerHTML=v[0]+' <small>· '+v[1]+'</small>';
+    $('#pst').innerHTML=(pp.stores[k]||[]).map(function(s){return '<span>📍 '+s+'</span>';}).join('');
+  }
+  /* Attempts the real product photo; only swaps it in if it actually loads. */
+  function tryReal(list,ok){list=(list||[]).slice();(function next(){if(!list.length)return;var u=list.shift(),t=new Image();t.referrerPolicy='no-referrer';t.onload=function(){if(t.naturalWidth>40)ok(u);else next();};t.onerror=next;t.src=u;})();}
+  function loadShop(b){
+    cur=b;var d=SHOP[b],fr=$('#frame');
+    fr.classList.toggle('tdv',b==='td');$('#railwrap').classList.toggle('tdv',b==='td');
+    $('#flogo').innerHTML=d.logo;
+    $('#fnav').innerHTML=d.nav.map(function(n,i){return '<span class="'+(i===d.navOn?'on':'')+'">'+n+'</span>';}).join('');
+    var pi=$('#pimg'),im=$('#pimgEl');pi.classList.remove('err','real');
+    im.src=d.pk;im.alt=d.panels[0].h;$('#pfb').textContent=d.panels[0].h;
+    tryReal(d.real,function(u){if(cur===b){im.src=u;pi.classList.add('real');}});
+    [1,2,3].forEach(function(i){$('#ch'+i+'a').textContent=d.chips[i-1][0];$('#ch'+i+'b').textContent=d.chips[i-1][1];});
+    $('#panels').innerHTML=panelHTML(d);
+    $$('#panels .ctyp button').forEach(function(btn){btn.addEventListener('click',function(){ctyK[cur]=btn.dataset.k;setPrice();});});
+    setPrice();
+    $('#rail').innerHTML=d.rail.map(function(r,i){return '<div class="rc glass"><div class="im"><img data-i="'+i+'" src="'+r.pk+'" alt="'+r.n+'"></div><div class="bd"><h4>'+r.n+'</h4><p>'+r.d+'</p><div class="pr">'+r.pr+'</div></div></div>';}).join('');
+    d.rail.forEach(function(r,i){tryReal(r.real,function(u){var el=$('#rail img[data-i="'+i+'"]');if(el&&cur===b){el.src=u;el.parentNode.classList.add('real');}});});
+    $('#mnote').textContent=d.note;
+    step=-1;storyTick(true);
+  }
+  $$('#shoptab button').forEach(function(btn){btn.addEventListener('click',function(){
+    $$('#shoptab button').forEach(function(x){x.classList.toggle('on',x===btn);});loadShop(btn.dataset.b);});});
+
+  /* scroll-driven product story (works both directions) */
+  var story=$('#story'),pimg=$('#pimg'),o1=$('#orb1'),o2=$('#orb2'),fchips=$$('.floatchip');
+  function storyTick(force){
+    var r=story.getBoundingClientRect(),tot=r.height-innerHeight,p=Math.max(0,Math.min(1,-r.top/tot));
+    if(!reduce){
+      var rot=(p-.5)*-14, sc=.88+Math.sin(p*Math.PI)*.16, ty=(p-.5)*-40;
+      pimg.style.transform='translateY('+ty+'px) rotate('+rot+'deg) scale('+sc+')';
+      o1.style.transform='rotate('+(p*220)+'deg)';o2.style.transform='rotate('+(-p*140)+'deg)';
+      fchips.forEach(function(c){c.style.transform='translateY('+((p-.5)*120*c.dataset.f)+'px)';});
+    }
+    var s=Math.min(3,Math.floor(p*4*0.999));
+    if(s!==step||force){step=s;
+      $$('#panels .pnl').forEach(function(el,i){el.classList.toggle('on',i===s);el.classList.toggle('past',i<s);});
+      $$('#sind i').forEach(function(el,i){el.classList.toggle('on',i===s);});
+    }
+  }
+
+  /* tabs (hallazgos) */
+  $$('.tabs').forEach(function(t){if(t.id==='shoptab')return;
+    $$('button',t).forEach(function(btn){btn.addEventListener('click',function(){
+      $$('button',t).forEach(function(x){x.classList.toggle('on',x===btn);document.getElementById(x.dataset.t).classList.toggle('show',x===btn);});
+      $$('.st,.rv',document.getElementById(btn.dataset.t)).forEach(function(e){e.classList.add('in');e.classList.remove('above');});
+    });});
+  });
+
+  /* gantt */
+  $$('.gr[data-g]').forEach(function(r){
     var s=r.dataset.g.split(':'),on={};
     s[1].split(',').forEach(function(p){var a=p.split('-'),x=+a[0],y=+(a[1]||a[0]);for(var i=x;i<=y;i++)on[i]=1;});
     for(var m=1;m<=12;m++){var d=document.createElement('div');d.className='gb '+(on[m]?s[0]:'e');d.style.setProperty('--i',m);r.appendChild(d);}
   });
 
-  /* counters */
+  /* counters + gauges */
   function count(el,to){
     if(reduce){el.textContent=to;return;}
     cancelAnimationFrame(el._r);var t0=null;
-    (function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/1400,1),e=1-Math.pow(1-p,3);
+    (function f(t){if(!t0)t0=t;var p=Math.min((t-t0)/1300,1),e=1-Math.pow(1-p,3);
       el.textContent=Math.round(to*e).toLocaleString('es');if(p<1)el._r=requestAnimationFrame(f);})(performance.now());
   }
-  var fg=document.querySelector('.gauge .fg');
-  function gauge(on){fg.style.strokeDashoffset=on?754-754*fg.dataset.s/100:754;}
+  function gauge(g,on){$('.fg',g).style.strokeDashoffset=on?478-478*g.dataset.g/100:478;}
 
-  /* bidirectional reveal */
-  var els=document.querySelectorAll('.rv,.st,.gr[data-g]');
-  if(reduce){els.forEach(function(e){e.classList.add('in');});document.querySelectorAll('[data-n]').forEach(function(e){e.textContent=e.dataset.n;});gauge(true);}
+  /* Reveal. An element that leaves through the TOP slides upward (away from the
+     new content); one that leaves through the BOTTOM slides downward. It comes
+     back from the side it left, so nothing ever moves onto incoming content. */
+  var els=$$('.rv,.st,.gr[data-g],.gauge,.journey');
+  if(reduce){els.forEach(function(e){e.classList.add('in');});$$('[data-n]').forEach(function(e){e.textContent=e.dataset.n;});$$('.gauge').forEach(function(g){gauge(g,true);});}
   else{
     var io=new IntersectionObserver(function(es){es.forEach(function(en){
       var el=en.target,on=en.isIntersecting;
-      el.classList.toggle('in',on);
-      el.querySelectorAll('[data-n]').forEach(function(c){if(on)count(c,+c.dataset.n);else{cancelAnimationFrame(c._r);c.textContent='0';}});
-      if(el.id==='gauge')gauge(on);
-    });},{threshold:.15,rootMargin:'0px 0px -5% 0px'});
+      if(on){el.classList.add('in');el.classList.remove('above');}
+      else{el.classList.remove('in');el.classList.toggle('above',en.boundingClientRect.top<0);}
+      $$('[data-n]',el).forEach(function(c){if(on)count(c,+c.dataset.n);else{cancelAnimationFrame(c._r);c.textContent='0';}});
+      if(el.classList.contains('gauge'))gauge(el,on);
+    });},{threshold:0,rootMargin:'-6% 0px -6% 0px'});
     els.forEach(function(e){io.observe(e);});
   }
 
-  /* scroll: direction, progress, parallax, roadmap, nav */
-  var lastY=scrollY,tick=false,bar=document.getElementById('bar'),road=document.getElementById('road'),prog=document.getElementById('prog');
-  var ms=[].slice.call(document.querySelectorAll('.ms')),orbs=document.querySelectorAll('[data-p]');
-  var dots=[].slice.call(document.querySelectorAll('nav a')),secs=dots.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  /* scroll effects */
+  var tick=false,bar=$('#bar'),road=$('#road'),prog=$('#prog');
+  var ms=$$('.ms'),par=$$('[data-p]'),dots=$$('nav.dots a'),secs=dots.map(function(a){return document.querySelector(a.getAttribute('href'));});
   function onS(){
     var y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
-    if(Math.abs(y-lastY)>2){document.body.classList.toggle('up',y<lastY);lastY=y;}
     bar.style.width=(h>0?y/h*100:0)+'%';
-    if(!reduce)orbs.forEach(function(o){o.style.transform='translate3d(0,'+y*o.dataset.p+'px,0)';});
+    if(!reduce)par.forEach(function(o){o.style.transform='translate3d(0,'+y*o.dataset.p+'px,0)';});
     var r=road.getBoundingClientRect(),mid=innerHeight*.6,p=Math.max(0,Math.min(1,(mid-r.top)/r.height));
     prog.style.height=(p*r.height)+'px';
     ms.forEach(function(m){m.classList.toggle('lit',m.getBoundingClientRect().top+20<mid);});
-    var cur=0;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<innerHeight*.4)cur=i;});
-    dots.forEach(function(d,i){d.classList.toggle('act',i===cur);});
+    var c=0;secs.forEach(function(s,i){if(s&&s.getBoundingClientRect().top<innerHeight*.4)c=i;});
+    dots.forEach(function(d,i){d.classList.toggle('act',i===c);});
+    storyTick(false);
     tick=false;
   }
   addEventListener('scroll',function(){if(!tick){requestAnimationFrame(onS);tick=true;}},{passive:true});
-  addEventListener('resize',onS);onS();
-
-  /* pricing */
-  var P={
-    latam:{p1:{m:2900,s:4500,f:'🇨🇷',n:'Costa Rica'},
-           p4:{m:5400,s:7500,f:'🇨🇷🇵🇪🇵🇦🇬🇹',n:'Costa Rica, Perú, Panamá, Guatemala'},
-           p8:{m:8900,s:10500,f:'🇨🇷🇵🇪🇵🇦🇬🇹🇸🇻🇭🇳🇳🇮🇩🇴',n:'Los 8 países de LATAM'},
-           note:'<b>Solo LATAM:</b> contenido en español localizado por país. El plan de 1 país puede ser cualquiera de los 8.'},
-    us:{p1:{m:5900,s:8500,f:'🇺🇸',n:'Estados Unidos'},
-        p4:{m:8400,s:11000,f:'🇺🇸🇨🇷🇵🇪🇵🇦',n:'EE. UU. + Costa Rica, Perú, Panamá'},
-        p8:{m:11900,s:14000,f:'🇺🇸🇨🇷🇵🇪🇵🇦🇬🇹🇸🇻🇭🇳🇩🇴',n:'EE. UU. + 7 países de LATAM'},
-        note:'<b>Con EE. UU.:</b> contenido en inglés y español, PR en medios estadounidenses y foco en Amazon. Es un mercado más caro y con más competencia.'}
-  };
-  var reg='latam',anual=false,D=0.7;
-  function fmt(n){return Math.round(n).toLocaleString('en-US');}
-  function render(){
-    var d=P[reg],f=anual?.92:1;
-    document.querySelectorAll('.plan').forEach(function(pl){
-      var x=d[pl.dataset.k];
-      pl.querySelector('.ctry').textContent=x.f;pl.querySelector('.cn').textContent=x.n;
-      var list=x.m, real=x.m*D*f, listTot=list*12+x.s, tot=real*12;
-      pl.querySelector('.pl').textContent=fmt(list);
-      pl.querySelector('.pm').textContent=fmt(real);pl.querySelector('.ps').textContent=fmt(x.s);
-      pl.querySelector('.ptl').textContent=fmt(listTot);pl.querySelector('.pt').textContent=fmt(tot);
-      pl.querySelector('.pv').textContent=fmt(listTot-tot);
-      var pr=pl.querySelector('.pr');pr.classList.add('flash');setTimeout(function(){pr.classList.remove('flash');},350);
-    });
-    document.getElementById('regnote').innerHTML=d.note;
-  }
-  document.querySelectorAll('#reg button').forEach(function(b){b.addEventListener('click',function(){
-    document.querySelectorAll('#reg button').forEach(function(x){x.classList.toggle('on',x===b);});reg=b.dataset.r;render();});});
-  var tg=document.getElementById('anual');
-  function flip(){anual=!anual;tg.classList.toggle('on',anual);tg.setAttribute('aria-checked',anual);render();}
-  tg.addEventListener('click',flip);tg.addEventListener('keydown',function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}});
-  render();
+  addEventListener('resize',onS);
+  loadShop('bl');onS();
 })();
 </script>
 </body>
